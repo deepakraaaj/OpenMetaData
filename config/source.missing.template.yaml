@@ -1,0 +1,15 @@
+sources:
+  - name: fill_me_in
+    description: Add business context once the source is confirmed.
+    connection:
+      type: mysql
+      host:
+      port:
+      database:
+      username:
+      password:
+      unix_socket:
+      options: {}
+    notes:
+      - Only fill values that automatic discovery could not infer safely.
+

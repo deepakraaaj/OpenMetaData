@@ -1,0 +1,19 @@
+source:
+  type: {{ source_type }}
+  serviceName: {{ service_name }}
+  serviceConnection:
+    config:
+{% for key, value in service_connection.items() %}
+      {{ key }}: {{ value }}
+{% endfor %}
+  sourceConfig:
+    config:
+      type: DatabaseMetadata
+      markDeletedTables: false
+sink:
+  type: metadata-rest
+  config: {}
+workflowConfig:
+  openMetadataServerConfig:
+    hostPort: {{ openmetadata_host }}
+

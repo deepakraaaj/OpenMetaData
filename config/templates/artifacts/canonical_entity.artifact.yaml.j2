@@ -1,0 +1,14 @@
+entity_name: {{ entity_name }}
+description: {{ description }}
+mapped_source_tables:
+{% for item in mapped_source_tables %}
+  - {{ item }}
+{% endfor %}
+mapped_columns:
+{% for item in mapped_columns %}
+  - {{ item }}
+{% endfor %}
+confidence:
+  label: {{ confidence.label }}
+  score: {{ confidence.score }}
+

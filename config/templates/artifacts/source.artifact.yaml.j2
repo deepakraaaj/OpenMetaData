@@ -1,0 +1,17 @@
+source_name: {{ source_name }}
+db_type: {{ db_type }}
+domain: {{ domain }}
+description: {{ description }}
+key_entities:
+{% for item in key_entities %}
+  - {{ item }}
+{% endfor %}
+sensitive_areas:
+{% for item in sensitive_areas %}
+  - {{ item }}
+{% endfor %}
+approved_use_cases:
+{% for item in approved_use_cases %}
+  - {{ item }}
+{% endfor %}
+

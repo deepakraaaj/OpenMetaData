@@ -1,0 +1,31 @@
+question: {{ question }}
+domain: {{ domain }}
+matched_entities:
+{% for item in matched_entities %}
+  - {{ item }}
+{% endfor %}
+matched_tables:
+{% for item in matched_tables %}
+  - {{ item }}
+{% endfor %}
+matched_columns:
+{% for item in matched_columns %}
+  - {{ item }}
+{% endfor %}
+glossary_terms:
+{% for item in glossary_terms %}
+  - {{ item }}
+{% endfor %}
+safe_joins:
+{% for item in safe_joins %}
+  - {{ item }}
+{% endfor %}
+query_patterns:
+{% for item in query_patterns %}
+  - {{ item }}
+{% endfor %}
+notes_for_llm:
+{% for item in notes_for_llm %}
+  - {{ item }}
+{% endfor %}
+

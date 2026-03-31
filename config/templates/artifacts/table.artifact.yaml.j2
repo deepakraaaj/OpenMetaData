@@ -1,0 +1,28 @@
+table_name: {{ table_name }}
+business_meaning: {{ business_meaning }}
+grain: {{ grain }}
+likely_entity: {{ likely_entity }}
+important_columns:
+{% for item in important_columns %}
+  - {{ item }}
+{% endfor %}
+valid_joins:
+{% for item in valid_joins %}
+  - {{ item }}
+{% endfor %}
+common_filters:
+{% for item in common_filters %}
+  - {{ item }}
+{% endfor %}
+common_business_questions:
+{% for item in common_business_questions %}
+  - {{ item }}
+{% endfor %}
+sensitivity_notes:
+{% for item in sensitivity_notes %}
+  - {{ item }}
+{% endfor %}
+confidence:
+  label: {{ confidence.label }}
+  score: {{ confidence.score }}
+

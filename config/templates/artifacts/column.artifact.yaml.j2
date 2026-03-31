@@ -1,0 +1,18 @@
+column_name: {{ column_name }}
+technical_type: {{ technical_type }}
+business_meaning: {{ business_meaning }}
+example_values:
+{% for item in example_values %}
+  - {{ item }}
+{% endfor %}
+synonyms:
+{% for item in synonyms %}
+  - {{ item }}
+{% endfor %}
+filterable: {{ filterable }}
+displayable: {{ displayable }}
+sensitive: {{ sensitive }}
+confidence:
+  label: {{ confidence.label }}
+  score: {{ confidence.score }}
+

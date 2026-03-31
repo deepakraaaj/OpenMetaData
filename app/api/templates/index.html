@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Semantic Onboarding Review</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">OpenMetadata Semantic Onboarding</p>
+        <h1>Discovered Sources</h1>
+        <p class="lede">
+          Review the local databases we found automatically and open any onboarded source to inspect semantic guesses and follow-up questions.
+        </p>
+      </section>
+      <section class="card-grid">
+        {% for source in sources %}
+        <article class="card">
+          <h2>{{ source.name }}</h2>
+          <p>{{ source.connection.type.value }}{% if source.connection.database %} · {{ source.connection.database }}{% endif %}</p>
+          <p class="muted">{{ source.description or "Discovered local data source" }}</p>
+          <div class="actions">
+            <a href="/review/{{ source.name }}">Review</a>
+          </div>
+        </article>
+        {% else %}
+        <article class="card">
+          <h2>No sources yet</h2>
+          <p class="muted">Run <code>python -m app.discovery.scan</code> and <code>python -m app.onboard.run --all-discovered</code>.</p>
+        </article>
+        {% endfor %}
+      </section>
+    </main>
+  </body>
+</html>
+

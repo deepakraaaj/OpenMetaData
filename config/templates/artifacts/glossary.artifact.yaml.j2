@@ -1,0 +1,15 @@
+term: {{ term }}
+meaning: {{ meaning }}
+synonyms:
+{% for item in synonyms %}
+  - {{ item }}
+{% endfor %}
+related_tables:
+{% for item in related_tables %}
+  - {{ item }}
+{% endfor %}
+related_columns:
+{% for item in related_columns %}
+  - {{ item }}
+{% endfor %}
+

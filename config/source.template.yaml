@@ -1,0 +1,26 @@
+sources:
+  - name: example_mysql_source
+    description: Replace with a business-facing description of the source.
+    connection:
+      type: mysql
+      host: 127.0.0.1
+      port: 3306
+      database: example_db
+      username: root
+      password: change_me
+      options:
+        allowPublicKeyRetrieval: "true"
+        useSSL: "false"
+    tags:
+      - onboarding
+      - local
+    approved_use_cases:
+      - metadata_discovery
+      - semantic_onboarding
+      - chatbot_context
+  - name: example_sqlite_source
+    description: Replace with a local file-backed source.
+    connection:
+      type: sqlite
+      file_path: /absolute/path/to/example.sqlite3
+

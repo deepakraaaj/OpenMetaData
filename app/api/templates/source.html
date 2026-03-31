@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ semantic.source_name }} Review</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <a class="back" href="/">Back</a>
+      <section class="hero">
+        <p class="eyebrow">{{ semantic.db_type }} · {{ semantic.domain }}</p>
+        <h1>{{ semantic.source_name }}</h1>
+        <p class="lede">{{ semantic.description }}</p>
+      </section>
+      <section class="split">
+        <article class="card">
+          <h2>Key Entities</h2>
+          <ul>
+            {% for entity in semantic.key_entities %}
+            <li>{{ entity }}</li>
+            {% else %}
+            <li>No entity guesses yet.</li>
+            {% endfor %}
+          </ul>
+        </article>
+        <article class="card">
+          <h2>Questionnaire Gaps</h2>
+          <p>{{ questionnaire.questions|length }} focused questions generated</p>
+          <ul>
+            {% for question in questionnaire.questions[:8] %}
+            <li>{{ question.question }}</li>
+            {% else %}
+            <li>No open questions.</li>
+            {% endfor %}
+          </ul>
+        </article>
+      </section>
+      <section class="card">
+        <h2>Tables</h2>
+        <div class="table-list">
+          {% for table in semantic.tables[:20] %}
+          <div class="table-row">
+            <div>
+              <strong>{{ table.table_name }}</strong>
+              <p class="muted">{{ table.business_meaning }}</p>
+            </div>
+            <div class="pill">{{ table.confidence.label }} · {{ "%.2f"|format(table.confidence.score) }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
