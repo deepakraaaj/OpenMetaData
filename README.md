@@ -30,6 +30,23 @@ uv run uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8088
 - `output/<source_name>/questionnaire.json`
 - `output/<source_name>/artifacts/*.yaml`
 - `output/<source_name>/llm_context_package.json`
+- `output/<source_name>/tag_bundle/<domain>/`
+
+## Export For TAG
+
+Generate a copy-ready TAG overlay bundle from an onboarded source:
+
+```bash
+python -m app.artifacts.export_tag_bundle --source fits_dev_march_9 --domain maintenance
+```
+
+That creates:
+
+- `output/<source_name>/tag_bundle/<domain>/generated/capabilities.json`
+- `output/<source_name>/tag_bundle/<domain>/generated/domain_knowledge.json`
+- `output/<source_name>/tag_bundle/<domain>/review/manifest.tables.review.json`
+
+The first two files are the safe ones to copy into an existing TAG domain folder. The review manifest is intentionally separated so you do not accidentally overwrite manual TAG CRUD and table rules.
 
 ## Local OpenMetadata
 
@@ -42,4 +59,3 @@ See:
 - [`docs/openmetadata-integration.md`](/home/user/Desktop/OpenMetaData/docs/openmetadata-integration.md)
 - [`docs/questionnaire-design.md`](/home/user/Desktop/OpenMetaData/docs/questionnaire-design.md)
 - [`docs/artifact-format.md`](/home/user/Desktop/OpenMetaData/docs/artifact-format.md)
-

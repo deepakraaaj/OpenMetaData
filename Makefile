@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: install install-openmetadata discover onboard api test openmetadata-config
+.PHONY: install install-openmetadata discover onboard api test openmetadata-config tag-bundle
 
 install:
 	uv sync --extra dev
@@ -22,3 +22,6 @@ test:
 
 openmetadata-config:
 	$(PYTHON) -m app.openmetadata.sync --prepare-only
+
+tag-bundle:
+	$(PYTHON) -m app.artifacts.export_tag_bundle --source $(SOURCE) --domain $(DOMAIN)
