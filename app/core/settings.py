@@ -15,6 +15,19 @@ class Settings(BaseSettings):
     workspace_root: Path = Field(default=Path("."), alias="WORKSPACE_ROOT")
     config_dir: Path = Field(default=Path("./config"), alias="CONFIG_DIR")
     output_dir: Path = Field(default=Path("./output"), alias="OUTPUT_DIR")
+    tag_domains_dir: Path = Field(default=Path("../TAG-Implementation/app/domains"), alias="TAG_DOMAINS_DIR")
+    admin_ui_origins: str = Field(default="http://127.0.0.1:3000,http://localhost:3000", alias="ADMIN_UI_ORIGINS")
+    admin_ui_origin_regex: str = Field(
+        default=(
+            r"^https?://("
+            r"localhost|127\.0\.0\.1|0\.0\.0\.0|"
+            r"192\.168\.\d{1,3}\.\d{1,3}|"
+            r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+            r"172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}"
+            r")(:\d+)?$"
+        ),
+        alias="ADMIN_UI_ORIGIN_REGEX",
+    )
     app_metadata_database_url: str = Field(
         default="sqlite+pysqlite:///./output/app_metadata.db",
         alias="APP_METADATA_DATABASE_URL",
@@ -30,6 +43,10 @@ class Settings(BaseSettings):
     openmetadata_version: str = Field(default="1.12.0", alias="OPENMETADATA_VERSION")
     openmetadata_service_prefix: str = Field(default="local", alias="OPENMETADATA_SERVICE_PREFIX")
     openmetadata_enable_sync: bool = Field(default=False, alias="OPENMETADATA_ENABLE_SYNC")
+
+    llm_base_url: str = Field(default="http://192.168.15.112:8000/v1", alias="LLM_BASE_URL")
+    llm_model: str = Field(default="", alias="LLM_MODEL")
+    llm_api_key: str = Field(default="dummy", alias="LLM_API_KEY")
 
     discovery_scan_roots: str = Field(
         default="/home/user/Desktop,/home/user/Downloads,/home/user/Work",
@@ -64,6 +81,15 @@ class Settings(BaseSettings):
     @property
     def skip_dirs(self) -> set[str]:
         return {part.strip() for part in self.discovery_skip_dirs.split(",") if part.strip()}
+
+    @property
+    def admin_origins(self) -> list[str]:
+        return [part.strip() for part in self.admin_ui_origins.split(",") if part.strip()]
+
+    @property
+    def admin_origin_regex(self) -> str | None:
+        value = self.admin_ui_origin_regex.strip()
+        return value or None
 
 
 @lru_cache(maxsize=1)

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from datetime import datetime, timezone
 
+from app.artifacts.semantic_bundle import SEMANTIC_BUNDLE_DIRNAME, SEMANTIC_BUNDLE_FILES
 from app.models.normalized import NormalizedSource
 from app.models.questionnaire import QuestionnaireBundle
 from app.models.semantic import SemanticSourceModel
@@ -22,10 +24,38 @@ class WorkspaceRepository:
         write_json(self.config_dir / "discovered_sources.json", report)
         write_yaml(self.config_dir / "discovered_sources.yaml", report)
 
+    def upsert_discovered_source(self, source: DiscoveredSource) -> None:
+        try:
+            sources = self.load_discovered_sources()
+        except FileNotFoundError:
+            sources = []
+        merged: list[DiscoveredSource] = []
+        replaced = False
+        for existing in sources:
+            if existing.name == source.name:
+                merged.append(source)
+                replaced = True
+            else:
+                merged.append(existing)
+        if not replaced:
+            merged.append(source)
+        merged.sort(key=lambda item: item.name)
+        self.save_discovery_report(
+            DiscoveryReport(
+                generated_at=datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                roots_scanned=[],
+                discovered_sources=merged,
+                summary={"count": len(merged)},
+            )
+        )
+
     def load_discovered_sources(self) -> list[DiscoveredSource]:
         payload = read_json(self.config_dir / "discovered_sources.json")
         report = DiscoveryReport.model_validate(payload)
-        return report.discovered_sources
+        deduped: dict[str, DiscoveredSource] = {}
+        for source in report.discovered_sources:
+            deduped[source.name.lower()] = source
+        return sorted(deduped.values(), key=lambda item: item.name)
 
     def source_dir(self, source_name: str) -> Path:
         return source_output_dir(self.output_dir, source_name)
@@ -70,3 +100,33 @@ class WorkspaceRepository:
         payload = read_json(self.source_dir(source_name) / "questionnaire.json")
         return QuestionnaireBundle.model_validate(payload)
 
+    def semantic_bundle_dir(self, source_name: str) -> Path:
+        return self.source_dir(source_name) / SEMANTIC_BUNDLE_DIRNAME
+
+    def load_semantic_bundle(self, source_name: str) -> dict[str, dict]:
+        bundle_dir = self.semantic_bundle_dir(source_name)
+        payload: dict[str, dict] = {}
+        for filename in SEMANTIC_BUNDLE_FILES:
+            file_path = bundle_dir / filename
+            if file_path.exists():
+                content = read_json(file_path)
+                payload[filename] = dict(content) if isinstance(content, dict) else {}
+        if not payload:
+            raise FileNotFoundError(bundle_dir)
+        return payload
+
+    def load_semantic_bundle_file(self, source_name: str, filename: str) -> dict:
+        safe_name = str(filename or "").strip()
+        if safe_name not in SEMANTIC_BUNDLE_FILES:
+            raise FileNotFoundError(safe_name)
+        path = self.semantic_bundle_dir(source_name) / safe_name
+        payload = read_json(path)
+        return dict(payload) if isinstance(payload, dict) else {}
+
+    def save_semantic_bundle_file(self, source_name: str, filename: str, payload: dict) -> Path:
+        safe_name = str(filename or "").strip()
+        if safe_name not in SEMANTIC_BUNDLE_FILES:
+            raise FileNotFoundError(safe_name)
+        path = self.semantic_bundle_dir(source_name) / safe_name
+        write_json(path, payload)
+        return path

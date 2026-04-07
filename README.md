@@ -21,6 +21,8 @@ python -m app.onboard.run --all-discovered
 uv run uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8088
 ```
 
+If you open the admin UI from a LAN/dev origin like `http://192.168.x.x:3000`, add it to `ADMIN_UI_ORIGINS` in `.env`, or keep the default `ADMIN_UI_ORIGIN_REGEX` for private-network dev origins.
+
 ## Key outputs
 
 - `config/discovered_sources.json`
