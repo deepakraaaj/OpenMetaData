@@ -9,6 +9,10 @@ dist/
 build/
 *.egg-info/
 node_modules/
+.next/
+out/
+*.tsbuildinfo
+*.sqlite
 *.pyc
 *.pyo
 *.pyd
