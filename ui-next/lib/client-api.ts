@@ -1,6 +1,6 @@
 "use client";
 
-import type { UrlOnboardingResponse } from "./types";
+import type { KnowledgeState, UrlOnboardingResponse } from "./types";
 
 function normalizeBaseUrl(value: string | undefined, fallback = ""): string {
   return (value || fallback).replace(/\/$/, "");
@@ -45,3 +45,30 @@ export async function onboardFromUrl(payload: {
     body: JSON.stringify(payload),
   });
 }
+
+// Phase 4 Engine API
+export async function initializeEngine(sourceName: string): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/initialize`, {
+    method: "POST",
+  });
+}
+
+export async function getEngineState(sourceName: string): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/state`);
+}
+
+export async function getNextQuestion(sourceName: string): Promise<any> {
+  return fetchJson<any>(`/api/engine/${sourceName}/next-question`);
+}
+
+export async function submitAnswer(
+  sourceName: string,
+  gapId: string,
+  answer: string,
+): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/answer`, {
+    method: "POST",
+    body: JSON.stringify({ gap_id: gapId, answer }),
+  });
+}
+

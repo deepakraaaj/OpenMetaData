@@ -6,6 +6,7 @@ const defaultAttribution: SourceAttribution = {
 };
 
 export const MOCK_KNOWLEDGE_STATE: KnowledgeState = {
+  source_name: "demo_source",
   tables: {
     users: {
       table_name: "users",
@@ -82,6 +83,7 @@ export const MOCK_KNOWLEDGE_STATE: KnowledgeState = {
       description: "Database schema does not explicitly define a primary key for 'users'.",
       suggested_question: "Should I treat 'id' as the unique primary key for the users table?",
       is_blocking: true,
+      priority: 1,
     },
     {
       gap_id: "gap-orders-status",
@@ -91,6 +93,7 @@ export const MOCK_KNOWLEDGE_STATE: KnowledgeState = {
       description: "Found low-cardinality codes (0, 1, 2) in status column.",
       suggested_question: "Do these status codes map to Pending, Completed, and Cancelled?",
       is_blocking: false,
+      priority: 2,
     },
   ],
   readiness: {

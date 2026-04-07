@@ -63,6 +63,8 @@ export type GapCategory =
   | "unknown_business_meaning"
   | "unconfirmed_enum_mapping"
   | "potential_sensitivity"
+  | "glossary_term_missing"
+  | "relationship_role_unclear"
   | "other";
 
 export type SemanticGap = {
@@ -73,6 +75,7 @@ export type SemanticGap = {
   description: string;
   suggested_question?: string;
   is_blocking: boolean;
+  priority: number;
 };
 
 export type ReadinessState = {
@@ -84,8 +87,9 @@ export type ReadinessState = {
 };
 
 export type KnowledgeState = {
+  source_name: string;
   tables: Record<string, SemanticTable>;
-  canonical_entities: Record<string, unknown>; // Placeholder for Phase 2 implementation detail
+  canonical_entities: Record<string, unknown>;
   enums: Record<string, EnumMapping[]>;
   business_rules: unknown[];
   glossary: Record<string, unknown>;
@@ -94,7 +98,23 @@ export type KnowledgeState = {
   readiness: ReadinessState;
 };
 
-// Existing types for the Shell/Form (can be removed later if not needed)
+export type UrlOnboardingResponse = {
+  status: string;
+  source_name: string;
+  output_dir: string;
+  wizard_url: string;
+};
+
+export type GeneratedQuestion = {
+  gap_id: string;
+  question: string;
+  context: string;
+  evidence: string[];
+  input_type: string;
+  choices: string[];
+  suggested_answer?: string;
+};
+
 export type SourceSummary = {
   name: string;
   db_type?: string;
