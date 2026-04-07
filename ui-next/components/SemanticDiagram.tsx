@@ -162,40 +162,34 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
           <ForceGraph2D
             ref={fgRef}
             graphData={graphData}
-            nodeRelSize={2.5}
+            nodeRelSize={2}
+            nodeVal={node => (node as any).val}
+            nodeColor={node => highlightNodes.size && !highlightNodes.has(node.id as string) 
+              ? 'rgba(100,100,100,0.2)' 
+              : ((node as any).color as string)}
+            nodeCanvasObjectMode={() => "after"}
             nodeCanvasObject={(node: any, ctx, globalScale) => {
-              // 1. Draw the node circle
-              const size = node.val;
-              ctx.beginPath();
-              ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false);
-              
               const isHighlight = highlightNodes.has(node.id);
-              const isDimmed = highlightNodes.size > 0 && !isHighlight;
+              const isHovered = hoverNode && hoverNode.id === node.id;
               
-              ctx.fillStyle = isDimmed ? 'rgba(100,100,100,0.1)' : node.color;
-              ctx.fill();
-
-              // 2. Draw text label if it's part of the active cluster (or hovered)
-              const showText = isHighlight || (hoverNode && hoverNode.id === node.id);
-              
-              if (showText) {
+              if (isHighlight || isHovered) {
                 const label = node.name;
-                const fontSize = Math.max(12 / globalScale, 6);
+                const fontSize = Math.max(12 / globalScale, 4); // Scale text but keep it readable
+                const nodeSize = Math.sqrt(node.val) * 2; // Approximate visual radius
+                
                 ctx.font = `${fontSize}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 
-                // Add a slight text shadow/background for legibility
                 ctx.shadowColor = '#11111b';
                 ctx.shadowBlur = 4;
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = '#11111b';
-                ctx.strokeText(label, node.x, node.y + size + 2);
+                ctx.strokeText(label, node.x, node.y + nodeSize + 2);
                 
-                // Draw actual text
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = isDimmed ? 'rgba(255,255,255,0.4)' : 'rgba(255, 255, 255, 0.9)';
-                ctx.fillText(label, node.x, node.y + size + 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.fillText(label, node.x, node.y + nodeSize + 2);
               }
             }}
             linkColor={link => highlightLinks.has((link as any).id) ? 'rgba(255,255,255,0.8)' : '#313244'}
