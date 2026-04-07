@@ -163,7 +163,37 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
   return (
     <div className={isFullscreen ? "" : "card"} style={containerStyle}>
       <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface)' }}>
-        <span className="eyebrow" style={{ margin: 0 }}>Semantic Schema Brain</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <span className="eyebrow" style={{ margin: 0 }}>Semantic Schema Brain</span>
+          <select 
+            className="input" 
+            style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', width: '250px', background: 'var(--bg-surface-alt)', border: '1px solid var(--border)', color: 'var(--text)' }}
+            value={selectedTable?.table_name || ""}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (!val) {
+                handleBackgroundClick();
+              } else {
+                // Find node in physics simulation to zoom to it
+                const node = graphData.nodes.find((n: any) => n.id === val);
+                if (node) handleNodeClick(node);
+                else {
+                  // Fallback if node isn't mounted yet
+                  const table = state.tables[val];
+                  if (table) {
+                    setSelectedTable(table);
+                    updateHighlights(val);
+                  }
+                }
+              }
+            }}
+          >
+            <option value="">-- Find a table... --</option>
+            {Object.keys(state.tables || {}).sort().map(tableName => (
+              <option key={tableName} value={tableName}>{tableName}</option>
+            ))}
+          </select>
+        </div>
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           <span><span style={{ color: 'var(--success)' }}>●</span> High confidence</span>
           <span><span style={{ color: 'var(--warning)' }}>●</span> Medium</span>
