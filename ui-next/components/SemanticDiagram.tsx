@@ -1,98 +1,143 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { aiGroupTables } from "../lib/client-api";
+import { useEffect, useRef, useState } from "react";
+import mermaid from "mermaid";
 import { KnowledgeState } from "../lib/types";
 
-type TableGroups = Record<string, string[]>;
-
 export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
-  const [groups, setGroups] = useState<TableGroups | null>(null);
-  const [loading, setLoading] = useState(false);
-  const tables = Object.values(state.tables);
-  const sourceName = state.source_name;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [rendered, setRendered] = useState(false);
 
-  // Try AI grouping, fall back to prefix-based
   useEffect(() => {
-    if (!sourceName || tables.length === 0) return;
-    setLoading(true);
-    aiGroupTables(sourceName)
-      .then((res) => setGroups(res.groups))
-      .catch(() => setGroups(prefixGroup(state)))
-      .finally(() => setLoading(false));
-  }, [sourceName, tables.length]);
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        primaryColor: '#1e1e2e',
+        primaryBorderColor: '#313244',
+        lineColor: '#585b70',
+        textColor: '#cdd6f4',
+        fontSize: '14px',
+        fontFamily: 'Inter, sans-serif'
+      },
+      flowchart: {
+        curve: 'basis',
+        nodeSpacing: 50,
+        rankSpacing: 50,
+      }
+    });
+  }, []);
 
-  const displayGroups = groups || prefixGroup(state);
-  const sortedGroups = Object.entries(displayGroups).sort((a, b) => b[1].length - a[1].length);
+  useEffect(() => {
+    if (!containerRef.current || !state.tables) return;
 
-  // Confidence breakdown
-  const highConf = tables.filter(t => (t.confidence?.score ?? 0) >= 0.8).length;
-  const medConf = tables.filter(t => {
-    const s = t.confidence?.score ?? 0;
-    return s >= 0.55 && s < 0.8;
-  }).length;
-  const lowConf = tables.length - highConf - medConf;
+    // Build graph of top tables (to avoid complete mess)
+    const tables = Object.values(state.tables);
+    // Find tables with the most connections to act as the core visible graph
+    const connectionCounts: Record<string, number> = {};
+    const edges: Array<[string, string, string]> = []; // from, to, label
+
+    for (const table of tables) {
+      for (const join of table.valid_joins || []) {
+        const parts = join.split("=");
+        if (parts.length === 2) {
+          const left = parts[0].split(".")[0];
+          const right = parts[1].split(".")[0];
+          if (left && right && left !== right) {
+            connectionCounts[left] = (connectionCounts[left] || 0) + 1;
+            connectionCounts[right] = (connectionCounts[right] || 0) + 1;
+            edges.push([left, right, ""]);
+          }
+        }
+      }
+    }
+
+    // Take top 25 most connected tables
+    const topTables = Object.entries(connectionCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 25)
+      .map(entry => entry[0]);
+
+    // Only keep edges between top tables
+    const visibleEdges = edges.filter(e => topTables.includes(e[0]) && topTables.includes(e[1]));
+
+    let graphDefinition = "graph LR\n";
+
+    // Define nodes
+    for (const t of topTables) {
+      const dbTable = state.tables[t];
+      if (!dbTable) continue;
+      const conf = dbTable.confidence?.score ?? 0;
+      let styleClass = "classDef default fill:#11111b,stroke:#313244,color:#a6adc8,stroke-width:1px;";
+      let style = "default";
+
+      if (conf >= 0.8) {
+        style = "high";
+        graphDefinition += `classDef high fill:#11111b,stroke:#a6e3a1,color:#cdd6f4,stroke-width:2px;\n`;
+      } else if (conf >= 0.55) {
+        style = "med";
+        graphDefinition += `classDef med fill:#11111b,stroke:#f9e2af,color:#cdd6f4,stroke-width:2px;\n`;
+      } else {
+        style = "low";
+        graphDefinition += `classDef low fill:#11111b,stroke:#f38ba8,color:#cdd6f4,stroke-width:2px;\n`;
+      }
+
+      graphDefinition += `${t}["${t}"]:::${style}\n`;
+    }
+
+    // Define edges
+    const addedEdges = new Set<string>();
+    for (const [from, to] of visibleEdges) {
+      const edgeKey = [from, to].sort().join("-");
+      if (!addedEdges.has(edgeKey)) {
+        graphDefinition += `${from} --- ${to}\n`;
+        addedEdges.add(edgeKey);
+      }
+    }
+
+    // Render
+    containerRef.current.innerHTML = "";
+    mermaid.render("mermaid-erd", graphDefinition).then(({ svg }) => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = svg;
+        setRendered(true);
+      }
+    }).catch(err => {
+      console.error("Mermaid render error:", err);
+      if (containerRef.current) {
+        containerRef.current.innerHTML = `<div style="padding: 2rem; color: var(--danger)">Diagram render failed. Too many nodes.</div>`;
+      }
+    });
+
+  }, [state]);
 
   return (
-    <div className="card" style={{ padding: '2rem' }}>
-      {/* Confidence bar */}
-      <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', marginBottom: '1rem' }}>
-        {highConf > 0 && <div style={{ flex: highConf, background: 'var(--success)' }} />}
-        {medConf > 0 && <div style={{ flex: medConf, background: 'var(--warning)' }} />}
-        {lowConf > 0 && <div style={{ flex: lowConf, background: 'var(--danger)' }} />}
+    <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+      <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
+        <span className="eyebrow" style={{ margin: 0 }}>Core Entity Relationships (Top 25)</span>
+        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          <span><span style={{ color: 'var(--success)' }}>■</span> High confidence</span>
+          <span><span style={{ color: 'var(--warning)' }}>■</span> Medium</span>
+          <span><span style={{ color: 'var(--danger)' }}>■</span> Low — Needs Review</span>
+        </div>
       </div>
-      <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-        <span><span style={{ color: 'var(--success)' }}>●</span> {highConf} understood</span>
-        <span><span style={{ color: 'var(--warning)' }}>●</span> {medConf} guessed</span>
-        <span><span style={{ color: 'var(--danger)' }}>●</span> {lowConf} unclear</span>
-        {loading && <span style={{ marginLeft: 'auto', fontStyle: 'italic' }}>Grouping by relationships...</span>}
-        {groups && !loading && <span style={{ marginLeft: 'auto', color: 'var(--accent)' }}>⬡ Grouped by joins</span>}
-      </div>
-
-      {/* Domain groups */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
-        {sortedGroups.map(([domain, tableNames]) => {
-          const domainTables = tableNames.map(n => state.tables[n]).filter(Boolean);
-          const avg = domainTables.length > 0
-            ? domainTables.reduce((s, t) => s + (t.confidence?.score ?? 0), 0) / domainTables.length
-            : 0;
-          const color = avg >= 0.8 ? 'var(--success)' : avg >= 0.55 ? 'var(--warning)' : 'var(--danger)';
-          return (
-            <div
-              key={domain}
-              style={{
-                padding: '0.75rem 1rem',
-                background: 'var(--bg-surface-alt)',
-                borderLeft: `3px solid ${color}`,
-                borderRadius: '8px',
-              }}
-            >
-              <div style={{ fontWeight: 600, fontSize: '0.85rem', textTransform: 'capitalize' }}>{domain}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                {tableNames.length} table{tableNames.length > 1 ? 's' : ''}
-              </div>
-            </div>
-          );
-        })}
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          minHeight: '400px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--bg-surface-alt)',
+          padding: '2rem',
+          opacity: rendered ? 1 : 0,
+          transition: 'opacity 0.3s ease'
+        }}
+      >
+        {!rendered && <div className="spinner" />}
       </div>
     </div>
   );
-}
-
-function prefixGroup(state: KnowledgeState): TableGroups {
-  const groups: TableGroups = {};
-  for (const name of Object.keys(state.tables)) {
-    const parts = name.split("_");
-    const prefix = parts.length > 1 ? parts[0] : name;
-    if (!groups[prefix]) groups[prefix] = [];
-    groups[prefix].push(name);
-  }
-  const misc: string[] = [];
-  const merged: TableGroups = {};
-  for (const [prefix, tables] of Object.entries(groups)) {
-    if (tables.length < 2) misc.push(...tables);
-    else merged[prefix] = tables;
-  }
-  if (misc.length) merged["misc"] = misc;
-  return merged;
 }
