@@ -23,10 +23,30 @@ uv run uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8088
 
 If you open the admin UI from a LAN/dev origin like `http://192.168.x.x:3000`, add it to `ADMIN_UI_ORIGINS` in `.env`, or keep the default `ADMIN_UI_ORIGIN_REGEX` for private-network dev origins.
 
+## Phase 1 deterministic core only
+
+List DB presets from the sibling TAG runtime `.env` and run deterministic introspection only:
+
+```bash
+.venv/bin/python -m app.introspection.cli list-env --env-file ../TAG-Implementation/.env
+.venv/bin/python -m app.introspection.cli introspect-env VTS_DATABASE_URL --env-file ../TAG-Implementation/.env --source-name vts_phase1_demo --output-dir output/vts_phase1_demo
+```
+
+You can also call the API without running the full onboarding pipeline:
+
+- `GET /api/introspection/env/presets?env_file=...`
+- `POST /api/introspection/env`
+- `POST /api/introspection/url`
+
 ## Key outputs
 
 - `config/discovered_sources.json`
 - `output/<source_name>/technical_metadata.json`
+- `output/<source_name>/tables.json`
+- `output/<source_name>/columns.json`
+- `output/<source_name>/relationships.json`
+- `output/<source_name>/profiling.json`
+- `output/<source_name>/enum_candidates.json`
 - `output/<source_name>/normalized_metadata.json`
 - `output/<source_name>/semantic_model.json`
 - `output/<source_name>/questionnaire.json`

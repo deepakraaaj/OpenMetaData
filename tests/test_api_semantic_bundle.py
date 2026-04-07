@@ -158,6 +158,8 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
         names = set(archive.namelist())
         assert "semantic_bundle/schema_context.json" in names
         assert "technical_metadata.json" in names
+        assert "tables.json" in names
+        assert "relationships.json" in names
 
 
 def test_url_onboarding_rejects_empty_schema(tmp_path: Path, monkeypatch) -> None:

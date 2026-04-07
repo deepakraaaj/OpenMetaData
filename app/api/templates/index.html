@@ -12,27 +12,114 @@
         <p class="eyebrow">OpenMetadata Semantic Onboarding</p>
         <h1>Discovered Sources</h1>
         <p class="lede">
-          Review the local databases we found automatically and open any onboarded source to inspect semantic guesses and follow-up questions.
+          Paste a database URL to run Phase 1 deterministic introspection, then stay in the UI to inspect the schema snapshot before moving on to later onboarding phases.
         </p>
+      </section>
+      <section class="card form-card">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Phase 1</p>
+            <h2>Run Deterministic Introspection</h2>
+          </div>
+          <div class="pill">UI Only</div>
+        </div>
+        <form id="phase1-form" class="stack">
+          <div class="field-grid">
+            <label class="field field-wide">
+              <span>Database URL</span>
+              <input id="db_url" name="db_url" type="text" placeholder="mysql+aiomysql://root:password@127.0.0.1:3306/VTS?charset=utf8mb4" required />
+            </label>
+            <label class="field">
+              <span>Source Name</span>
+              <input id="source_name" name="source_name" type="text" placeholder="vts_phase1" />
+            </label>
+            <label class="field">
+              <span>Schema Name</span>
+              <input id="schema_name" name="schema_name" type="text" placeholder="optional" />
+            </label>
+            <label class="field field-wide">
+              <span>Allow Tables</span>
+              <input id="allow_tables" name="allow_tables" type="text" placeholder="optional, comma separated table names" />
+            </label>
+          </div>
+          <div class="actions">
+            <button id="phase1-submit" class="button" type="submit">Run Phase 1</button>
+          </div>
+          <p id="phase1-status" class="muted form-status">The URL stays in the current browser session and is sent only to the local API endpoint you trigger.</p>
+        </form>
       </section>
       <section class="card-grid">
         {% for source in sources %}
         <article class="card">
-          <h2>{{ source.name }}</h2>
-          <p>{{ source.connection.type.value }}{% if source.connection.database %} · {{ source.connection.database }}{% endif %}</p>
-          <p class="muted">{{ source.description or "Discovered local data source" }}</p>
+          <div class="card-heading">
+            <h2>{{ source.name }}</h2>
+            <div class="pill">{{ source.status }}</div>
+          </div>
+          <p>{{ source.db_type }}{% if source.database_name %} · {{ source.database_name }}{% endif %}</p>
+          <p class="muted">{{ source.description }}</p>
+          {% if source.table_count %}
+          <p class="muted">{{ source.table_count }} tables{% if source.column_count %} · {{ source.column_count }} columns{% endif %}</p>
+          {% endif %}
           <div class="actions">
-            <a href="/review/{{ source.name }}">Review</a>
+            {% if source.has_action %}
+            <a href="{{ source.action_href }}">{{ source.action_label }}</a>
+            {% else %}
+            <span class="muted">No artifacts yet</span>
+            {% endif %}
           </div>
         </article>
         {% else %}
         <article class="card">
           <h2>No sources yet</h2>
-          <p class="muted">Run <code>python -m app.discovery.scan</code> and <code>python -m app.onboard.run --all-discovered</code>.</p>
+          <p class="muted">Paste a DB URL above or run <code>python -m app.discovery.scan</code> and <code>python -m app.onboard.run --all-discovered</code>.</p>
         </article>
         {% endfor %}
       </section>
     </main>
+    <script>
+      const form = document.getElementById("phase1-form");
+      const status = document.getElementById("phase1-status");
+      const submitButton = document.getElementById("phase1-submit");
+
+      if (form && status && submitButton) {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          status.textContent = "Running deterministic introspection...";
+          status.className = "form-status";
+          submitButton.disabled = true;
+
+          const allowTablesRaw = document.getElementById("allow_tables").value || "";
+          const payload = {
+            db_url: document.getElementById("db_url").value.trim(),
+            source_name: document.getElementById("source_name").value.trim() || null,
+            schema_name: document.getElementById("schema_name").value.trim() || null,
+            allow_tables: allowTablesRaw
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item.length > 0),
+          };
+
+          try {
+            const response = await fetch("/api/introspection/url", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.detail || "Deterministic introspection failed.");
+            }
+            status.textContent = "Introspection complete. Opening technical snapshot...";
+            status.className = "form-status success";
+            window.location.href = `/technical/${encodeURIComponent(data.source_name)}`;
+          } catch (error) {
+            status.textContent = error.message || "Deterministic introspection failed.";
+            status.className = "form-status error";
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+      }
+    </script>
   </body>
 </html>
-

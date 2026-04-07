@@ -83,12 +83,28 @@ class DatabaseIntrospector:
         )
 
     def _schema_names(self, inspector: Any, source: DiscoveredSource) -> list[str | None]:
-        if source.connection.type == DatabaseType.sqlite:
+        connection = source.connection
+        if connection.type in {DatabaseType.sqlite, DatabaseType.duckdb}:
             return ["main"]
-        if source.connection.database:
-            return [source.connection.database]
-        names = [name for name in inspector.get_schema_names() if not name.startswith("information_schema")]
-        return names or [None]
+        if connection.schema_name:
+            return [connection.schema_name]
+
+        system_schemas = {
+            "information_schema",
+            "pg_catalog",
+            "pg_toast",
+            "mysql",
+            "performance_schema",
+            "sys",
+        }
+        names = [name for name in inspector.get_schema_names() if name and name not in system_schemas]
+        if connection.type == DatabaseType.mysql and connection.database:
+            return [connection.database]
+
+        default_schema = getattr(inspector, "default_schema_name", None)
+        if default_schema and default_schema in names:
+            return [default_schema]
+        return names or [default_schema or None]
 
     def _table_profile(
         self,

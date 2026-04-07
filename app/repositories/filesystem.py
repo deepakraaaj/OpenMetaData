@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 from app.artifacts.semantic_bundle import SEMANTIC_BUNDLE_DIRNAME, SEMANTIC_BUNDLE_FILES
+from app.introspection.serializer import IntrospectionSerializer
 from app.models.normalized import NormalizedSource
 from app.models.questionnaire import QuestionnaireBundle
 from app.models.semantic import SemanticSourceModel
@@ -64,6 +65,7 @@ class WorkspaceRepository:
         directory = self.source_dir(metadata.source_name)
         write_json(directory / "technical_metadata.json", metadata)
         write_yaml(directory / "technical_metadata.yaml", metadata)
+        IntrospectionSerializer(metadata, directory, include_bundle=False).serialize()
         return directory / "technical_metadata.json"
 
     def load_technical_metadata(self, source_name: str) -> SourceTechnicalMetadata:

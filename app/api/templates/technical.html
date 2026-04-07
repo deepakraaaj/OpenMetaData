@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ source_name }} Technical Snapshot</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <a class="back" href="/">Back</a>
+      <section class="hero">
+        <p class="eyebrow">Phase 1 Deterministic Core</p>
+        <h1>{{ source_name }}</h1>
+        <p class="lede">
+          {{ technical.db_type.value }}{% if technical.database_name %} · {{ technical.database_name }}{% endif %}
+          {% if source_record and source_record.description %}<br />{{ source_record.description }}{% endif %}
+        </p>
+      </section>
+
+      <section class="summary-grid">
+        <article class="card stat-card">
+          <p class="muted">Schemas</p>
+          <strong>{{ summary.schema_count }}</strong>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Tables</p>
+          <strong>{{ summary.table_count }}</strong>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Columns</p>
+          <strong>{{ summary.column_count }}</strong>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Relationships</p>
+          <strong>{{ summary.relationship_count }}</strong>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Enum Candidates</p>
+          <strong>{{ summary.enum_candidate_count }}</strong>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Sampled Tables</p>
+          <strong>{{ summary.tables_with_samples }}</strong>
+        </article>
+      </section>
+
+      <section class="split">
+        <article class="card">
+          <h2>Artifacts</h2>
+          <div class="file-list">
+            <a href="/api/sources/{{ source_name }}/json-zip">Download JSON Bundle</a>
+            {% if has_semantic %}
+            <a href="/review/{{ source_name }}">Open Semantic Review</a>
+            {% endif %}
+          </div>
+          <p class="muted">This page stays inside Phase 1 and shows only deterministic schema facts.</p>
+        </article>
+        <article class="card">
+          <h2>Connectivity</h2>
+          <p>{{ "Connected" if technical.connectivity_ok else "Connection failed" }}</p>
+          <ul>
+            {% for note in technical.connectivity_notes %}
+            <li>{{ note }}</li>
+            {% else %}
+            <li>No connectivity notes recorded.</li>
+            {% endfor %}
+          </ul>
+        </article>
+      </section>
+
+      <section class="card">
+        <h2>Tables</h2>
+        <div class="table-list">
+          {% for table in table_rows %}
+          <div class="table-row">
+            <div>
+              <strong>{{ table.schema_name }}.{{ table.table_name }}</strong>
+              <p class="muted">
+                PK: {{ table.primary_key }} ·
+                FK: {{ table.foreign_key_count }} ·
+                Candidate joins: {{ table.candidate_join_count }} ·
+                Enum candidates: {{ table.enum_candidate_count }}
+              </p>
+              <p class="muted">
+                Samples: {{ table.sample_column_count }}
+                {% if table.status_columns %} · Status: {{ table.status_columns|join(", ") }}{% endif %}
+                {% if table.timestamp_columns %} · Time: {{ table.timestamp_columns|join(", ") }}{% endif %}
+              </p>
+            </div>
+            <div class="pill">
+              {% if table.row_count is not none %}{{ table.row_count }} rows{% else %}rows unknown{% endif %}
+            </div>
+          </div>
+          {% else %}
+          <div class="table-row">
+            <div>
+              <strong>No tables found</strong>
+              <p class="muted">The deterministic core did not capture any tables for this source.</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
