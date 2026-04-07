@@ -116,3 +116,15 @@ def ai_resolve(source_name: str) -> JSONResponse:
         "remaining_gaps": len(state.unresolved_gaps),
         "readiness": state.readiness.model_dump(mode="json"),
     })
+
+@router.get("/{source_name}/export-llm-artifact")
+def export_llm_artifact(source_name: str) -> JSONResponse:
+    """Generates the optimized Chatbot context artifact."""
+    from app.engine.export_artifact import generate_llm_domain_artifact
+
+    state = engine.get_state(source_name)
+    if state is None:
+        raise HTTPException(status_code=404, detail=f"No engine state for '{source_name}'.")
+
+    artifact = generate_llm_domain_artifact(state)
+    return JSONResponse(artifact)

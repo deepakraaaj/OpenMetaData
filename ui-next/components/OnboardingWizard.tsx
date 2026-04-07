@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { initializeEngine, getEngineState, getNextQuestion, submitAnswer } from "../lib/client-api";
+import { initializeEngine, getEngineState, getNextQuestion, submitAnswer, openMetadataClientApiBaseUrl } from "../lib/client-api";
 import { MOCK_KNOWLEDGE_STATE } from "../lib/mock-data";
 import type { KnowledgeState, GeneratedQuestion } from "../lib/types";
 import KnowledgePanel from "./KnowledgePanel";
 import Chatbot from "./Chatbot";
 import SemanticDiagram from "./SemanticDiagram";
+import DomainSummary from "./DomainSummary";
 import EnumReviewGrid from "./EnumReviewGrid";
 
 type Screen = "connect" | "overview" | "workspace" | "enums" | "final";
@@ -181,6 +182,7 @@ function ConnectScreen({ onNext, sourceName, mode, error }: { onNext: () => void
 
 function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string; onStateUpdate: (s: KnowledgeState) => void }) {
   const [resolving, setResolving] = useState(false);
+  const [activeTab, setActiveTab] = useState<'domains' | 'graph'>('domains');
   const [resolveResult, setResolveResult] = useState<{ resolved: number; remaining: number } | null>(null);
 
   const tableCount = Object.keys(state.tables).length;
@@ -204,23 +206,46 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate }: { on
   };
 
   return (
-    <div className="stack" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ marginBottom: '0.5rem' }}>
-          {sourceName} — {tableCount} tables, {totalCols} columns
-        </h2>
-        <p className="hint">
-          {gapCount > 0
-            ? `The system understood most of the schema but needs your input on ${gapCount} items.`
-            : 'Everything looks good. The schema is fully understood.'}
-        </p>
+    <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <h2 style={{ marginBottom: '0.5rem' }}>
+            {sourceName} — {tableCount} tables, {totalCols} columns
+          </h2>
+          <p className="hint" style={{ margin: 0 }}>
+            {gapCount > 0
+              ? `The system understood most of the schema but needs your input on ${gapCount} items.`
+              : 'Everything looks good. The schema is fully understood.'}
+          </p>
+        </div>
+        
+        <div style={{ display: 'flex', background: 'var(--bg-surface)', padding: '0.25rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
+          <button 
+            className={`btn ${activeTab === 'domains' ? 'btn-primary' : 'btn-ghost'}`} 
+            style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+            onClick={() => setActiveTab('domains')}
+          >
+            Business Domains
+          </button>
+          <button 
+            className={`btn ${activeTab === 'graph' ? 'btn-primary' : 'btn-ghost'}`} 
+            style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+            onClick={() => setActiveTab('graph')}
+          >
+            Technical Brain Map
+          </button>
+        </div>
       </div>
 
-      <SemanticDiagram state={state} />
+      {activeTab === 'domains' ? (
+        <DomainSummary state={state} />
+      ) : (
+        <SemanticDiagram state={state} />
+      )}
 
       {/* AI resolve bar */}
       {gapCount > 0 && mode === 'live' && (
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem', padding: '1rem 1.5rem' }}>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', padding: '1rem 1.5rem' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
               {resolveResult
@@ -362,15 +387,21 @@ function FinalReviewScreen({ state, sourceName }: { state: KnowledgeState; sourc
             <div>  ├── knowledge_state.json</div>
             <div>  ├── tables.json</div>
             <div>  ├── enums.json</div>
-            <div>  └── readiness.json</div>
+            <div style={{ fontWeight: 'bold', color: 'var(--success)' }}>  └── .domain.json (LLM Artifact)</div>
           </div>
-          <a href={`/api/sources/${sourceName}/json-zip`} className="btn btn-outline" style={{ marginTop: '1rem', width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}>
-            Download ZIP
+          <a 
+            href={`${openMetadataClientApiBaseUrl()}/api/engine/${sourceName}/export-llm-artifact`} 
+            download={`${sourceName}.domain.json`}
+            target="_blank"
+            className="btn btn-primary" 
+            style={{ marginTop: '1rem', width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}
+          >
+            Download LLM Context Artifact (.domain.json)
           </a>
         </div>
       </div>
 
-      <button className="btn btn-primary" style={{ marginTop: '2rem', padding: '1rem 3rem' }} disabled={!state.readiness.is_ready}>
+      <button className="btn btn-outline" style={{ marginTop: '2rem', padding: '1rem 3rem' }} disabled={!state.readiness.is_ready}>
         Publish to TAG Domain
       </button>
     </div>
