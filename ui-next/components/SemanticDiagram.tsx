@@ -130,21 +130,30 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
       <div
         style={{
           width: '100%',
-          minHeight: '400px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height: '500px',
           background: 'var(--bg-surface-alt)',
-          padding: '2rem',
           opacity: rendered ? 1 : 0,
-          transition: 'opacity 0.3s ease'
+          transition: 'opacity 0.3s ease',
+          position: 'relative',
         }}
       >
         {!rendered ? (
-          <div className="spinner" />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="spinner" />
+          </div>
         ) : (
-          <div dangerouslySetInnerHTML={{ __html: svgContent }} />
+          <div 
+            style={{ width: '100%', height: '100%', overflow: 'auto', padding: '2rem' }}
+            dangerouslySetInnerHTML={{ __html: svgContent }} 
+          />
         )}
+        <style dangerouslySetInnerHTML={{ __html: `
+          .card svg {
+            max-width: none !important;
+            height: auto !important;
+            min-width: 800px;
+          }
+        `}} />
       </div>
     </div>
   );
