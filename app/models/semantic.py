@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from app.models.common import NamedConfidence, SensitivityLabel
+from app.models.source_attribution import SourceAttribution
 
 
 class SemanticColumn(BaseModel):
@@ -15,6 +16,7 @@ class SemanticColumn(BaseModel):
     displayable: bool = True
     sensitive: SensitivityLabel = SensitivityLabel.none
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
 
 
 class SemanticTable(BaseModel):
@@ -28,6 +30,7 @@ class SemanticTable(BaseModel):
     common_business_questions: list[str] = Field(default_factory=list)
     sensitivity_notes: list[str] = Field(default_factory=list)
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
     columns: list[SemanticColumn] = Field(default_factory=list)
 
 
@@ -37,6 +40,7 @@ class CanonicalEntity(BaseModel):
     mapped_source_tables: list[str] = Field(default_factory=list)
     mapped_columns: list[str] = Field(default_factory=list)
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
 
 
 class GlossaryTerm(BaseModel):
@@ -45,6 +49,7 @@ class GlossaryTerm(BaseModel):
     synonyms: list[str] = Field(default_factory=list)
     related_tables: list[str] = Field(default_factory=list)
     related_columns: list[str] = Field(default_factory=list)
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
 
 
 class QueryPattern(BaseModel):
@@ -55,6 +60,21 @@ class QueryPattern(BaseModel):
     safe_filters: list[str] = Field(default_factory=list)
     optional_sql_template: str | None = None
     rendering_guidance: str | None = None
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
+
+class EnumMapping(BaseModel):
+    database_value: str
+    business_label: str
+    description: str | None = None
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
+
+class BusinessRule(BaseModel):
+    rule_name: str
+    description: str
+    enforcement_level: str = "warning"
+    related_tables: list[str] = Field(default_factory=list)
+    related_columns: list[str] = Field(default_factory=list)
+    attribution: SourceAttribution = Field(default_factory=SourceAttribution)
 
 
 class SemanticSourceModel(BaseModel):
