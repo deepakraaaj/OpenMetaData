@@ -142,6 +142,15 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
   const medConf = tables.filter(t => { const s = t.confidence?.score ?? 0; return s >= 0.55 && s < 0.8; }).length;
   const lowConf = tables.length - highConf - medConf;
 
+  // Fix the physics simulation to heavily repel nodes (preventing clumping) and extend links
+  useEffect(() => {
+    if (fgRef.current && dimensions.width > 0) {
+      fgRef.current.d3Force('charge').strength(-300); // Strong repulsion
+      fgRef.current.d3Force('link').distance(80);     // Longer edges
+      fgRef.current.d3ReheatSimulation();
+    }
+  }, [dimensions.width, graphData]);
+
   // Viewport classes based on fullscreen state
   const containerClass = isFullscreen 
     ? "fixed inset-0 z-50 bg-[#11111b] flex flex-col" 
@@ -187,12 +196,14 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
                 : ((node as any).color as string)}
               nodeCanvasObjectMode={() => "after"}
               nodeCanvasObject={(node: any, ctx, globalScale) => {
-                const isHighlight = highlightNodes.has(node.id);
+                // To avoid incredible screen clutter, we ONLY draw text for the node currently 
+                // under the mouse hover, OR the explicitly clicked/selected table.
                 const isHovered = hoverNode && hoverNode.id === node.id;
+                const isSelected = selectedTable && selectedTable.table_name === node.id;
                 
-                if (isHighlight || isHovered) {
+                if (isHovered || isSelected) {
                   const label = node.name;
-                  const fontSize = Math.max(12 / globalScale, 4); // Scale text but keep it readable
+                  const fontSize = Math.max(12 / globalScale, 5); // Scale text but keep it readable
                   const nodeSize = Math.sqrt(node.val) * 2; // Approximate visual radius
                   
                   ctx.font = `${fontSize}px Inter, sans-serif`;
@@ -200,14 +211,14 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
                   ctx.textBaseline = 'top';
                   
                   ctx.shadowColor = '#11111b';
-                  ctx.shadowBlur = 4;
-                  ctx.lineWidth = 2;
+                  ctx.shadowBlur = 6;
+                  ctx.lineWidth = 3;
                   ctx.strokeStyle = '#11111b';
-                  ctx.strokeText(label, node.x, node.y + nodeSize + 2);
+                  ctx.strokeText(label, node.x, node.y + nodeSize + 4);
                   
                   ctx.shadowBlur = 0;
-                  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                  ctx.fillText(label, node.x, node.y + nodeSize + 2);
+                  ctx.fillStyle = isSelected ? '#a6e3a1' : 'rgba(255, 255, 255, 0.9)';
+                  ctx.fillText(label, node.x, node.y + nodeSize + 4);
                 }
               }}
               linkColor={link => highlightLinks.has((link as any).id) ? 'rgba(255,255,255,0.8)' : '#313244'}
