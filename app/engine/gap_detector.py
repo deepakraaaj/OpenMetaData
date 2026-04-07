@@ -62,6 +62,11 @@ class GapDetector:
             for col in table.columns:
                 if not col.is_status_like and not col.enum_values:
                     continue
+                # Skip FK/PK/ID columns — they're references, not enums
+                if col.is_foreign_key or col.is_primary_key:
+                    continue
+                if col.column_name.endswith("_id") or col.column_name == "id":
+                    continue
                 col_key = f"{table.table_name}.{col.column_name}"
                 confirmed_enums = state.enums.get(col_key, [])
                 if any(e.attribution.source == DiscoverySource.CONFIRMED_BY_USER for e in confirmed_enums):
