@@ -142,14 +142,7 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
   const medConf = tables.filter(t => { const s = t.confidence?.score ?? 0; return s >= 0.55 && s < 0.8; }).length;
   const lowConf = tables.length - highConf - medConf;
 
-  // Fix the physics simulation to heavily repel nodes (preventing clumping) and extend links
-  useEffect(() => {
-    if (fgRef.current && dimensions.width > 0) {
-      fgRef.current.d3Force('charge').strength(-300); // Strong repulsion
-      fgRef.current.d3Force('link').distance(80);     // Longer edges
-      fgRef.current.d3ReheatSimulation();
-    }
-  }, [dimensions.width, graphData]);
+  // Physics simulation has default forces that are typically well-balanced.
 
   // Viewport classes based on fullscreen state
   const containerClass = isFullscreen 
