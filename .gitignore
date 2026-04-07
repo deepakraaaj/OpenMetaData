@@ -18,3 +18,5 @@ output/*
 config/discovered_sources*.json
 config/discovered_sources*.yaml
 .DS_Store
+.env
+.env.example    
