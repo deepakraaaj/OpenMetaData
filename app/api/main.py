@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from app.api.semantic_bundle_questions import build_semantic_bundle_questions
+from app.api.engine_routes import router as engine_router
 from app.artifacts.semantic_bundle import SEMANTIC_BUNDLE_FILES, SemanticBundleExporter
 from app.core.settings import get_settings
 from app.discovery.service import build_source_name, parse_connection_url
@@ -27,6 +28,7 @@ from app.repositories.filesystem import WorkspaceRepository
 settings = get_settings()
 repository = WorkspaceRepository(settings.config_dir, settings.output_dir)
 app = FastAPI(title="OpenMetadata Semantic Onboarding")
+app.include_router(engine_router)
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 app.add_middleware(

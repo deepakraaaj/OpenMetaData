@@ -9,7 +9,7 @@ from app.models.semantic import (
     GlossaryTerm,
     QueryPattern,
     EnumMapping,
-    BusinessRule
+    BusinessRule,
 )
 
 
@@ -19,6 +19,8 @@ class GapCategory(str, Enum):
     UNKNOWN_BUSINESS_MEANING = "unknown_business_meaning"
     UNCONFIRMED_ENUM_MAPPING = "unconfirmed_enum_mapping"
     POTENTIAL_SENSITIVITY = "potential_sensitivity"
+    GLOSSARY_TERM_MISSING = "glossary_term_missing"
+    RELATIONSHIP_ROLE_UNCLEAR = "relationship_role_unclear"
     OTHER = "other"
 
 
@@ -30,6 +32,7 @@ class SemanticGap(BaseModel):
     description: str
     suggested_question: str | None = None
     is_blocking: bool = False
+    priority: int = Field(default=3, ge=1, le=3)  # 1=blocking, 2=high, 3=nice-to-have
 
 
 class ReadinessState(BaseModel):
@@ -41,12 +44,14 @@ class ReadinessState(BaseModel):
 
 
 class KnowledgeState(BaseModel):
+    source_name: str = ""
     tables: dict[str, SemanticTable] = Field(default_factory=dict)
     canonical_entities: dict[str, CanonicalEntity] = Field(default_factory=dict)
-    enums: dict[str, EnumMapping] = Field(default_factory=dict)
+    enums: dict[str, list[EnumMapping]] = Field(default_factory=dict)
     business_rules: list[BusinessRule] = Field(default_factory=list)
     glossary: dict[str, GlossaryTerm] = Field(default_factory=dict)
     query_patterns: list[QueryPattern] = Field(default_factory=list)
-    
+
     unresolved_gaps: list[SemanticGap] = Field(default_factory=list)
     readiness: ReadinessState = Field(default_factory=ReadinessState)
+
