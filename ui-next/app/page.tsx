@@ -67,37 +67,23 @@ export default async function HomePage() {
     return (
       <main className="stack">
         <section className="hero">
-          <span className="eyebrow">OpenMetaData → TAG</span>
-          <h1>Onboarding UI is up, but the backend API is not reachable.</h1>
+          <span className="eyebrow">Phase 3 — Mock Mode Active</span>
+          <h1>Admin API is offline, but the UI shell is ready.</h1>
           <p>
-            The Next.js app is trying to load sources from the OpenMetaData API and could not reach
-            it. Start the API first, then refresh this page.
+            You are running in <strong>Mock Mode</strong>. You can explore the split-layout onboarding 
+            workspace and review the premium design system safely while the backend is disconnected.
           </p>
+          <div style={{ marginTop: '2rem' }}>
+            <Link href="/source/demo_source" className="btn btn-primary" style={{ padding: '1rem 3rem' }}>
+              Enter Mock Workspace
+            </Link>
+          </div>
         </section>
 
-        <StartOnboardingForm />
-
-        <section className="panel stack">
-          <div className="notice">
-            <strong>Expected API base URL</strong>
-            <div>
-              <code>{openMetadataServerApiBaseUrl()}</code>
-            </div>
-          </div>
-
-          <div className="notice">
-            <strong>Start the API</strong>
-            <div>
-              <code>cd /home/deepakrajb/Desktop/MD/OpenMetaData</code>
-            </div>
-            <div>
-              <code>uv run uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8088</code>
-            </div>
-          </div>
-
-          <div className="notice">
-            <strong>Current error</strong>
-            <div className="hint">{message}</div>
+        <section className="card-grid" style={{ opacity: 0.5, pointerEvents: 'none' }}>
+          <div className="card">
+            <h3>Backend API unreachable</h3>
+            <p className="hint">{message}</p>
           </div>
         </section>
       </main>
