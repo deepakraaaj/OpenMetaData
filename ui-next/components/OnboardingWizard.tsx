@@ -181,42 +181,28 @@ function ConnectScreen({ onNext, sourceName, mode, error }: { onNext: () => void
 
 function OverviewScreen({ onNext, state, sourceName, mode }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string }) {
   const tableCount = Object.keys(state.tables).length;
+  const totalCols = Object.values(state.tables).reduce((s, t) => s + t.columns.length, 0);
   const gapCount = state.unresolved_gaps.length;
-  const blockingCount = state.unresolved_gaps.filter(g => g.is_blocking).length;
 
   return (
-    <div className="stack" style={{ padding: '2rem' }}>
-      <div className="hero" style={{ padding: '2rem 0', textAlign: 'left', margin: 0 }}>
-        <span className="eyebrow">Step 2 — Schema Overview</span>
-        <h2>
-          {mode === 'live'
-            ? `Discovered ${tableCount} tables with ${gapCount} gaps in ${sourceName}.`
-            : `Showing ${tableCount} mock tables for ${sourceName}.`}
+    <div className="stack" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ marginBottom: '0.5rem' }}>
+          {sourceName} — {tableCount} tables, {totalCols} columns
         </h2>
-        {blockingCount > 0 && (
-          <p style={{ color: 'var(--warning)' }}>⚠️ {blockingCount} blocking gap(s) must be resolved before export.</p>
-        )}
+        <p className="hint">
+          {gapCount > 0
+            ? `The system understood most of the schema but needs your input on ${gapCount} items.`
+            : 'Everything looks good. The schema is fully understood.'}
+        </p>
       </div>
 
       <SemanticDiagram state={state} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '1.5rem' }}>
-        <div className="card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent)' }}>{tableCount}</div>
-          <div className="hint">Tables</div>
-        </div>
-        <div className="card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: gapCount > 0 ? 'var(--warning)' : 'var(--success)' }}>{gapCount}</div>
-          <div className="hint">Unresolved Gaps</div>
-        </div>
-        <div className="card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--success)' }}>{state.readiness.readiness_percentage}%</div>
-          <div className="hint">Readiness</div>
-        </div>
-      </div>
-
       <div className="button-row" style={{ marginTop: '2rem', justifyContent: 'flex-end' }}>
-        <button className="btn btn-primary" onClick={onNext}>Continue to Workspace</button>
+        <button className="btn btn-primary" onClick={onNext}>
+          {gapCount > 0 ? `Review ${gapCount} items →` : 'Continue →'}
+        </button>
       </div>
     </div>
   );

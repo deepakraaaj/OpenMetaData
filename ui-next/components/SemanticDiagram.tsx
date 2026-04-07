@@ -6,100 +6,78 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
   const tables = Object.values(state.tables);
   const totalColumns = tables.reduce((sum, t) => sum + t.columns.length, 0);
 
-  // Group tables by likely_entity or first word of table name
+  // Group by TABLE PREFIX (e.g., "event_log" → "event", "route_history" → "route")
   const groups: Record<string, typeof tables> = {};
   for (const table of tables) {
-    const group = table.likely_entity || table.table_name.split("_")[0] || "other";
-    if (!groups[group]) groups[group] = [];
-    groups[group].push(table);
+    const parts = table.table_name.split("_");
+    const prefix = parts.length > 1 ? parts[0] : table.table_name;
+    if (!groups[prefix]) groups[prefix] = [];
+    groups[prefix].push(table);
   }
 
-  const sortedGroups = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+  // Sort by size (biggest domains first) and merge tiny groups into "other"
+  const entries = Object.entries(groups);
+  const significant = entries.filter(([, t]) => t.length >= 2).sort((a, b) => b[1].length - a[1].length);
+  const singles = entries.filter(([, t]) => t.length < 2);
+  const otherCount = singles.reduce((sum, [, t]) => sum + t.length, 0);
+
+  // Confidence breakdown
+  const highConf = tables.filter(t => t.confidence?.score >= 0.8).length;
+  const medConf = tables.filter(t => t.confidence?.score >= 0.55 && t.confidence?.score < 0.8).length;
+  const lowConf = tables.length - highConf - medConf;
 
   return (
     <div className="card" style={{ padding: '2rem' }}>
-      <span className="eyebrow">Semantic Object Model</span>
-
-      {/* Summary stats */}
-      <div style={{ display: 'flex', gap: '2rem', margin: '1.5rem 0', flexWrap: 'wrap' }}>
-        <div>
-          <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent)' }}>{tables.length}</span>
-          <span className="hint" style={{ marginLeft: '0.5rem' }}>tables</span>
-        </div>
-        <div>
-          <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>{totalColumns}</span>
-          <span className="hint" style={{ marginLeft: '0.5rem' }}>columns</span>
-        </div>
-        <div>
-          <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>{sortedGroups.length}</span>
-          <span className="hint" style={{ marginLeft: '0.5rem' }}>entity groups</span>
-        </div>
+      {/* Clean confidence bar */}
+      <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', marginBottom: '1.5rem' }}>
+        {highConf > 0 && <div style={{ flex: highConf, background: 'var(--success)' }} title={`${highConf} high confidence`} />}
+        {medConf > 0 && <div style={{ flex: medConf, background: 'var(--warning)' }} title={`${medConf} medium confidence`} />}
+        {lowConf > 0 && <div style={{ flex: lowConf, background: 'var(--danger)' }} title={`${lowConf} low confidence`} />}
+      </div>
+      <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>
+        <span><span style={{ color: 'var(--success)' }}>●</span> {highConf} understood</span>
+        <span><span style={{ color: 'var(--warning)' }}>●</span> {medConf} guessed</span>
+        <span><span style={{ color: 'var(--danger)' }}>●</span> {lowConf} unclear</span>
       </div>
 
-      {/* Entity groups as a compact grid */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {sortedGroups.slice(0, 12).map(([group, groupTables]) => (
-          <div key={group}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-              <span style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: 'var(--accent)',
-              }}>
-                {group}
-              </span>
-              <span className="hint" style={{ fontSize: '0.75rem' }}>
-                {groupTables.length} table{groupTables.length > 1 ? 's' : ''}
-              </span>
-              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      {/* Domain groups as a clean grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+        {significant.map(([prefix, groupTables]) => {
+          const avgConf = groupTables.reduce((s, t) => s + (t.confidence?.score ?? 0), 0) / groupTables.length;
+          const color = avgConf >= 0.8 ? 'var(--success)' : avgConf >= 0.55 ? 'var(--warning)' : 'var(--danger)';
+          return (
+            <div
+              key={prefix}
+              style={{
+                padding: '1rem',
+                background: 'var(--bg-surface-alt)',
+                borderLeft: `3px solid ${color}`,
+                borderRadius: '8px',
+              }}
+            >
+              <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{prefix}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                {groupTables.length} table{groupTables.length > 1 ? 's' : ''} · {groupTables.reduce((s, t) => s + t.columns.length, 0)} cols
+              </div>
             </div>
+          );
+        })}
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {groupTables.map((table) => {
-                const conf = table.confidence?.score ?? 0;
-                const borderColor = conf >= 0.8 ? 'var(--success)' : conf >= 0.55 ? 'var(--warning)' : 'var(--danger)';
-                return (
-                  <div
-                    key={table.table_name}
-                    title={`${table.table_name}\n${table.business_meaning || 'No meaning yet'}\nConfidence: ${(conf * 100).toFixed(0)}%`}
-                    style={{
-                      padding: '0.4rem 0.75rem',
-                      background: 'var(--bg-surface-alt)',
-                      border: `1px solid ${borderColor}`,
-                      borderRadius: '6px',
-                      fontSize: '0.75rem',
-                      fontFamily: 'monospace',
-                      cursor: 'default',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    {table.table_name}
-                    <span style={{ marginLeft: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                      ({table.columns.length})
-                    </span>
-                  </div>
-                );
-              })}
+        {otherCount > 0 && (
+          <div
+            style={{
+              padding: '1rem',
+              background: 'var(--bg-surface-alt)',
+              borderLeft: '3px solid var(--border)',
+              borderRadius: '8px',
+            }}
+          >
+            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-muted)' }}>misc</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+              {otherCount} standalone table{otherCount > 1 ? 's' : ''}
             </div>
           </div>
-        ))}
-
-        {sortedGroups.length > 12 && (
-          <p className="hint" style={{ textAlign: 'center' }}>
-            + {sortedGroups.length - 12} more entity groups ({tables.length - sortedGroups.slice(0, 12).reduce((s, [, t]) => s + t.length, 0)} tables)
-          </p>
         )}
-      </div>
-
-      <div className="hint" style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem' }}>
-        <span style={{ color: 'var(--success)' }}>■</span> High confidence
-        {' · '}
-        <span style={{ color: 'var(--warning)' }}>■</span> Medium
-        {' · '}
-        <span style={{ color: 'var(--danger)' }}>■</span> Low — needs review
       </div>
     </div>
   );
