@@ -97,16 +97,26 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
     }
 
     // Render
-    containerRef.current.innerHTML = "";
-    mermaid.render("mermaid-erd", graphDefinition).then(({ svg }) => {
+    // Render
+    const id = `mermaid-erd-${Date.now()}`;
+    mermaid.render(id, graphDefinition).then(({ svg }) => {
       if (containerRef.current) {
-        containerRef.current.innerHTML = svg;
+        // Clear safely
+        while (containerRef.current.firstChild) {
+          containerRef.current.removeChild(containerRef.current.firstChild);
+        }
+        // Insert SVG safely
+        const div = document.createElement("div");
+        div.innerHTML = svg;
+        if (div.firstChild) {
+          containerRef.current.appendChild(div.firstChild);
+        }
         setRendered(true);
       }
     }).catch(err => {
       console.error("Mermaid render error:", err);
       if (containerRef.current) {
-        containerRef.current.innerHTML = `<div style="padding: 2rem; color: var(--danger)">Diagram render failed. Too many nodes.</div>`;
+        containerRef.current.innerHTML = `<div style="padding: 2rem; color: var(--danger)">Diagram render failed.</div>`;
       }
     });
 
