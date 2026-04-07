@@ -172,9 +172,9 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
         </div>
       </div>
 
-      <div style={{ width: '100%', height: isFullscreen ? '100%' : '600px', background: '#11111b', position: 'relative', display: 'flex', flex: 1 }}>
-        <div ref={containerRef} style={{ flex: 1, position: 'relative' }}>
-          {dimensions.width > 0 && (
+      <div style={{ width: '100%', height: isFullscreen ? '100%' : '600px', background: '#11111b', position: 'relative', display: 'flex' }}>
+        <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+          {dimensions.width > 0 && dimensions.height > 0 && (
             <ForceGraph2D
               ref={fgRef}
               width={dimensions.width}
