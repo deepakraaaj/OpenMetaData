@@ -1,84 +1,98 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { aiGroupTables } from "../lib/client-api";
 import { KnowledgeState } from "../lib/types";
 
+type TableGroups = Record<string, string[]>;
+
 export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
+  const [groups, setGroups] = useState<TableGroups | null>(null);
+  const [loading, setLoading] = useState(false);
   const tables = Object.values(state.tables);
-  const totalColumns = tables.reduce((sum, t) => sum + t.columns.length, 0);
+  const sourceName = state.source_name;
 
-  // Group by TABLE PREFIX (e.g., "event_log" → "event", "route_history" → "route")
-  const groups: Record<string, typeof tables> = {};
-  for (const table of tables) {
-    const parts = table.table_name.split("_");
-    const prefix = parts.length > 1 ? parts[0] : table.table_name;
-    if (!groups[prefix]) groups[prefix] = [];
-    groups[prefix].push(table);
-  }
+  // Try AI grouping, fall back to prefix-based
+  useEffect(() => {
+    if (!sourceName || tables.length === 0) return;
+    setLoading(true);
+    aiGroupTables(sourceName)
+      .then((res) => setGroups(res.groups))
+      .catch(() => setGroups(prefixGroup(state)))
+      .finally(() => setLoading(false));
+  }, [sourceName, tables.length]);
 
-  // Sort by size (biggest domains first) and merge tiny groups into "other"
-  const entries = Object.entries(groups);
-  const significant = entries.filter(([, t]) => t.length >= 2).sort((a, b) => b[1].length - a[1].length);
-  const singles = entries.filter(([, t]) => t.length < 2);
-  const otherCount = singles.reduce((sum, [, t]) => sum + t.length, 0);
+  const displayGroups = groups || prefixGroup(state);
+  const sortedGroups = Object.entries(displayGroups).sort((a, b) => b[1].length - a[1].length);
 
   // Confidence breakdown
-  const highConf = tables.filter(t => t.confidence?.score >= 0.8).length;
-  const medConf = tables.filter(t => t.confidence?.score >= 0.55 && t.confidence?.score < 0.8).length;
+  const highConf = tables.filter(t => (t.confidence?.score ?? 0) >= 0.8).length;
+  const medConf = tables.filter(t => {
+    const s = t.confidence?.score ?? 0;
+    return s >= 0.55 && s < 0.8;
+  }).length;
   const lowConf = tables.length - highConf - medConf;
 
   return (
     <div className="card" style={{ padding: '2rem' }}>
-      {/* Clean confidence bar */}
-      <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', marginBottom: '1.5rem' }}>
-        {highConf > 0 && <div style={{ flex: highConf, background: 'var(--success)' }} title={`${highConf} high confidence`} />}
-        {medConf > 0 && <div style={{ flex: medConf, background: 'var(--warning)' }} title={`${medConf} medium confidence`} />}
-        {lowConf > 0 && <div style={{ flex: lowConf, background: 'var(--danger)' }} title={`${lowConf} low confidence`} />}
+      {/* Confidence bar */}
+      <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', marginBottom: '1rem' }}>
+        {highConf > 0 && <div style={{ flex: highConf, background: 'var(--success)' }} />}
+        {medConf > 0 && <div style={{ flex: medConf, background: 'var(--warning)' }} />}
+        {lowConf > 0 && <div style={{ flex: lowConf, background: 'var(--danger)' }} />}
       </div>
-      <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
         <span><span style={{ color: 'var(--success)' }}>●</span> {highConf} understood</span>
         <span><span style={{ color: 'var(--warning)' }}>●</span> {medConf} guessed</span>
         <span><span style={{ color: 'var(--danger)' }}>●</span> {lowConf} unclear</span>
+        {loading && <span style={{ marginLeft: 'auto', fontStyle: 'italic' }}>AI grouping...</span>}
+        {groups && !loading && <span style={{ marginLeft: 'auto', color: 'var(--accent)' }}>✦ AI-grouped</span>}
       </div>
 
-      {/* Domain groups as a clean grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
-        {significant.map(([prefix, groupTables]) => {
-          const avgConf = groupTables.reduce((s, t) => s + (t.confidence?.score ?? 0), 0) / groupTables.length;
-          const color = avgConf >= 0.8 ? 'var(--success)' : avgConf >= 0.55 ? 'var(--warning)' : 'var(--danger)';
+      {/* Domain groups */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
+        {sortedGroups.map(([domain, tableNames]) => {
+          const domainTables = tableNames.map(n => state.tables[n]).filter(Boolean);
+          const avg = domainTables.length > 0
+            ? domainTables.reduce((s, t) => s + (t.confidence?.score ?? 0), 0) / domainTables.length
+            : 0;
+          const color = avg >= 0.8 ? 'var(--success)' : avg >= 0.55 ? 'var(--warning)' : 'var(--danger)';
           return (
             <div
-              key={prefix}
+              key={domain}
               style={{
-                padding: '1rem',
+                padding: '0.75rem 1rem',
                 background: 'var(--bg-surface-alt)',
                 borderLeft: `3px solid ${color}`,
                 borderRadius: '8px',
               }}
             >
-              <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{prefix}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                {groupTables.length} table{groupTables.length > 1 ? 's' : ''} · {groupTables.reduce((s, t) => s + t.columns.length, 0)} cols
+              <div style={{ fontWeight: 600, fontSize: '0.85rem', textTransform: 'capitalize' }}>{domain}</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                {tableNames.length} table{tableNames.length > 1 ? 's' : ''}
               </div>
             </div>
           );
         })}
-
-        {otherCount > 0 && (
-          <div
-            style={{
-              padding: '1rem',
-              background: 'var(--bg-surface-alt)',
-              borderLeft: '3px solid var(--border)',
-              borderRadius: '8px',
-            }}
-          >
-            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-muted)' }}>misc</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              {otherCount} standalone table{otherCount > 1 ? 's' : ''}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
+}
+
+function prefixGroup(state: KnowledgeState): TableGroups {
+  const groups: TableGroups = {};
+  for (const name of Object.keys(state.tables)) {
+    const parts = name.split("_");
+    const prefix = parts.length > 1 ? parts[0] : name;
+    if (!groups[prefix]) groups[prefix] = [];
+    groups[prefix].push(name);
+  }
+  const misc: string[] = [];
+  const merged: TableGroups = {};
+  for (const [prefix, tables] of Object.entries(groups)) {
+    if (tables.length < 2) misc.push(...tables);
+    else merged[prefix] = tables;
+  }
+  if (misc.length) merged["misc"] = misc;
+  return merged;
 }

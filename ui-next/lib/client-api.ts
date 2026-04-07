@@ -72,3 +72,15 @@ export async function submitAnswer(
   });
 }
 
+// AI-powered endpoints
+export async function aiGroupTables(sourceName: string): Promise<{ groups: Record<string, string[]> }> {
+  return fetchJson<{ groups: Record<string, string[]> }>(`/api/engine/${sourceName}/ai-group`);
+}
+
+export async function aiResolveGaps(sourceName: string): Promise<{
+  resolved_count: number;
+  remaining_gaps: number;
+  readiness: any;
+}> {
+  return fetchJson(`/api/engine/${sourceName}/ai-resolve`, { method: "POST" });
+}

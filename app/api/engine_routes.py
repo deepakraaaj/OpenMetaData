@@ -75,3 +75,44 @@ def submit_answer(source_name: str, request: AnswerRequest) -> JSONResponse:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return JSONResponse(state.model_dump(mode="json"))
+
+
+@router.get("/{source_name}/ai-group")
+def ai_group(source_name: str) -> JSONResponse:
+    """Use the LLM to group tables into logical business domains."""
+    from app.engine.ai_resolver import ai_group_tables
+
+    state = engine.get_state(source_name)
+    if state is None:
+        raise HTTPException(status_code=404, detail=f"No engine state for '{source_name}'.")
+    groups = ai_group_tables(state)
+    return JSONResponse({"source_name": source_name, "groups": groups})
+
+
+@router.post("/{source_name}/ai-resolve")
+def ai_resolve(source_name: str) -> JSONResponse:
+    """Use the LLM to auto-resolve obvious semantic gaps."""
+    from app.engine.ai_resolver import ai_resolve_gaps
+
+    state = engine.get_state(source_name)
+    if state is None:
+        raise HTTPException(status_code=404, detail=f"No engine state for '{source_name}'.")
+
+    gaps = state.unresolved_gaps
+    answers = ai_resolve_gaps(state, gaps)
+
+    # Apply each answer through the engine
+    resolved_count = 0
+    for gap_id, answer in answers.items():
+        try:
+            state = engine.submit_answer(source_name, gap_id, answer)
+            resolved_count += 1
+        except ValueError:
+            continue
+
+    return JSONResponse({
+        "source_name": source_name,
+        "resolved_count": resolved_count,
+        "remaining_gaps": len(state.unresolved_gaps),
+        "readiness": state.readiness.model_dump(mode="json"),
+    })

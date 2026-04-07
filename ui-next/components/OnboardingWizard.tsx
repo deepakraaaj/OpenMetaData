@@ -87,7 +87,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
       case "connect":
         return <ConnectScreen onNext={handleInitialize} sourceName={sourceName} mode={mode} error={error} />;
       case "overview":
-        return <OverviewScreen onNext={() => setScreen("workspace")} state={state} sourceName={sourceName} mode={mode} />;
+        return <OverviewScreen onNext={() => setScreen("workspace")} state={state} sourceName={sourceName} mode={mode} onStateUpdate={setState} />;
       case "workspace":
         return (
           <div className="workspace">
@@ -179,10 +179,29 @@ function ConnectScreen({ onNext, sourceName, mode, error }: { onNext: () => void
   );
 }
 
-function OverviewScreen({ onNext, state, sourceName, mode }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string }) {
+function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string; onStateUpdate: (s: KnowledgeState) => void }) {
+  const [resolving, setResolving] = useState(false);
+  const [resolveResult, setResolveResult] = useState<{ resolved: number; remaining: number } | null>(null);
+
   const tableCount = Object.keys(state.tables).length;
   const totalCols = Object.values(state.tables).reduce((s, t) => s + t.columns.length, 0);
   const gapCount = state.unresolved_gaps.length;
+
+  const handleAiResolve = async () => {
+    setResolving(true);
+    try {
+      const { aiResolveGaps, getEngineState } = await import("../lib/client-api");
+      const result = await aiResolveGaps(sourceName);
+      setResolveResult({ resolved: result.resolved_count, remaining: result.remaining_gaps });
+      // Reload state
+      const fresh = await getEngineState(sourceName);
+      onStateUpdate(fresh);
+    } catch (err) {
+      console.error("AI resolve failed:", err);
+    } finally {
+      setResolving(false);
+    }
+  };
 
   return (
     <div className="stack" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
@@ -199,7 +218,33 @@ function OverviewScreen({ onNext, state, sourceName, mode }: { onNext: () => voi
 
       <SemanticDiagram state={state} />
 
-      <div className="button-row" style={{ marginTop: '2rem', justifyContent: 'flex-end' }}>
+      {/* AI resolve bar */}
+      {gapCount > 0 && mode === 'live' && (
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem', padding: '1rem 1.5rem' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+              {resolveResult
+                ? `✦ AI resolved ${resolveResult.resolved} items — ${resolveResult.remaining} remaining`
+                : `✦ Let AI resolve the obvious ${gapCount} items`}
+            </div>
+            <div className="hint" style={{ fontSize: '0.75rem' }}>
+              {resolveResult
+                ? 'You can run it again or review the remaining items manually.'
+                : 'The LLM will answer business meanings, enum labels, and relationship confirmations.'}
+            </div>
+          </div>
+          <button
+            className="btn btn-outline"
+            onClick={handleAiResolve}
+            disabled={resolving}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            {resolving ? 'Resolving...' : resolveResult ? 'Run Again' : 'Auto-Resolve'}
+          </button>
+        </div>
+      )}
+
+      <div className="button-row" style={{ marginTop: '1.5rem', justifyContent: 'flex-end' }}>
         <button className="btn btn-primary" onClick={onNext}>
           {gapCount > 0 ? `Review ${gapCount} items →` : 'Continue →'}
         </button>
