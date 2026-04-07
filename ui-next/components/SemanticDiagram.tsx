@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import mermaid from "mermaid";
 import { KnowledgeState } from "../lib/types";
 
 export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [svgContent, setSvgContent] = useState<string>("");
   const [rendered, setRendered] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
   }, []);
 
   useEffect(() => {
-    if (!containerRef.current || !state.tables) return;
+    if (!state.tables) return;
 
     // Build graph of top tables (to avoid complete mess)
     const tables = Object.values(state.tables);
@@ -96,30 +96,25 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
       }
     }
 
-    // Render
-    // Render
+    // Render safely without mutating the DOM directly
+    let isMounted = true;
     const id = `mermaid-erd-${Date.now()}`;
     mermaid.render(id, graphDefinition).then(({ svg }) => {
-      if (containerRef.current) {
-        // Clear safely
-        while (containerRef.current.firstChild) {
-          containerRef.current.removeChild(containerRef.current.firstChild);
-        }
-        // Insert SVG safely
-        const div = document.createElement("div");
-        div.innerHTML = svg;
-        if (div.firstChild) {
-          containerRef.current.appendChild(div.firstChild);
-        }
+      if (isMounted) {
+        setSvgContent(svg);
         setRendered(true);
       }
     }).catch(err => {
       console.error("Mermaid render error:", err);
-      if (containerRef.current) {
-        containerRef.current.innerHTML = `<div style="padding: 2rem; color: var(--danger)">Diagram render failed.</div>`;
+      if (isMounted) {
+        setSvgContent(`<div style="padding: 2rem; color: var(--danger)">Diagram render failed.</div>`);
+        setRendered(true);
       }
     });
 
+    return () => {
+      isMounted = false;
+    };
   }, [state]);
 
   return (
@@ -133,7 +128,6 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
         </div>
       </div>
       <div
-        ref={containerRef}
         style={{
           width: '100%',
           minHeight: '400px',
@@ -146,7 +140,11 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
           transition: 'opacity 0.3s ease'
         }}
       >
-        {!rendered && <div className="spinner" />}
+        {!rendered ? (
+          <div className="spinner" />
+        ) : (
+          <div dangerouslySetInnerHTML={{ __html: svgContent }} />
+        )}
       </div>
     </div>
   );
