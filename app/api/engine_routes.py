@@ -79,13 +79,13 @@ def submit_answer(source_name: str, request: AnswerRequest) -> JSONResponse:
 
 @router.get("/{source_name}/ai-group")
 def ai_group(source_name: str) -> JSONResponse:
-    """Use the LLM to group tables into logical business domains."""
-    from app.engine.ai_resolver import ai_group_tables
+    """Group tables using the FK/join relationship graph (deterministic, no LLM)."""
+    from app.engine.ai_resolver import group_tables_by_relationships
 
     state = engine.get_state(source_name)
     if state is None:
         raise HTTPException(status_code=404, detail=f"No engine state for '{source_name}'.")
-    groups = ai_group_tables(state)
+    groups = group_tables_by_relationships(state)
     return JSONResponse({"source_name": source_name, "groups": groups})
 
 

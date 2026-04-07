@@ -45,8 +45,8 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
         <span><span style={{ color: 'var(--success)' }}>●</span> {highConf} understood</span>
         <span><span style={{ color: 'var(--warning)' }}>●</span> {medConf} guessed</span>
         <span><span style={{ color: 'var(--danger)' }}>●</span> {lowConf} unclear</span>
-        {loading && <span style={{ marginLeft: 'auto', fontStyle: 'italic' }}>AI grouping...</span>}
-        {groups && !loading && <span style={{ marginLeft: 'auto', color: 'var(--accent)' }}>✦ AI-grouped</span>}
+        {loading && <span style={{ marginLeft: 'auto', fontStyle: 'italic' }}>Grouping by relationships...</span>}
+        {groups && !loading && <span style={{ marginLeft: 'auto', color: 'var(--accent)' }}>⬡ Grouped by joins</span>}
       </div>
 
       {/* Domain groups */}
