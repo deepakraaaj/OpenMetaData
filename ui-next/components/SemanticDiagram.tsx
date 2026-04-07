@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { KnowledgeState, TableMetadata } from "../lib/types";
+import { KnowledgeState, SemanticTable } from "../lib/types";
 
 // Must dynamically import because it renders canvas and relies on 'window'
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -12,11 +12,26 @@ const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
 
 export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
   const fgRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [highlightNodes, setHighlightNodes] = useState(new Set<string>());
   const [highlightLinks, setHighlightLinks] = useState(new Set<string>());
   const [hoverNode, setHoverNode] = useState<any>(null);
-  const [selectedTable, setSelectedTable] = useState<TableMetadata | null>(null);
+  const [selectedTable, setSelectedTable] = useState<SemanticTable | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Resize observer to maintain canvas size sync with flex dimensions
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver(entries => {
+      if (entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        setDimensions({ width: Math.floor(width), height: Math.floor(height) });
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Compute graph data
   const graphData = useMemo(() => {
@@ -158,52 +173,56 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
       </div>
 
       <div style={{ width: '100%', height: isFullscreen ? '100%' : '600px', background: '#11111b', position: 'relative', display: 'flex', flex: 1 }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <ForceGraph2D
-            ref={fgRef}
-            graphData={graphData}
-            nodeRelSize={2}
-            nodeVal={node => (node as any).val}
-            nodeColor={node => highlightNodes.size && !highlightNodes.has(node.id as string) 
-              ? 'rgba(100,100,100,0.2)' 
-              : ((node as any).color as string)}
-            nodeCanvasObjectMode={() => "after"}
-            nodeCanvasObject={(node: any, ctx, globalScale) => {
-              const isHighlight = highlightNodes.has(node.id);
-              const isHovered = hoverNode && hoverNode.id === node.id;
-              
-              if (isHighlight || isHovered) {
-                const label = node.name;
-                const fontSize = Math.max(12 / globalScale, 4); // Scale text but keep it readable
-                const nodeSize = Math.sqrt(node.val) * 2; // Approximate visual radius
+        <div ref={containerRef} style={{ flex: 1, position: 'relative' }}>
+          {dimensions.width > 0 && (
+            <ForceGraph2D
+              ref={fgRef}
+              width={dimensions.width}
+              height={dimensions.height}
+              graphData={graphData}
+              nodeRelSize={2}
+              nodeVal={node => (node as any).val}
+              nodeColor={node => highlightNodes.size && !highlightNodes.has(node.id as string) 
+                ? 'rgba(100,100,100,0.2)' 
+                : ((node as any).color as string)}
+              nodeCanvasObjectMode={() => "after"}
+              nodeCanvasObject={(node: any, ctx, globalScale) => {
+                const isHighlight = highlightNodes.has(node.id);
+                const isHovered = hoverNode && hoverNode.id === node.id;
                 
-                ctx.font = `${fontSize}px Inter, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                
-                ctx.shadowColor = '#11111b';
-                ctx.shadowBlur = 4;
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = '#11111b';
-                ctx.strokeText(label, node.x, node.y + nodeSize + 2);
-                
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                ctx.fillText(label, node.x, node.y + nodeSize + 2);
-              }
-            }}
-            linkColor={link => highlightLinks.has((link as any).id) ? 'rgba(255,255,255,0.8)' : '#313244'}
-            linkWidth={link => highlightLinks.has((link as any).id) ? 2 : 1}
-            linkDirectionalParticles={4}
-            linkDirectionalParticleWidth={link => highlightLinks.has((link as any).id) ? 4 : 0}
-            onNodeHover={handleNodeHover}
-            onNodeClick={handleNodeClick}
-            onBackgroundClick={handleBackgroundClick}
-            backgroundColor="#11111b"
-            cooldownTicks={100}
-            enableZoomInteraction={true}
-            enablePanInteraction={true}
-          />
+                if (isHighlight || isHovered) {
+                  const label = node.name;
+                  const fontSize = Math.max(12 / globalScale, 4); // Scale text but keep it readable
+                  const nodeSize = Math.sqrt(node.val) * 2; // Approximate visual radius
+                  
+                  ctx.font = `${fontSize}px Inter, sans-serif`;
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'top';
+                  
+                  ctx.shadowColor = '#11111b';
+                  ctx.shadowBlur = 4;
+                  ctx.lineWidth = 2;
+                  ctx.strokeStyle = '#11111b';
+                  ctx.strokeText(label, node.x, node.y + nodeSize + 2);
+                  
+                  ctx.shadowBlur = 0;
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                  ctx.fillText(label, node.x, node.y + nodeSize + 2);
+                }
+              }}
+              linkColor={link => highlightLinks.has((link as any).id) ? 'rgba(255,255,255,0.8)' : '#313244'}
+              linkWidth={link => highlightLinks.has((link as any).id) ? 2 : 1}
+              linkDirectionalParticles={4}
+              linkDirectionalParticleWidth={link => highlightLinks.has((link as any).id) ? 4 : 0}
+              onNodeHover={handleNodeHover}
+              onNodeClick={handleNodeClick}
+              onBackgroundClick={handleBackgroundClick}
+              backgroundColor="#11111b"
+              cooldownTicks={100}
+              enableZoomInteraction={true}
+              enablePanInteraction={true}
+            />
+          )}
         </div>
         
         {/* Detail Panel: Makes data "meaningful" to user */}
@@ -222,7 +241,7 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
                 <button onClick={handleBackgroundClick} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
               </div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {selectedTable.description || "No description available."}
+                {selectedTable.business_meaning || "No description available."}
               </div>
               
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
@@ -253,14 +272,14 @@ export default function SemanticDiagram({ state }: { state: KnowledgeState }) {
 
               <h4 style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', margin: '1.5rem 0 1rem 0' }}>Schema Columns</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {selectedTable.columns.map((col, i) => (
+                {selectedTable.columns.map((col: any, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
                     <div>
                       <span style={{ color: 'var(--text)' }}>{col.column_name}</span>
                       {col.is_primary_key && <span style={{ marginLeft: '0.5rem', color: '#f9e2af', fontSize: '0.7rem' }}>PK</span>}
                       {col.is_foreign_key && <span style={{ marginLeft: '0.5rem', color: '#89b4fa', fontSize: '0.7rem' }}>FK</span>}
                     </div>
-                    <span style={{ color: 'var(--text-muted)' }}>{col.logical_type}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{col.technical_type || col.logical_type}</span>
                   </div>
                 ))}
               </div>
