@@ -105,6 +105,17 @@ export type UrlOnboardingResponse = {
   wizard_url: string;
 };
 
+export type BundleResponse = {
+  source_name: string;
+  bundle_dir: string;
+  files: Record<string, unknown>;
+};
+
+export type QuestionsResponse = {
+  source_name: string;
+  sections: Array<Record<string, unknown>>;
+};
+
 export type GeneratedQuestion = {
   gap_id: string;
   question: string;
@@ -112,6 +123,8 @@ export type GeneratedQuestion = {
   evidence: string[];
   input_type: string;
   choices: string[];
+  target_entity?: string;
+  target_property?: string;
   suggested_answer?: string;
 };
 

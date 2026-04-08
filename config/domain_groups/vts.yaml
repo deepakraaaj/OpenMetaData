@@ -1,0 +1,91 @@
+source_name: vts
+groups:
+  Vehicles & Devices:
+    - asset_category
+    - asset_device_mapping
+    - asset_type_master
+    - asset_use_case_cfg
+    - asset_use_case_device_cfg
+    - asset_use_case_mapping
+    - device_cfg_history
+    - device_command_master
+    - device_history
+    - device_removal_location_detail
+    - sim_info
+    - transporter_details
+    - vehicle
+    - vehicle_company_mapping
+  Trips & Dispatch:
+    - route
+    - trip
+    - trip_log
+    - trip_status_master
+    - trip_vts_mapping
+    - vehicle_trip_communication
+  Telemetry, Alerts & Exceptions:
+    - alert_cfg
+    - dms_exception
+    - dms_exception_mapping
+    - dms_transaction
+    - email_log
+    - entity_alert_flag_history
+    - entity_update_history
+    - event_alert_log
+    - event_alert_master
+    - event_log_position_detail
+    - sms_log
+    - sms_provider_master
+    - sms_template_master
+    - vehicle_communication
+    - vehicle_communication_issue
+    - vehicle_communication_issue_state_history
+    - vts_exception
+    - vts_exception_mapping
+    - vts_transaction
+  Support, Tickets & Inspections:
+    - call_log
+    - call_log_problem_identified
+    - call_log_problem_master
+    - call_log_problem_reported
+    - call_log_solution_master
+    - call_log_solution_provided
+    - inspection_question_master
+    - inspection_type_master
+    - inspection_type_question_mapping
+    - tickets_support
+    - tickets_support_status
+    - vehicle_inspection_image
+    - vehicle_inspection_question_response
+    - vehicle_inspection_response
+    - vehicle_inspection_response_image
+    - vehicle_locking_system_images
+  Products & Billing:
+    - product
+    - product_change_approval
+    - removal_category_master
+    - removal_category_product_type_mapping
+    - supported_product_cfg
+    - vehicle_billing_company_history
+    - vehicle_billing_company_product_mapping
+  Organizations & Access:
+    - api_key
+    - company
+    - contact_information
+    - role_master
+    - user
+    - user_location_mapping
+    - user_role
+  Locations & Geography:
+    - country
+    - country_state
+    - location
+    - location_additional_fence
+    - location_boundary
+    - location_company_mapping
+    - regional_office
+    - state_office
+  System & Admin:
+    - app_setting
+    - flyway_schema_history
+    - random_password_generator
+    - unhandled_log

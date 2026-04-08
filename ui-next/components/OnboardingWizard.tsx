@@ -9,6 +9,7 @@ import Chatbot from "./Chatbot";
 import SemanticDiagram from "./SemanticDiagram";
 import DomainSummary from "./DomainSummary";
 import EnumReviewGrid from "./EnumReviewGrid";
+import DomainAuditPanel from "./DomainAuditPanel";
 
 type Screen = "connect" | "overview" | "workspace" | "enums" | "final";
 type DataMode = "loading" | "live" | "mock";
@@ -19,18 +20,30 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
   const [mode, setMode] = useState<DataMode>("loading");
   const [error, setError] = useState<string>("");
   const [question, setQuestion] = useState<GeneratedQuestion | null>(null);
+  const [groups, setGroups] = useState<Record<string, string[]>>({});
+
+  const loadGroups = useCallback(async () => {
+    try {
+      const { aiGroupTables } = await import("../lib/client-api");
+      const g = await aiGroupTables(sourceName);
+      setGroups(g.groups);
+    } catch (err) {
+      console.error("Domain grouping failed:", err);
+    }
+  }, [sourceName]);
 
   const loadState = useCallback(async () => {
     try {
+      const { getEngineState } = await import("../lib/client-api");
       const engineState = await getEngineState(sourceName);
       setState(engineState);
       setMode("live");
       setError("");
+      void loadGroups();
     } catch {
-      // Engine not initialized yet — will initialize on "connect"
       setMode("mock");
     }
-  }, [sourceName]);
+  }, [loadGroups, sourceName]);
 
   // Try loading existing state on mount
   useEffect(() => {
@@ -40,15 +53,16 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
   const handleInitialize = async () => {
     setError("");
     try {
+      const { initializeEngine } = await import("../lib/client-api");
       const engineState = await initializeEngine(sourceName);
       setState(engineState);
       setMode("live");
       setScreen("overview");
+      void loadGroups();
     } catch (err) {
-      // Backend not running — fall through to mock
       setMode("mock");
       setScreen("overview");
-      setError(err instanceof Error ? err.message : "Could not reach engine API. Running in mock mode.");
+      setError(err instanceof Error ? err.message : "Could not reach engine API.");
     }
   };
 
@@ -88,7 +102,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
       case "connect":
         return <ConnectScreen onNext={handleInitialize} sourceName={sourceName} mode={mode} error={error} />;
       case "overview":
-        return <OverviewScreen onNext={() => setScreen("workspace")} state={state} sourceName={sourceName} mode={mode} onStateUpdate={setState} />;
+        return <OverviewScreen onNext={() => setScreen("workspace")} state={state} sourceName={sourceName} mode={mode} onStateUpdate={setState} groups={groups} />;
       case "workspace":
         return (
           <div className="workspace">
@@ -97,6 +111,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
               question={question}
               onSubmit={handleSubmitAnswer}
               mode={mode}
+              groups={groups}
             />
             <KnowledgePanel state={state} />
           </div>
@@ -104,7 +119,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
       case "enums":
         return <EnumReviewGrid state={state} />;
       case "final":
-        return <FinalReviewScreen state={state} sourceName={sourceName} />;
+        return <FinalReviewScreen state={state} sourceName={sourceName} onStateUpdate={setState} groups={groups} />;
     }
   };
 
@@ -180,7 +195,7 @@ function ConnectScreen({ onNext, sourceName, mode, error }: { onNext: () => void
   );
 }
 
-function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string; onStateUpdate: (s: KnowledgeState) => void }) {
+function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string; onStateUpdate: (s: KnowledgeState) => void, groups: Record<string, string[]> }) {
   const [resolving, setResolving] = useState(false);
   const [activeTab, setActiveTab] = useState<'domains' | 'graph'>('domains');
   const [resolveResult, setResolveResult] = useState<{ resolved: number; remaining: number } | null>(null);
@@ -238,7 +253,7 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate }: { on
       </div>
 
       {activeTab === 'domains' ? (
-        <DomainSummary state={state} />
+        <DomainSummary state={state} groups={groups} />
       ) : (
         <SemanticDiagram state={state} />
       )}
@@ -283,11 +298,13 @@ function ChatPanel({
   question,
   onSubmit,
   mode,
+  groups,
 }: {
   state: KnowledgeState;
   question: GeneratedQuestion | null;
   onSubmit: (gapId: string, answer: string) => void;
   mode: DataMode;
+  groups: Record<string, string[]>;
 }) {
   const [answer, setAnswer] = useState("");
 
@@ -305,6 +322,9 @@ function ChatPanel({
     );
   }
 
+  // Determine domain context
+  const domain = [...Object.entries(groups)].find(([_, tables]) => tables.includes(question.target_entity || ""))?.[0];
+
   const handleSubmit = () => {
     if (!answer.trim()) return;
     onSubmit(question.gap_id, answer);
@@ -314,9 +334,16 @@ function ChatPanel({
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
       <div>
-        <span className={`pill ${question.input_type === 'boolean' ? 'pill-warning' : ''}`} style={{ marginBottom: '0.75rem', display: 'inline-block' }}>
-          {question.gap_id}
-        </span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+          <span className={`pill ${question.input_type === 'boolean' ? 'pill-warning' : ''}`}>
+            {question.gap_id}
+          </span>
+          {domain && (
+            <span className="pill pill-success" style={{ textTransform: 'uppercase', fontSize: '0.7rem' }}>
+              Domain: {domain}
+            </span>
+          )}
+        </div>
         <h3 style={{ marginTop: '0.5rem' }}>{question.question}</h3>
         <p className="hint" style={{ marginTop: '0.5rem' }}>{question.context}</p>
       </div>
@@ -360,13 +387,22 @@ function ChatPanel({
   );
 }
 
-function FinalReviewScreen({ state, sourceName }: { state: KnowledgeState; sourceName: string }) {
+function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state: KnowledgeState; sourceName: string; onStateUpdate: (s: KnowledgeState) => void; groups: Record<string, string[]> }) {
   return (
-    <div className="hero" style={{ textAlign: 'left', maxWidth: '1000px' }}>
-      <span className="eyebrow">Step 5 — Final Review</span>
-      <h1>Review and Export Bundle.</h1>
+    <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <span className="eyebrow">Step 5 — Final Review</span>
+        <h1>Manual Domain Audit</h1>
+        <p className="hint">Review the AI-generated semantic mappings below. Confirm each table to reach 100% readiness for TAG deployment.</p>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '2rem' }}>
+      <DomainAuditPanel 
+        state={state} 
+        groups={groups} 
+        onStateUpdate={onStateUpdate} 
+      />
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '3rem' }}>
         <div className="card">
           <h3>Readiness</h3>
           <div style={{ width: '100%', height: 6, background: 'var(--bg-surface-alt)', borderRadius: 3, overflow: 'hidden', margin: '1rem 0' }}>
@@ -374,9 +410,13 @@ function FinalReviewScreen({ state, sourceName }: { state: KnowledgeState; sourc
           </div>
           <h2 style={{ color: 'var(--accent)' }}>{state.readiness.readiness_percentage}% Complete</h2>
           <div className="stack" style={{ marginTop: '1rem' }}>
-            {state.readiness.readiness_notes.map((note: string, i: number) => (
-              <p key={i} className="hint" style={{ color: 'var(--warning)' }}>⚠️ {note}</p>
-            ))}
+            {state.readiness.readiness_notes.length > 0 ? (
+              state.readiness.readiness_notes.map((note: string, i: number) => (
+                <p key={i} className="hint" style={{ color: 'var(--warning)', fontSize: '0.8rem' }}>⚠️ {note}</p>
+              ))
+            ) : (
+              <p className="hint" style={{ color: 'var(--success)' }}>✓ All semantic quality checks passed.</p>
+            )}
           </div>
         </div>
 
@@ -386,24 +426,29 @@ function FinalReviewScreen({ state, sourceName }: { state: KnowledgeState; sourc
             <div style={{ color: 'var(--accent)' }}>/{sourceName}/</div>
             <div>  ├── knowledge_state.json</div>
             <div>  ├── tables.json</div>
-            <div>  ├── enums.json</div>
-            <div style={{ fontWeight: 'bold', color: 'var(--success)' }}>  └── .domain.json (LLM Artifact)</div>
+            <div style={{ fontWeight: 'bold', color: 'var(--success)' }}>  └── {sourceName}.domain.json (LLM Artifact)</div>
           </div>
           <a 
             href={`${openMetadataClientApiBaseUrl()}/api/engine/${sourceName}/export-llm-artifact`} 
             download={`${sourceName}.domain.json`}
             target="_blank"
             className="btn btn-primary" 
-            style={{ marginTop: '1rem', width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}
+            style={{ marginTop: '1.5rem', width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}
           >
             Download LLM Context Artifact (.domain.json)
           </a>
         </div>
       </div>
 
-      <button className="btn btn-outline" style={{ marginTop: '2rem', padding: '1rem 3rem' }} disabled={!state.readiness.is_ready}>
-        Publish to TAG Domain
-      </button>
+      <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'center' }}>
+        <button 
+          className="btn btn-outline" 
+          style={{ padding: '1rem 4rem', fontSize: '1.1rem' }} 
+          disabled={!state.readiness.is_ready}
+        >
+          {state.readiness.is_ready ? '🚀 Publish to TAG Domain' : 'Complete Audit to Publish'}
+        </button>
+      </div>
     </div>
   );
 }

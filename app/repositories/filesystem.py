@@ -21,6 +21,9 @@ class WorkspaceRepository:
         ensure_dir(self.config_dir)
         ensure_dir(self.output_dir)
 
+    def domain_groups_config_dir(self) -> Path:
+        return self.config_dir / "domain_groups"
+
     def save_discovery_report(self, report: DiscoveryReport) -> None:
         write_json(self.config_dir / "discovered_sources.json", report)
         write_yaml(self.config_dir / "discovered_sources.yaml", report)
@@ -101,6 +104,35 @@ class WorkspaceRepository:
     def load_questionnaire(self, source_name: str) -> QuestionnaireBundle:
         payload = read_json(self.source_dir(source_name) / "questionnaire.json")
         return QuestionnaireBundle.model_validate(payload)
+
+    def load_domain_groups(self, source_name: str) -> dict[str, list[str]]:
+        output_path = self.source_dir(source_name) / "domain_groups.json"
+        config_path = self.domain_groups_config_dir() / f"{source_name}.json"
+        if output_path.exists():
+            payload = read_json(output_path)
+        else:
+            payload = read_json(config_path)
+        groups = payload.get("groups") if isinstance(payload, dict) else payload
+        if not isinstance(groups, dict):
+            raise ValueError(f"Invalid domain groups payload for '{source_name}'.")
+
+        normalized: dict[str, list[str]] = {}
+        for label, tables in groups.items():
+            if not isinstance(label, str) or not isinstance(tables, list):
+                continue
+            members = [str(table).strip() for table in tables if str(table).strip()]
+            if members:
+                normalized[label] = members
+        if not normalized:
+            raise ValueError(f"Domain groups for '{source_name}' are empty.")
+        return normalized
+
+    def save_domain_groups(self, source_name: str, groups: dict[str, list[str]]) -> Path:
+        directory = self.source_dir(source_name)
+        payload = {"source_name": source_name, "groups": groups}
+        write_json(directory / "domain_groups.json", payload)
+        write_yaml(directory / "domain_groups.yaml", payload)
+        return directory / "domain_groups.json"
 
     def semantic_bundle_dir(self, source_name: str) -> Path:
         return self.source_dir(source_name) / SEMANTIC_BUNDLE_DIRNAME

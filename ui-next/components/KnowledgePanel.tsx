@@ -8,26 +8,47 @@ type Props = {
 
 export default function KnowledgePanel({ state }: Props) {
   const tables = Object.values(state.tables);
+  const confirmedTables = tables.filter(t => t.attribution.source === 'confirmed_by_user');
+  const confirmedPercentage = (confirmedTables.length / Math.max(tables.length, 1)) * 100;
 
   return (
     <div className="knowledge-panel">
-      <div className="panel-header">
+      <div className="panel-header" style={{ paddingBottom: '1.5rem' }}>
         <div className="stack">
           <h3>Knowledge Graph</h3>
-          <span className="hint">{tables.length} tables interpreted</span>
+          <span className="hint">{tables.length} tables in scope</span>
         </div>
-        <div className="progress-container" style={{ width: '100px', margin: 0 }}>
-          <div 
-            className="progress-bar" 
-            style={{ width: `${state.readiness.readiness_percentage}%` }}
-          ></div>
+        <div className="stack" style={{ alignItems: 'flex-end', gap: '0.25rem' }}>
+          <span className="eyebrow" style={{ fontSize: '0.65rem' }}>Readiness</span>
+          <div className="progress-container" style={{ width: '80px', margin: 0, height: '4px' }}>
+            <div 
+              className="progress-bar" 
+              style={{ width: `${state.readiness.readiness_percentage}%`, background: 'var(--accent)' }}
+            ></div>
+          </div>
         </div>
       </div>
 
       <div className="panel-content stack">
-        {tables.map((table) => (
-          <TableSummaryCard key={table.table_name} table={table} />
-        ))}
+        <div className="card" style={{ padding: '1rem', background: 'rgba(var(--success-rgb), 0.05)', border: '1px solid rgba(var(--success-rgb), 0.2)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Human Audit</span>
+            <span className="hint" style={{ fontSize: '0.8rem' }}>{confirmedTables.length}/{tables.length}</span>
+          </div>
+          <div className="progress-container" style={{ height: '6px' }}>
+            <div 
+              className="progress-bar" 
+              style={{ width: `${confirmedPercentage}%`, background: 'var(--success)' }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="stack" style={{ marginTop: '1rem' }}>
+          <span className="eyebrow">Entity Clusters</span>
+          {tables.map((table) => (
+            <TableSummaryCard key={table.table_name} table={table} />
+          ))}
+        </div>
 
         {state.unresolved_gaps.length > 0 && (
           <div className="stack" style={{ marginTop: '2rem' }}>

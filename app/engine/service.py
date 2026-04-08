@@ -112,3 +112,38 @@ class OnboardingEngine:
         # Persist
         self.state_manager.save(source_name, state)
         return state
+    def confirm_table(
+        self, source_name: str, table_name: str, reviewer: str | None = None
+    ) -> KnowledgeState:
+        """Mark a table and all its current column mappings as human-confirmed."""
+        state = self.state_manager.load(source_name)
+        if state is None:
+            raise ValueError(f"No knowledge state found for source '{source_name}'.")
+
+        if table_name not in state.tables:
+            raise ValueError(f"Table '{table_name}' not found in knowledge state.")
+
+        from datetime import datetime
+        from app.models.source_attribution import DiscoverySource
+
+        table = state.tables[table_name]
+        table.attribution.source = DiscoverySource.CONFIRMED_BY_USER
+        table.attribution.user = reviewer
+        table.attribution.timestamp = datetime.utcnow().isoformat()
+        table.confidence.score = 1.0
+        table.confidence.label = "high"
+
+        # Also confirm all columns currently in the model
+        for column in table.columns:
+            column.attribution.source = DiscoverySource.CONFIRMED_BY_USER
+            column.attribution.user = reviewer
+            column.attribution.timestamp = datetime.utcnow().isoformat()
+            column.confidence.score = 1.0
+            column.confidence.label = "high"
+
+        # Recompute readiness
+        state.readiness = self.readiness_computer.compute(state)
+
+        # Persist
+        self.state_manager.save(source_name, state)
+        return state

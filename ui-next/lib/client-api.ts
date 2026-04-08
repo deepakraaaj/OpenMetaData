@@ -34,6 +34,23 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+async function fetchJsonWithTimeout<T>(
+  path: string,
+  timeoutMs: number,
+  init?: RequestInit,
+): Promise<T> {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetchJson<T>(path, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 export async function onboardFromUrl(payload: {
   db_url: string;
   source_name?: string;
@@ -74,7 +91,10 @@ export async function submitAnswer(
 
 // AI-powered endpoints
 export async function aiGroupTables(sourceName: string): Promise<{ groups: Record<string, string[]> }> {
-  return fetchJson<{ groups: Record<string, string[]> }>(`/api/engine/${sourceName}/ai-group`);
+  return fetchJsonWithTimeout<{ groups: Record<string, string[]> }>(
+    `/api/engine/${sourceName}/ai-group`,
+    8000,
+  );
 }
 
 export async function aiResolveGaps(sourceName: string): Promise<{
@@ -83,4 +103,14 @@ export async function aiResolveGaps(sourceName: string): Promise<{
   readiness: any;
 }> {
   return fetchJson(`/api/engine/${sourceName}/ai-resolve`, { method: "POST" });
+}
+export async function confirmTable(
+  sourceName: string,
+  tableName: string,
+  reviewer?: string,
+): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/confirm-table`, {
+    method: "POST",
+    body: JSON.stringify({ table_name: tableName, reviewer }),
+  });
 }

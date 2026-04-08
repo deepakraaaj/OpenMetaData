@@ -79,14 +79,37 @@ def submit_answer(source_name: str, request: AnswerRequest) -> JSONResponse:
 
 @router.get("/{source_name}/ai-group")
 def ai_group(source_name: str) -> JSONResponse:
-    """Group tables using the FK/join relationship graph (deterministic, no LLM)."""
+    """Group tables using full schema structure plus LLM reasoning."""
     from app.engine.ai_resolver import group_tables_by_relationships
+
+    try:
+        cached_groups = repository.load_domain_groups(source_name)
+    except (FileNotFoundError, ValueError):
+        cached_groups = None
+
+    if cached_groups:
+        return JSONResponse({"source_name": source_name, "groups": cached_groups, "cached": True})
 
     state = engine.get_state(source_name)
     if state is None:
         raise HTTPException(status_code=404, detail=f"No engine state for '{source_name}'.")
-    groups = group_tables_by_relationships(state)
-    return JSONResponse({"source_name": source_name, "groups": groups})
+
+    try:
+        technical_metadata = repository.load_technical_metadata(source_name)
+    except FileNotFoundError:
+        technical_metadata = None
+
+    try:
+        semantic_model = repository.load_semantic_model(source_name)
+    except FileNotFoundError:
+        semantic_model = None
+
+    groups = group_tables_by_relationships(
+        state,
+        technical_metadata=technical_metadata,
+        semantic_model=semantic_model,
+    )
+    return JSONResponse({"source_name": source_name, "groups": groups, "cached": False})
 
 
 @router.post("/{source_name}/ai-resolve")
@@ -117,7 +140,23 @@ def ai_resolve(source_name: str) -> JSONResponse:
         "readiness": state.readiness.model_dump(mode="json"),
     })
 
+class ConfirmTableRequest(BaseModel):
+    table_name: str
+    reviewer: str | None = None
+
+
+@router.post("/{source_name}/confirm-table")
+def confirm_table(source_name: str, request: ConfirmTableRequest) -> JSONResponse:
+    """Manually confirm a table's semantic mappings."""
+    try:
+        state = engine.confirm_table(source_name, request.table_name, request.reviewer)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JSONResponse(state.model_dump(mode="json"))
+
+
 @router.get("/{source_name}/export-llm-artifact")
+
 def export_llm_artifact(source_name: str) -> JSONResponse:
     """Generates the optimized Chatbot context artifact."""
     from app.engine.export_artifact import generate_llm_domain_artifact

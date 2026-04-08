@@ -1,45 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { KnowledgeState, SemanticTable } from "../lib/types";
-import { aiGroupTables } from "../lib/client-api";
+import { KnowledgeState } from "../lib/types";
+import { formatDomainGroupLabel } from "../lib/domain-groups";
 
-export default function DomainSummary({ state }: { state: KnowledgeState }) {
-  const [groups, setGroups] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    async function fetchGroups() {
-      try {
-        const result = await aiGroupTables(state.source_name);
-        if (mounted) {
-          setGroups(result.groups);
-          setLoading(false);
-        }
-      } catch (err: any) {
-        if (mounted) {
-          setError(err.message || "Failed to load domains");
-          setLoading(false);
-        }
-      }
-    }
-    fetchGroups();
-    return () => { mounted = false; };
-  }, [state.source_name]);
-
-  if (loading) {
+export default function DomainSummary({ state, groups }: { state: KnowledgeState, groups: Record<string, string[]> }) {
+  if (!groups || Object.keys(groups).length === 0) {
     return (
       <div className="card" style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-        <div className="spinner" />
+        <p className="hint">Identifying domains...</p>
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="card" style={{ color: 'var(--danger)' }}>{error}</div>
     );
   }
 
@@ -63,7 +32,7 @@ export default function DomainSummary({ state }: { state: KnowledgeState }) {
           <div key={domain} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1rem', marginBottom: '1rem' }}>
               <h3 style={{ margin: 0, textTransform: 'capitalize', fontSize: '1.2rem', color: 'var(--text)' }}>
-                {domain === 'misc' ? 'Miscellaneous' : `${domain} Domain`}
+                {formatDomainGroupLabel(domain)}
               </h3>
               <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
                 <span>{counts.total} Tables</span>
