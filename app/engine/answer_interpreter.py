@@ -94,13 +94,29 @@ class AnswerInterpreter:
         table = state.tables.get(gap.target_entity or "")
         if not table:
             return
-        is_valid = answer.strip().lower() in {"yes", "true", "yes, this is valid", "1"}
-        if is_valid:
-            if gap.target_property and gap.target_property not in table.valid_joins:
-                table.valid_joins.append(gap.target_property)
-        else:
-            if gap.target_property and gap.target_property in table.valid_joins:
-                table.valid_joins.remove(gap.target_property)
+        normalized_answer = answer.strip()
+        choice_key = normalized_answer.lower()
+        candidate_joins = gap.metadata.get("candidate_joins") if isinstance(gap.metadata, dict) else None
+        if isinstance(candidate_joins, dict) and candidate_joins:
+            selected_join = None
+            for table_name, join in candidate_joins.items():
+                if str(table_name).strip().lower() == choice_key:
+                    selected_join = str(join)
+                    break
+            for join in candidate_joins.values():
+                join_value = str(join)
+                if join_value in table.valid_joins:
+                    table.valid_joins.remove(join_value)
+            if selected_join:
+                table.valid_joins.append(selected_join)
+                table.attribution = _user_attribution()
+                return
+
+        is_valid = choice_key in {"yes", "true", "yes, this is valid", "1"}
+        if is_valid and gap.target_property and gap.target_property not in table.valid_joins:
+            table.valid_joins.append(gap.target_property)
+        elif gap.target_property and gap.target_property in table.valid_joins:
+            table.valid_joins.remove(gap.target_property)
         table.attribution = _user_attribution()
 
     def _apply_sensitivity(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:

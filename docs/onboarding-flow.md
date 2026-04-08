@@ -46,12 +46,17 @@
    python -m app.artifacts.generate --source <source_name>
    ```
 
-8. Publish the reviewed semantic bundle into TAG and trigger runtime reindex:
+8. Open the generated chatbot package when you want one folder with the visual summary, reviewer questions, runtime context, semantic bundle, and TAG overlay:
+
+   - filesystem: `output/<source>/chatbot_package/visuals/overview.html`
+   - API/UI: `/chatbot/<source_name>`
+
+9. Publish the reviewed semantic bundle into TAG and trigger runtime reindex:
 
    - OpenMetaData publishes `output/<source>/semantic_bundle/` into `TAG-Implementation/app/domains/<domain>/semantic_bundle/`.
    - TAG can then reindex via `POST /api/v1/semantic/reindex?domain=<domain>`.
 
-9. Debug context assembly for a realistic business question:
+10. Debug context assembly for a realistic business question:
 
    ```bash
    python -m app.retrieval.debug --source <source_name> --question "How many active trips were completed this week?"

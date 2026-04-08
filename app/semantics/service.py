@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import re
 
+from app.core.inference_rules import SemanticInferenceRules, load_inference_rules
 from app.models.common import ConfidenceLabel, NamedConfidence, SensitivityLabel
 from app.models.normalized import NormalizedColumn, NormalizedSource, NormalizedTable
 from app.models.semantic import (
@@ -15,19 +17,14 @@ from app.models.semantic import (
 from app.utils.text import snake_to_words, tokenize, unique_non_empty
 
 
-DOMAIN_RULES = {
-    "maintenance": {"maintenance", "facility", "asset", "scheduler", "task", "technician"},
-    "fleet_operations": {"trip", "vehicle", "driver", "tracking", "lock", "econtroller", "dispatch"},
-    "inventory_supply_chain": {"purchase", "delivery", "vendor", "component", "stock", "assembly", "bom"},
-    "billing_finance": {"invoice", "billing", "currency", "tax", "bank"},
-    "platform_ops": {"user", "role", "privilege", "api", "notification", "session"},
-}
-
-
 class SemanticGuessService:
+    def __init__(self, rules: SemanticInferenceRules | None = None) -> None:
+        self.rules = rules or load_inference_rules()
+
     def enrich(self, normalized: NormalizedSource) -> SemanticSourceModel:
         domain, domain_confidence = self._guess_domain(normalized)
-        tables = [self._semantic_table(table) for table in normalized.tables]
+        actor_table = self._actor_table_name(normalized.tables)
+        tables = [self._semantic_table(table, actor_table) for table in normalized.tables]
         glossary = self._glossary_terms(domain, tables)
         canonical_entities = self._canonical_entities(tables)
         query_patterns = self._query_patterns(tables)
@@ -63,8 +60,9 @@ class SemanticGuessService:
         best_domain = "operations"
         best_score = 0.2
         reasons: list[str] = ["default operational domain"]
-        for domain, keywords in DOMAIN_RULES.items():
-            overlap = token_pool & keywords
+        for domain, keywords in self.rules.domain_rules.items():
+            keyword_set = set(keywords)
+            overlap = token_pool & keyword_set
             if not overlap:
                 continue
             score = 0.3 + 0.1 * len(overlap)
@@ -75,9 +73,9 @@ class SemanticGuessService:
 
         return best_domain, self._confidence(best_score, reasons)
 
-    def _semantic_table(self, table: NormalizedTable) -> SemanticTable:
+    def _semantic_table(self, table: NormalizedTable, actor_table: str | None = None) -> SemanticTable:
         meaning, confidence = self._table_meaning(table)
-        columns = [self._semantic_column(table, column) for column in table.columns]
+        columns = [self._semantic_column(table, column, actor_table) for column in table.columns]
         important_columns = unique_non_empty(
             [
                 *table.primary_key,
@@ -111,7 +109,12 @@ class SemanticGuessService:
             columns=columns,
         )
 
-    def _semantic_column(self, table: NormalizedTable, column: NormalizedColumn) -> SemanticColumn:
+    def _semantic_column(
+        self,
+        table: NormalizedTable,
+        column: NormalizedColumn,
+        actor_table: str | None = None,
+    ) -> SemanticColumn:
         meaning, confidence = self._column_meaning(table, column)
         sensitive = (
             SensitivityLabel.sensitive
@@ -129,6 +132,9 @@ class SemanticGuessService:
         )[:4]
         displayable = sensitive == SensitivityLabel.none
         filterable = not any(token in column.technical_type.lower() for token in ("blob", "text"))
+        actor_meaning = self._actor_reference_meaning(table, column, actor_table)
+        if actor_meaning is not None:
+            meaning, confidence = actor_meaning
         return SemanticColumn(
             column_name=column.column_name,
             technical_type=column.technical_type,
@@ -141,35 +147,113 @@ class SemanticGuessService:
             confidence=confidence,
         )
 
+    def _actor_table_name(self, tables: list[NormalizedTable]) -> str | None:
+        table_names = {table.table_name.lower(): table.table_name for table in tables}
+        actor_priority = self.rules.actor_table_priority
+        for candidate in actor_priority:
+            if candidate in table_names:
+                return table_names[candidate]
+        for table in tables:
+            lowered = table.table_name.lower()
+            if any(token in lowered for token in actor_priority):
+                return table.table_name
+        return None
+
+    def _actor_reference_meaning(
+        self,
+        table: NormalizedTable,
+        column: NormalizedColumn,
+        actor_table: str | None,
+    ) -> tuple[str, NamedConfidence] | None:
+        if not actor_table:
+            return None
+
+        column_name = str(column.column_name or "").strip().lower()
+        actor_label = snake_to_words(actor_table).lower()
+        entity_label = snake_to_words(table.table_name.rstrip("s"))
+
+        if column_name in self.rules.audit_actor_patterns:
+            action = self.rules.audit_actor_patterns[column_name]
+            return (
+                f"{actor_label.capitalize()} who {action} this {entity_label} record.",
+                self._confidence(
+                    0.94,
+                    [
+                        f"audit actor naming pattern: {column.column_name}",
+                        f"actor table '{actor_table}' exists in schema",
+                    ],
+                ),
+            )
+
+        direct_patterns = {
+            f"{actor_table.lower()}_id",
+            "user_id" if actor_table.lower() == "user" else "",
+        }
+        if column_name in direct_patterns or column_name.endswith("_user_id"):
+            return (
+                f"Reference to the {actor_label} associated with this {entity_label} record.",
+                self._confidence(
+                    0.92,
+                    [
+                        f"direct actor reference naming: {column.column_name}",
+                        f"actor table '{actor_table}' exists in schema",
+                    ],
+                ),
+            )
+
+        responsibility_roles = self.rules.actor_responsibility_roles
+        if responsibility_roles and re.fullmatch(
+            rf"({'|'.join(re.escape(role) for role in responsibility_roles)})_id",
+            column_name,
+        ):
+            return (
+                f"Reference to the {actor_label} responsible for this {entity_label} record.",
+                self._confidence(
+                    0.88,
+                    [
+                        f"actor-like identifier naming: {column.column_name}",
+                        f"actor table '{actor_table}' exists in schema",
+                    ],
+                ),
+            )
+        return None
+
     def _table_meaning(self, table: NormalizedTable) -> tuple[str, NamedConfidence]:
+        table_rules = self.rules.table_meaning
         reasons: list[str] = []
         score = 0.45
         name = table.table_name
-        if name.endswith("_mapping"):
+        inferred_directory_meaning = self._communication_directory_table_meaning(table)
+        if inferred_directory_meaning is not None:
+            return inferred_directory_meaning
+        mapping_suffix = self._matching_suffix(name, table_rules.mapping_suffixes)
+        if mapping_suffix:
             reasons.append("mapping suffix")
             score = 0.85
             return (
-                f"Relationship mapping records for {snake_to_words(name.replace('_mapping', ''))}.",
+                f"Relationship mapping records for {snake_to_words(self._trim_suffix(name, mapping_suffix))}.",
                 self._confidence(score, reasons),
             )
-        if name.endswith("_history") or name.endswith("_log"):
+        history_suffix = self._matching_suffix(name, table_rules.history_suffixes)
+        if history_suffix:
             reasons.append("history/log suffix")
             score = 0.85
             return (
-                f"Historical event records for {snake_to_words(name.replace('_history', '').replace('_log', ''))}.",
+                f"Historical event records for {snake_to_words(self._trim_suffix(name, history_suffix))}.",
                 self._confidence(score, reasons),
             )
-        if name.endswith("_detail") or name.endswith("_details"):
+        detail_suffix = self._matching_suffix(name, table_rules.detail_suffixes)
+        if detail_suffix:
             reasons.append("detail suffix")
             score = 0.7
             return (
-                f"Detailed records associated with {snake_to_words(name.replace('_details', '').replace('_detail', ''))}.",
+                f"Detailed records associated with {snake_to_words(self._trim_suffix(name, detail_suffix))}.",
                 self._confidence(score, reasons),
             )
         if table.row_count and table.row_count > 10_000:
             reasons.append("high row count suggests transactional or master usage")
             score += 0.15
-        if any(token in table.tokens for token in {"status", "state", "transaction"}):
+        if any(token in table.tokens for token in table_rules.lifecycle_tokens):
             reasons.append("name suggests process lifecycle")
             score += 0.1
         return (
@@ -177,7 +261,96 @@ class SemanticGuessService:
             self._confidence(min(score, 0.9), reasons or ["generic table naming"]),
         )
 
+    def _communication_directory_table_meaning(
+        self,
+        table: NormalizedTable,
+    ) -> tuple[str, NamedConfidence] | None:
+        rules = self.rules.communication_directory
+        name = table.table_name.lower()
+        support_columns = [
+            column.column_name
+            for column in table.columns
+            if any(token in column.column_name.lower() for token in rules.support_column_tokens)
+        ]
+        if len(support_columns) < rules.minimum_support_columns:
+            return None
+
+        structure_score = sum(1 for token in rules.structure_tokens if token in name)
+        related_entities = self._table_related_entities(table)
+        if (
+            structure_score == 0
+            and len(support_columns) < rules.minimum_support_columns_without_structure
+            and len(related_entities) < rules.minimum_related_entities_without_structure
+        ):
+            return None
+        entity_phrase = self._directory_entity_phrase(related_entities)
+        if support_columns and entity_phrase:
+            return (
+                f"Support and contact details maintained for {entity_phrase}.",
+                self._confidence(
+                    0.9,
+                    [
+                        "communication/support column pattern",
+                        f"support/contact columns: {', '.join(support_columns[:4])}",
+                        f"related entities: {', '.join(related_entities[:4])}" if related_entities else "related entities inferred from joins",
+                    ],
+                ),
+            )
+        return (
+            "Directory of operational contact details and support channels.",
+            self._confidence(
+                0.82,
+                [
+                    "communication/support column pattern",
+                    f"support/contact columns: {', '.join(support_columns[:4])}",
+                ],
+            ),
+        )
+
+    def _table_related_entities(self, table: NormalizedTable) -> list[str]:
+        related: list[str] = []
+        for join in table.join_candidates:
+            try:
+                left, right = join.split("=")
+            except ValueError:
+                continue
+            left_table = left.split(".")[0].strip()
+            right_table = right.split(".")[0].strip()
+            for table_name in (left_table, right_table):
+                if table_name and table_name != table.table_name and table_name not in related:
+                    related.append(table_name)
+        return related[:6]
+
+    def _directory_entity_phrase(self, related_entities: list[str]) -> str:
+        labels: list[str] = []
+        seen: set[str] = set()
+        for entity in related_entities:
+            lowered = entity.lower()
+            label = next(
+                (
+                    candidate_label
+                    for token, candidate_label in self.rules.communication_directory.related_entity_labels.items()
+                    if token in lowered
+                ),
+                None,
+            )
+            if not label:
+                continue
+            if label in seen:
+                continue
+            seen.add(label)
+            labels.append(label)
+
+        if not labels:
+            return ""
+        if len(labels) == 1:
+            return labels[0]
+        if len(labels) == 2:
+            return f"{labels[0]} and {labels[1]}"
+        return f"{', '.join(labels[:-1])}, and {labels[-1]}"
+
     def _column_meaning(self, table: NormalizedTable, column: NormalizedColumn) -> tuple[str, NamedConfidence]:
+        column_rules = self.rules.column_meaning
         name = column.column_name.lower()
         reasons: list[str] = []
         score = 0.45
@@ -193,17 +366,17 @@ class SemanticGuessService:
                 f"Reference to a related {snake_to_words(column.column_name.replace('_id', ''))}.",
                 self._confidence(score, reasons),
             )
-        if "status" in name or "state" in name:
+        if any(token in name for token in column_rules.status_tokens):
             return (
                 "Lifecycle or workflow status for the record.",
                 self._confidence(0.9, ["status/state naming"]),
             )
-        if "type" in name or "category" in name:
+        if any(token in name for token in column_rules.classification_tokens):
             return (
                 "Classification or category for the record.",
                 self._confidence(0.8, ["type/category naming"]),
             )
-        if "created" in name or "updated" in name or column.is_timestamp_like:
+        if any(token in name for token in column_rules.timestamp_tokens) or column.is_timestamp_like:
             return (
                 "Timestamp used for audit, freshness, or trend analysis.",
                 self._confidence(0.85, ["timestamp-like naming"]),
@@ -219,6 +392,17 @@ class SemanticGuessService:
             f"Business attribute for {snake_to_words(table.table_name)} related to {snake_to_words(column.column_name)}.",
             self._confidence(min(score, 0.8), reasons or ["generic naming"]),
         )
+
+    def _matching_suffix(self, value: str, suffixes: tuple[str, ...]) -> str | None:
+        for suffix in suffixes:
+            if suffix and value.endswith(suffix):
+                return suffix
+        return None
+
+    def _trim_suffix(self, value: str, suffix: str) -> str:
+        if suffix and value.endswith(suffix):
+            return value[: -len(suffix)]
+        return value
 
     def _business_questions(self, table: NormalizedTable) -> list[str]:
         singular = snake_to_words(table.table_name.rstrip("s"))
@@ -309,4 +493,3 @@ class SemanticGuessService:
         else:
             label = ConfidenceLabel.low
         return NamedConfidence(label=label, score=round(score, 2), rationale=reasons)
-

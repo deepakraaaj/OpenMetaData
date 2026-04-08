@@ -103,12 +103,41 @@ export type UrlOnboardingResponse = {
   source_name: string;
   output_dir: string;
   wizard_url: string;
+  chatbot_package_url?: string;
+  chatbot_package_download_url?: string;
 };
 
 export type BundleResponse = {
   source_name: string;
   bundle_dir: string;
   files: Record<string, unknown>;
+};
+
+export type ChatbotPackageManifest = {
+  package_type: string;
+  version: number;
+  generated_at: string;
+  source_name: string;
+  domain_name: string;
+  summary: {
+    db_type?: string;
+    database_name?: string;
+    table_count?: number;
+    key_entity_count?: number;
+    question_count?: number;
+    domain_group_count?: number;
+  };
+  entrypoints: Record<string, string>;
+  next_steps: string[];
+  inventory: string[];
+};
+
+export type ChatbotPackageResponse = {
+  source_name: string;
+  package_dir: string;
+  manifest: ChatbotPackageManifest;
+  overview_url: string;
+  download_url: string;
 };
 
 export type QuestionsResponse = {

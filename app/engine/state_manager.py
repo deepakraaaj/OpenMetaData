@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from app.models.normalized import NormalizedSource
@@ -11,6 +12,7 @@ from app.models.state import KnowledgeState
 
 
 STATE_FILENAME = "knowledge_state.json"
+logger = logging.getLogger(__name__)
 
 
 class StateManager:
@@ -29,13 +31,28 @@ class StateManager:
         path = self._state_path(source_name)
         if not path.exists():
             return None
-        raw = json.loads(path.read_text())
+        text = path.read_text()
+        try:
+            raw = json.loads(text)
+        except json.JSONDecodeError as exc:
+            decoder = json.JSONDecoder()
+            raw, index = decoder.raw_decode(text)
+            trailing = text[index:].strip()
+            if not trailing:
+                raise
+            logger.warning(
+                "Recovered knowledge state '%s' with trailing invalid JSON content: %s",
+                source_name,
+                trailing[:80],
+            )
         return KnowledgeState.model_validate(raw)
 
     def save(self, source_name: str, state: KnowledgeState) -> Path:
         path = self._state_path(source_name)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(state.model_dump_json(indent=2))
+        temp_path = path.with_suffix(f"{path.suffix}.tmp")
+        temp_path.write_text(state.model_dump_json(indent=2))
+        temp_path.replace(path)
         return path
 
     def initialize_from_semantic(

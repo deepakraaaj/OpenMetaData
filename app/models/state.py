@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Any
 from pydantic import BaseModel, Field
 
 from app.models.semantic import (
@@ -31,6 +32,7 @@ class SemanticGap(BaseModel):
     target_property: str | None = None
     description: str
     suggested_question: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
     is_blocking: bool = False
     priority: int = Field(default=3, ge=1, le=3)  # 1=blocking, 2=high, 3=nice-to-have
 
@@ -54,4 +56,3 @@ class KnowledgeState(BaseModel):
 
     unresolved_gaps: list[SemanticGap] = Field(default_factory=list)
     readiness: ReadinessState = Field(default_factory=ReadinessState)
-

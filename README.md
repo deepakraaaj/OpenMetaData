@@ -52,6 +52,7 @@ You can also call the API without running the full onboarding pipeline:
 - `output/<source_name>/questionnaire.json`
 - `output/<source_name>/artifacts/*.yaml`
 - `output/<source_name>/llm_context_package.json`
+- `output/<source_name>/chatbot_package/`
 - `output/<source_name>/tag_bundle/<domain>/`
 
 ## Export For TAG
@@ -69,6 +70,25 @@ That creates:
 - `output/<source_name>/tag_bundle/<domain>/review/manifest.tables.review.json`
 
 The first two files are the safe ones to copy into an existing TAG domain folder. The review manifest is intentionally separated so you do not accidentally overwrite manual TAG CRUD and table rules.
+
+## Export A Chatbot Package
+
+Generate a single review-and-runtime handoff folder for an onboarded source:
+
+```bash
+uv run python -m app.artifacts.export_chatbot_package --source vts
+```
+
+That creates `output/<source>/chatbot_package/` with:
+
+- `visuals/overview.html` for the business-facing summary
+- `questions/semantic_bundle_questions.json` for reviewer prompts
+- `runtime/llm_context_package.json` for LLM grounding
+- `semantic_bundle/` for TAG semantic publish
+- `tag_bundle/<domain>/` for TAG overlay merge
+- `reference/` for traceable raw onboarding outputs
+
+The same package is now generated automatically during `POST /api/onboarding/url` and OpenMetaData onboarding pipeline runs.
 
 ## Local OpenMetadata
 

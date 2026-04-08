@@ -1,6 +1,6 @@
 "use client";
 
-import type { KnowledgeState, UrlOnboardingResponse } from "./types";
+import type { ChatbotPackageResponse, KnowledgeState, UrlOnboardingResponse } from "./types";
 
 function normalizeBaseUrl(value: string | undefined, fallback = ""): string {
   return (value || fallback).replace(/\/$/, "");
@@ -61,6 +61,10 @@ export async function onboardFromUrl(payload: {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function loadChatbotPackage(sourceName: string): Promise<ChatbotPackageResponse> {
+  return fetchJson<ChatbotPackageResponse>(`/api/sources/${sourceName}/chatbot-package`);
 }
 
 // Phase 4 Engine API

@@ -7,22 +7,28 @@ import zipfile
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from app.api.semantic_bundle_questions import build_semantic_bundle_questions
 from app.api.engine_routes import router as engine_router
+from app.artifacts.chatbot_package import CHATBOT_PACKAGE_DIRNAME, ChatbotPackageExporter
 from app.artifacts.semantic_bundle import SEMANTIC_BUNDLE_FILES, SemanticBundleExporter
+from app.artifacts.tag_bundle import TagBundleExporter
 from app.core.settings import get_settings
 from app.discovery.service import build_source_name, parse_connection_url
 from app.introspection.env import list_database_url_presets, load_database_url_preset, resolve_env_file
 from app.introspection.service import IntrospectionService
+from app.models.artifacts import LLMContextPackage
 from app.models.common import DatabaseType
+from app.models.semantic import SemanticSourceModel
 from app.models.source import DiscoveredSource
 from app.onboard.pipeline import OnboardingPipeline, OnboardingPipelineError
 from app.repositories.filesystem import WorkspaceRepository
+from app.retrieval.service import RetrievalContextBuilder
+from app.utils.serialization import read_json
 
 
 settings = get_settings()
@@ -174,6 +180,7 @@ def technical_source(request: Request, source_name: str) -> HTMLResponse:
     summary["tables_with_timestamps"] = timestamp_table_count
 
     has_semantic = (repository.source_dir(source_name) / "semantic_model.json").exists()
+    has_chatbot_package = (repository.source_dir(source_name) / CHATBOT_PACKAGE_DIRNAME / "manifest.json").exists()
     return templates.TemplateResponse(
         request,
         "technical.html",
@@ -185,6 +192,7 @@ def technical_source(request: Request, source_name: str) -> HTMLResponse:
             "summary": summary,
             "table_rows": table_rows[:40],
             "has_semantic": has_semantic,
+            "has_chatbot_package": has_chatbot_package,
         },
     )
 
@@ -238,9 +246,12 @@ def onboard_from_db_url(request: UrlOnboardingRequest) -> JSONResponse:
             "source_name": source_name,
             "output_dir": str(output_dir),
             "bundle_dir": str(repository.semantic_bundle_dir(source_name)),
-            "wizard_url": f"/source/{source_name}",
+            "chatbot_package_dir": str(repository.source_dir(source_name) / CHATBOT_PACKAGE_DIRNAME),
+            "wizard_url": f"/review/{source_name}",
             "api_wizard_url": f"/api/sources/{source_name}/semantic-bundle/questions",
             "download_url": f"/api/sources/{source_name}/json-zip",
+            "chatbot_package_url": f"/chatbot/{source_name}",
+            "chatbot_package_download_url": f"/api/sources/{source_name}/chatbot-package/zip",
         }
     )
 
@@ -433,25 +444,62 @@ def publish_semantic_bundle(source_name: str, request: PublishBundleRequest) -> 
     )
 
 
+@app.get("/chatbot/{source_name}")
+def chatbot_package_overview(source_name: str) -> RedirectResponse:
+    package_dir = _rebuild_chatbot_package(source_name)
+    overview_path = package_dir / "visuals" / "overview.html"
+    if not overview_path.exists():
+        raise HTTPException(status_code=404, detail=f"Chatbot package overview for `{source_name}` is missing.")
+    return RedirectResponse(url=f"/chatbot-files/{source_name}/visuals/overview.html")
+
+
+@app.get("/chatbot-files/{source_name}/{file_path:path}")
+def chatbot_package_file(source_name: str, file_path: str) -> FileResponse:
+    package_dir = _rebuild_chatbot_package(source_name).resolve()
+    target_path = (package_dir / file_path).resolve()
+    try:
+        target_path.relative_to(package_dir)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail="Unknown package file.") from exc
+    if not target_path.exists() or not target_path.is_file():
+        raise HTTPException(status_code=404, detail="Unknown package file.")
+    return FileResponse(target_path)
+
+
+@app.get("/api/sources/{source_name}/chatbot-package")
+def get_chatbot_package(source_name: str) -> JSONResponse:
+    package_dir = _rebuild_chatbot_package(source_name)
+    manifest = read_json(package_dir / "manifest.json")
+    return JSONResponse(
+        {
+            "source_name": source_name,
+            "package_dir": str(package_dir),
+            "manifest": manifest,
+            "overview_url": f"/chatbot/{source_name}",
+            "download_url": f"/api/sources/{source_name}/chatbot-package/zip",
+        }
+    )
+
+
+@app.get("/api/sources/{source_name}/chatbot-package/zip")
+def download_chatbot_package_zip(source_name: str) -> StreamingResponse:
+    package_dir = _rebuild_chatbot_package(source_name)
+    return _stream_directory_zip(
+        directory=package_dir,
+        filename=f"{source_name}_chatbot_package.zip",
+    )
+
+
 @app.get("/api/sources/{source_name}/json-zip")
 def download_source_json_zip(source_name: str) -> StreamingResponse:
     source_dir = repository.source_dir(source_name)
     if not source_dir.exists():
         raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.")
 
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path in sorted(source_dir.rglob("*.json")):
-            if path.name.endswith(".zip"):
-                continue
-            archive.write(path, arcname=str(path.relative_to(source_dir)))
-    buffer.seek(0)
-
-    filename = f"{source_name}_json_bundle.zip"
-    return StreamingResponse(
-        buffer,
-        media_type="application/zip",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    return _stream_directory_zip(
+        directory=source_dir,
+        filename=f"{source_name}_json_bundle.zip",
+        only_json=True,
     )
 
 
@@ -473,6 +521,91 @@ def _rebuild_semantic_bundle(source_name: str) -> Path:
         questionnaire=questionnaire,
         source_output_dir=repository.source_dir(source_name),
         domain_name=semantic.domain,
+    )
+
+
+def _rebuild_chatbot_package(source_name: str) -> Path:
+    source_dir = repository.source_dir(source_name)
+    if not source_dir.exists():
+        raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.")
+
+    try:
+        semantic = repository.load_semantic_model(source_name)
+        technical = repository.load_technical_metadata(source_name)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.") from exc
+
+    questionnaire = None
+    questionnaire_path = source_dir / "questionnaire.json"
+    if questionnaire_path.exists():
+        questionnaire = repository.load_questionnaire(source_name)
+
+    semantic_bundle_dir = repository.semantic_bundle_dir(source_name)
+    if not semantic_bundle_dir.exists():
+        semantic_bundle_dir = _rebuild_semantic_bundle(source_name)
+
+    context_package = _load_context_package(source_name, semantic)
+
+    tag_bundle_dir = source_dir / "tag_bundle" / str(semantic.domain or semantic.source_name).strip().lower().replace(" ", "_")
+    if not tag_bundle_dir.exists():
+        tag_bundle_dir = TagBundleExporter().export(
+            semantic=semantic,
+            technical=technical,
+            questionnaire=questionnaire,
+            source_output_dir=source_dir,
+            domain_name=semantic.domain,
+        )
+
+    try:
+        domain_groups = repository.load_domain_groups(source_name)
+    except (FileNotFoundError, ValueError):
+        domain_groups = {}
+
+    return ChatbotPackageExporter().export(
+        semantic=semantic,
+        technical=technical,
+        questionnaire=questionnaire,
+        context_package=context_package,
+        source_output_dir=source_dir,
+        semantic_bundle_dir=semantic_bundle_dir,
+        tag_bundle_dir=tag_bundle_dir,
+        domain_groups=domain_groups,
+        domain_name=semantic.domain,
+    )
+
+
+def _load_context_package(source_name: str, semantic: SemanticSourceModel) -> LLMContextPackage:
+    context_path = repository.source_dir(source_name) / "llm_context_package.json"
+    if context_path.exists():
+        return LLMContextPackage.model_validate(read_json(context_path))
+
+    package = RetrievalContextBuilder().build(
+        semantic,
+        question=f"What does {source_name} contain and how should it be queried safely?",
+    )
+    return package
+
+
+def _stream_directory_zip(
+    *,
+    directory: Path,
+    filename: str,
+    only_json: bool = False,
+) -> StreamingResponse:
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in sorted(directory.rglob("*")):
+            if not path.is_file() or path.name.endswith(".zip"):
+                continue
+            if only_json and path.suffix.lower() != ".json":
+                continue
+            archive.write(path, arcname=str(path.relative_to(directory)))
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

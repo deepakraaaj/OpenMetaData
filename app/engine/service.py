@@ -13,6 +13,7 @@ from app.engine.state_manager import StateManager
 from app.models.normalized import NormalizedSource
 from app.models.semantic import SemanticSourceModel
 from app.models.state import KnowledgeState
+from app.models.source_attribution import DiscoverySource
 from app.normalization.service import MetadataNormalizer
 from app.semantics.service import SemanticGuessService
 
@@ -62,6 +63,23 @@ class OnboardingEngine:
         """Return the current knowledge state, or None if not initialized."""
         return self.state_manager.load(source_name)
 
+    def refresh(
+        self,
+        source_name: str,
+        normalized: NormalizedSource,
+    ) -> KnowledgeState:
+        """Recompute gaps and readiness using the latest detector logic."""
+        state = self.state_manager.load(source_name)
+        if state is None:
+            raise ValueError(f"No knowledge state found for source '{source_name}'.")
+
+        refreshed_semantic = self.semantic_service.enrich(normalized)
+        self._merge_inferred_semantics(state, refreshed_semantic)
+        state.unresolved_gaps = self.gap_detector.detect(normalized, state)
+        state.readiness = self.readiness_computer.compute(state)
+        self.state_manager.save(source_name, state)
+        return state
+
     def next_question(
         self, source_name: str, normalized: NormalizedSource | None = None
     ) -> GeneratedQuestion | None:
@@ -72,8 +90,11 @@ class OnboardingEngine:
 
         # Optionally re-detect gaps if normalized data is provided
         if normalized is not None:
+            refreshed_semantic = self.semantic_service.enrich(normalized)
+            self._merge_inferred_semantics(state, refreshed_semantic)
             fresh_gaps = self.gap_detector.detect(normalized, state)
             state.unresolved_gaps = fresh_gaps
+            self.state_manager.save(source_name, state)
 
         top_gap = self.prioritizer.next_gap(state.unresolved_gaps)
         if top_gap is None:
@@ -103,6 +124,8 @@ class OnboardingEngine:
 
         # Re-detect remaining gaps if we have normalized data
         if normalized is not None:
+            refreshed_semantic = self.semantic_service.enrich(normalized)
+            self._merge_inferred_semantics(state, refreshed_semantic)
             fresh_gaps = self.gap_detector.detect(normalized, state)
             state.unresolved_gaps = fresh_gaps
 
@@ -112,6 +135,7 @@ class OnboardingEngine:
         # Persist
         self.state_manager.save(source_name, state)
         return state
+
     def confirm_table(
         self, source_name: str, table_name: str, reviewer: str | None = None
     ) -> KnowledgeState:
@@ -147,3 +171,61 @@ class OnboardingEngine:
         # Persist
         self.state_manager.save(source_name, state)
         return state
+
+    def _merge_inferred_semantics(
+        self,
+        state: KnowledgeState,
+        semantic: SemanticSourceModel,
+    ) -> None:
+        semantic_tables = {table.table_name: table for table in semantic.tables}
+        for table_name, state_table in state.tables.items():
+            inferred_table = semantic_tables.get(table_name)
+            if inferred_table is None:
+                continue
+
+            if (
+                state_table.attribution.source != DiscoverySource.CONFIRMED_BY_USER
+                and inferred_table.confidence.score >= state_table.confidence.score
+                and self._should_replace_meaning(state_table.business_meaning, inferred_table.business_meaning)
+            ):
+                state_table.business_meaning = inferred_table.business_meaning
+                state_table.confidence = inferred_table.confidence
+                if not state_table.likely_entity and inferred_table.likely_entity:
+                    state_table.likely_entity = inferred_table.likely_entity
+                if not state_table.grain and inferred_table.grain:
+                    state_table.grain = inferred_table.grain
+
+            inferred_columns = {column.column_name: column for column in inferred_table.columns}
+            for state_column in state_table.columns:
+                inferred_column = inferred_columns.get(state_column.column_name)
+                if inferred_column is None:
+                    continue
+                if state_column.attribution.source == DiscoverySource.CONFIRMED_BY_USER:
+                    continue
+                if inferred_column.confidence.score < state_column.confidence.score:
+                    continue
+                if not self._should_replace_meaning(state_column.business_meaning, inferred_column.business_meaning):
+                    continue
+                state_column.business_meaning = inferred_column.business_meaning
+                state_column.confidence = inferred_column.confidence
+                if inferred_column.synonyms:
+                    state_column.synonyms = inferred_column.synonyms
+
+    def _should_replace_meaning(self, current: str | None, incoming: str | None) -> bool:
+        current_text = str(current or "").strip()
+        incoming_text = str(incoming or "").strip()
+        if not incoming_text:
+            return False
+        if not current_text:
+            return True
+        if current_text == incoming_text:
+            return True
+        generic_prefixes = (
+            "Business attribute for ",
+            "Reference to a related ",
+            "Primary records for ",
+            "Detailed records associated with ",
+            "Historical event records for ",
+            "Timestamp used for audit",
+        )
+        return current_text.startswith(generic_prefixes) and current_text != incoming_text

@@ -8,8 +8,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 
 from app.api import main as api_main
+from app.api import engine_routes
 from app.api.semantic_bundle_questions import build_semantic_bundle_questions
 from app.artifacts.semantic_bundle import SEMANTIC_BUNDLE_DIRNAME
+from app.engine.service import OnboardingEngine
 from app.models.common import DatabaseType
 from app.models.questionnaire import QuestionnaireBundle
 from app.models.semantic import QueryPattern, SemanticSourceModel, SemanticTable
@@ -77,6 +79,8 @@ def test_semantic_bundle_api_rebuild_and_publish(tmp_path: Path, monkeypatch) ->
     _seed_source(repository, "warehouse_source")
 
     monkeypatch.setattr(api_main, "repository", repository)
+    monkeypatch.setattr(engine_routes, "repository", repository)
+    monkeypatch.setattr(engine_routes, "engine", OnboardingEngine(output_dir))
     monkeypatch.setattr(
         api_main,
         "settings",
@@ -118,6 +122,8 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
         conn.execute(text("INSERT INTO task_transaction (company_id, status) VALUES (1, 'open')"))
 
     monkeypatch.setattr(api_main, "repository", repository)
+    monkeypatch.setattr(engine_routes, "repository", repository)
+    monkeypatch.setattr(engine_routes, "engine", OnboardingEngine(output_dir))
     monkeypatch.setattr(
         api_main,
         "settings",
@@ -128,6 +134,10 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
             output_dir=output_dir,
             openmetadata_enable_sync=False,
         ),
+    )
+    monkeypatch.setattr(
+        "app.onboard.pipeline.group_tables_by_relationships",
+        lambda state, **_kwargs: {"Operations": sorted(state.tables.keys())},
     )
 
     client = TestClient(api_main.app)
@@ -145,10 +155,41 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
     payload = onboard.json()
     assert payload["source_name"] == "warehouse_direct"
     assert (output_dir / "warehouse_direct" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
+    assert (output_dir / "warehouse_direct" / "knowledge_state.json").exists()
+    assert (output_dir / "warehouse_direct" / "domain_groups.json").exists()
+    assert (output_dir / "warehouse_direct" / "chatbot_package" / "manifest.json").exists()
+    assert payload["chatbot_package_url"] == "/chatbot/warehouse_direct"
 
     bundle_questions = client.get("/api/sources/warehouse_direct/semantic-bundle/questions")
     assert bundle_questions.status_code == 200
     assert bundle_questions.json()["sections"]
+
+    engine_state = client.get("/api/engine/warehouse_direct/state")
+    assert engine_state.status_code == 200
+    assert "task_transaction" in engine_state.json()["tables"]
+
+    groups = client.get("/api/engine/warehouse_direct/ai-group")
+    assert groups.status_code == 200
+    assert groups.json()["cached"] is True
+    assert groups.json()["groups"] == {"Operations": ["task_transaction"]}
+
+    package = client.get("/api/sources/warehouse_direct/chatbot-package")
+    assert package.status_code == 200
+    assert package.json()["manifest"]["entrypoints"]["visual_summary"] == "visuals/overview.html"
+
+    package_overview = client.get("/chatbot/warehouse_direct")
+    assert package_overview.status_code == 200
+    assert "Chatbot Onboarding Package" in package_overview.text
+
+    package_zip = client.get("/api/sources/warehouse_direct/chatbot-package/zip")
+    assert package_zip.status_code == 200
+    package_archive_path = tmp_path / "warehouse_direct_chatbot_package.zip"
+    package_archive_path.write_bytes(package_zip.content)
+    with zipfile.ZipFile(package_archive_path, "r") as archive:
+        names = set(archive.namelist())
+        assert "manifest.json" in names
+        assert "visuals/overview.html" in names
+        assert "runtime/llm_context_package.json" in names
 
     zip_response = client.get("/api/sources/warehouse_direct/json-zip")
     assert zip_response.status_code == 200

@@ -10,6 +10,7 @@ import SemanticDiagram from "./SemanticDiagram";
 import DomainSummary from "./DomainSummary";
 import EnumReviewGrid from "./EnumReviewGrid";
 import DomainAuditPanel from "./DomainAuditPanel";
+import ArtifactExplorer from "./ArtifactExplorer";
 
 type Screen = "connect" | "overview" | "workspace" | "enums" | "final";
 type DataMode = "loading" | "live" | "mock";
@@ -39,6 +40,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
       setState(engineState);
       setMode("live");
       setError("");
+      setScreen((current) => (current === "connect" ? "overview" : current));
       void loadGroups();
     } catch {
       setMode("mock");
@@ -357,13 +359,13 @@ function ChatPanel({
         </div>
       )}
 
-      {question.input_type === 'boolean' && question.choices.length > 0 ? (
+      {(question.input_type === 'boolean' || question.input_type === 'select') && question.choices.length > 0 ? (
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           {question.choices.map((choice) => (
             <button
               key={choice}
               className="btn btn-outline"
-              style={{ flex: 1 }}
+              style={{ flex: question.input_type === 'boolean' ? 1 : 'unset' }}
               onClick={() => onSubmit(question.gap_id, choice)}
             >
               {choice}
@@ -402,7 +404,7 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
         onStateUpdate={onStateUpdate} 
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '3rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
         <div className="card">
           <h3>Readiness</h3>
           <div style={{ width: '100%', height: 6, background: 'var(--bg-surface-alt)', borderRadius: 3, overflow: 'hidden', margin: '1rem 0' }}>
@@ -421,24 +423,45 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
         </div>
 
         <div className="card">
-          <h3>Export Preview</h3>
-          <div style={{ background: 'var(--bg-surface-alt)', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', fontFamily: 'monospace' }}>
-            <div style={{ color: 'var(--accent)' }}>/{sourceName}/</div>
-            <div>  ├── knowledge_state.json</div>
-            <div>  ├── tables.json</div>
-            <div style={{ fontWeight: 'bold', color: 'var(--success)' }}>  └── {sourceName}.domain.json (LLM Artifact)</div>
+          <h3>Built Outputs</h3>
+          <p className="hint">
+            The wizard now exposes the real generated package instead of a mock preview. Open the
+            package overview, inspect each file, or download the complete zip.
+          </p>
+          <div style={{ display: 'grid', gap: '0.9rem', marginTop: '1rem' }}>
+            <a
+              href={`${openMetadataClientApiBaseUrl()}/chatbot/${sourceName}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-primary"
+              style={{ width: '100%', textAlign: 'center', textDecoration: 'none' }}
+            >
+              Open Chatbot Package Overview
+            </a>
+            <a
+              href={`${openMetadataClientApiBaseUrl()}/api/sources/${sourceName}/chatbot-package/zip`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-outline"
+              style={{ width: '100%', textAlign: 'center', textDecoration: 'none' }}
+            >
+              Download Chatbot Package Zip
+            </a>
+            <a
+              href={`${openMetadataClientApiBaseUrl()}/api/engine/${sourceName}/export-llm-artifact`}
+              download={`${sourceName}.domain.json`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-outline"
+              style={{ width: '100%', textAlign: 'center', textDecoration: 'none' }}
+            >
+              Download LLM Context Artifact
+            </a>
           </div>
-          <a 
-            href={`${openMetadataClientApiBaseUrl()}/api/engine/${sourceName}/export-llm-artifact`} 
-            download={`${sourceName}.domain.json`}
-            target="_blank"
-            className="btn btn-primary" 
-            style={{ marginTop: '1.5rem', width: '100%', display: 'block', textAlign: 'center', textDecoration: 'none' }}
-          >
-            Download LLM Context Artifact (.domain.json)
-          </a>
         </div>
       </div>
+
+      <ArtifactExplorer sourceName={sourceName} />
 
       <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'center' }}>
         <button 

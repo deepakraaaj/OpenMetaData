@@ -14,6 +14,8 @@ class GeneratedQuestion(BaseModel):
     input_type: str = "text"  # text, boolean, select, tags
     choices: list[str] = Field(default_factory=list)
     suggested_answer: str | None = None
+    target_entity: str | None = None
+    target_property: str | None = None
 
 
 class QuestionGenerator:
@@ -27,37 +29,33 @@ class QuestionGenerator:
         evidence: list[str] = []
         suggested = None
 
-        if gap.target_property:
-            # Column-level
-            table = state.tables.get(gap.target_entity or "")
-            if table:
-                col = next((c for c in table.columns if c.column_name == gap.target_property), None)
-                if col:
-                    if col.business_meaning:
-                        suggested = col.business_meaning
-                        evidence.append(f"System guess: {col.business_meaning}")
-                    if col.example_values:
-                        evidence.append(f"Sample values: {', '.join(col.example_values[:5])}")
-                    evidence.append(f"Type: {col.technical_type}")
-        else:
-            # Table-level
-            table = state.tables.get(gap.target_entity or "")
-            if table:
-                if table.business_meaning:
-                    suggested = table.business_meaning
-                    evidence.append(f"System guess: {table.business_meaning}")
-                if table.grain:
-                    evidence.append(f"Grain: {table.grain}")
-                if table.important_columns:
-                    evidence.append(f"Key columns: {', '.join(table.important_columns[:5])}")
+        table = state.tables.get(gap.target_entity or "")
+        if table:
+            if table.business_meaning:
+                suggested = table.business_meaning
+                evidence.append(f"Current guess: {table.business_meaning}")
+            if table.likely_entity:
+                evidence.append(f"Likely entity: {table.likely_entity}")
+            if table.grain:
+                evidence.append(f"Grain: {table.grain}")
+            columns = gap.metadata.get("important_columns") if isinstance(gap.metadata, dict) else None
+            if columns:
+                evidence.append(f"Important columns: {', '.join(columns[:5])}")
+            elif table.important_columns:
+                evidence.append(f"Important columns: {', '.join(table.important_columns[:5])}")
+            neighbors = gap.metadata.get("neighbor_tables") if isinstance(gap.metadata, dict) else None
+            if neighbors:
+                evidence.append(f"Connected to: {', '.join(neighbors[:5])}")
 
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,
-            context="Help the system understand the business meaning so it can generate accurate queries.",
+            context="Answer with the real business concept or workflow this table represents. Use operational language, not SQL structure.",
             evidence=evidence,
             input_type="text",
             suggested_answer=suggested,
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     def _enum_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -68,8 +66,12 @@ class QuestionGenerator:
         if table and gap.target_property:
             col = next((c for c in table.columns if c.column_name == gap.target_property), None)
             if col and col.example_values:
-                choices = col.example_values[:10]
-                evidence.append(f"Discovered values: {', '.join(choices)}")
+                choices = list(dict.fromkeys(col.example_values))[:10]
+        observed_values = gap.metadata.get("observed_values") if isinstance(gap.metadata, dict) else None
+        if observed_values:
+            choices = [str(value) for value in observed_values[:10]]
+        if choices:
+            evidence.append(f"Observed values: {', '.join(choices)}")
 
         existing_enums = state.enums.get(f"{gap.target_entity}.{gap.target_property}", [])
         if existing_enums:
@@ -78,10 +80,12 @@ class QuestionGenerator:
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,
-            context="Provide the business label for each value (e.g., '0=Pending, 1=Active, 2=Closed').",
+            context="Map each observed value to the business meaning users would understand. Example: `open=Ready to dispatch, closed=No further action`.",
             evidence=evidence,
             input_type="tags",
             choices=choices,
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     def _pk_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -103,16 +107,24 @@ class QuestionGenerator:
             input_type="select" if choices else "text",
             choices=choices,
             suggested_answer=choices[0] if choices else None,
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     def _relationship_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
+        candidate_tables = gap.metadata.get("candidate_tables") if isinstance(gap.metadata, dict) else None
+        evidence = []
+        if candidate_tables:
+            evidence.append(f"Possible target tables: {', '.join(candidate_tables)}")
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,
-            context="Confirming this join ensures the system generates correct multi-table queries.",
-            evidence=[f"Inferred join: {gap.target_property}"] if gap.target_property else [],
-            input_type="boolean",
-            choices=["Yes, this is valid", "No, this is incorrect"],
+            context="Choose the real entity this field references so cross-table queries join to the correct business object.",
+            evidence=evidence,
+            input_type="select" if candidate_tables else "boolean",
+            choices=list(candidate_tables or ["Yes, this is valid", "No, this is incorrect", "None of these"]),
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     def _sensitivity_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -123,15 +135,19 @@ class QuestionGenerator:
             evidence=[],
             input_type="boolean",
             choices=["Yes, mask this column", "No, it is safe to display"],
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     def _glossary_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,
-            context="Adding user-facing terms helps the chatbot understand questions phrased in business language.",
+            context="Provide the real business term teams use in day-to-day conversations, dashboards, or SOPs.",
             evidence=[],
             input_type="text",
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     def _default_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -141,6 +157,8 @@ class QuestionGenerator:
             context="Your answer will be recorded in the semantic bundle.",
             evidence=[],
             input_type="text",
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
         )
 
     _handlers = {

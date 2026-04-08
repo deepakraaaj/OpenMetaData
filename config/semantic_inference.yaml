@@ -1,0 +1,155 @@
+domain_rules:
+  maintenance:
+    - maintenance
+    - facility
+    - asset
+    - scheduler
+    - task
+    - technician
+  fleet_operations:
+    - trip
+    - vehicle
+    - driver
+    - tracking
+    - lock
+    - econtroller
+    - dispatch
+  inventory_supply_chain:
+    - purchase
+    - delivery
+    - vendor
+    - component
+    - stock
+    - assembly
+    - bom
+  billing_finance:
+    - invoice
+    - billing
+    - currency
+    - tax
+    - bank
+  platform_ops:
+    - user
+    - role
+    - privilege
+    - api
+    - notification
+    - session
+
+actor_table_priority:
+  - user
+  - employee
+  - staff
+  - agent
+  - operator
+  - driver
+  - member
+
+audit_actor_patterns:
+  created_by: created
+  updated_by: last updated
+  modified_by: last modified
+  deleted_by: deleted
+  approved_by: approved
+  rejected_by: rejected
+  assigned_by: assigned
+  closed_by: closed
+  opened_by: opened
+  read_by: viewed or acknowledged
+
+actor_responsibility_roles:
+  - owner
+  - creator
+  - approver
+  - assignee
+
+communication_directory:
+  support_column_tokens:
+    - phone
+    - mobile
+    - email
+    - support
+    - contact
+  structure_tokens:
+    - contact
+    - support
+    - directory
+    - communication
+    - channel
+    - helpline
+  related_entity_labels:
+    company: companies
+    office: offices
+    location: locations
+    state: regional or state entities
+    region: regional or state entities
+  minimum_support_columns: 2
+  minimum_support_columns_without_structure: 3
+  minimum_related_entities_without_structure: 2
+
+table_meaning:
+  mapping_suffixes:
+    - _mapping
+  history_suffixes:
+    - _history
+    - _log
+  detail_suffixes:
+    - _detail
+    - _details
+  lifecycle_tokens:
+    - status
+    - state
+    - transaction
+
+column_meaning:
+  status_tokens:
+    - status
+    - state
+  classification_tokens:
+    - type
+    - category
+  timestamp_tokens:
+    - created
+    - updated
+
+gap_detection:
+  audit_column_suffixes:
+    - _by
+    - _at
+    - _on
+  audit_column_names:
+    - id
+    - created_by
+    - updated_by
+    - modified_by
+    - deleted_by
+    - approved_by
+    - read_by
+    - date_created
+    - date_updated
+    - created_at
+    - updated_at
+    - deleted_at
+  temporal_name_tokens:
+    - created
+    - updated
+    - deleted
+    - modified
+    - timestamp
+    - date_
+    - time_
+  enum_name_tokens:
+    - status
+    - state
+    - type
+    - category
+    - flag
+    - reason
+    - stage
+    - mode
+    - priority
+    - active
+    - enabled
+  boolean_prefixes:
+    - is_
+    - has_

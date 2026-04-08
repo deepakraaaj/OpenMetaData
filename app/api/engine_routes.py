@@ -47,7 +47,19 @@ def initialize_engine(source_name: str) -> JSONResponse:
 @router.get("/{source_name}/state")
 def get_engine_state(source_name: str) -> JSONResponse:
     """Return the current knowledge state."""
-    state = engine.get_state(source_name)
+    try:
+        normalized = repository.load_normalized_metadata(source_name)
+    except FileNotFoundError:
+        normalized = None
+
+    if normalized is not None:
+        try:
+            state = engine.refresh(source_name, normalized)
+        except ValueError:
+            state = None
+    else:
+        state = engine.get_state(source_name)
+
     if state is None:
         raise HTTPException(
             status_code=404,
@@ -59,7 +71,12 @@ def get_engine_state(source_name: str) -> JSONResponse:
 @router.get("/{source_name}/next-question")
 def next_question(source_name: str) -> JSONResponse:
     """Get the highest-priority unresolved question."""
-    question = engine.next_question(source_name)
+    try:
+        normalized = repository.load_normalized_metadata(source_name)
+    except FileNotFoundError:
+        normalized = None
+
+    question = engine.next_question(source_name, normalized=normalized)
     if question is None:
         return JSONResponse(
             {"status": "complete", "message": "All semantic gaps have been resolved."}
@@ -71,7 +88,12 @@ def next_question(source_name: str) -> JSONResponse:
 def submit_answer(source_name: str, request: AnswerRequest) -> JSONResponse:
     """Submit an answer to a specific gap and get the updated state."""
     try:
-        state = engine.submit_answer(source_name, request.gap_id, request.answer)
+        normalized = repository.load_normalized_metadata(source_name)
+    except FileNotFoundError:
+        normalized = None
+
+    try:
+        state = engine.submit_answer(source_name, request.gap_id, request.answer, normalized=normalized)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return JSONResponse(state.model_dump(mode="json"))
