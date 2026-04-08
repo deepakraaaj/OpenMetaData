@@ -8,6 +8,12 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.logging import get_logger
 from app.models.common import DatabaseType
+from app.models.onboarding_job import (
+    OnboardingLogLevel,
+    OnboardingProgressUpdate,
+    OnboardingStage,
+    OnboardingStepState,
+)
 from app.models.source import DiscoveredSource
 from app.models.technical import (
     CandidateJoin,
@@ -18,8 +24,9 @@ from app.models.technical import (
     SourceTechnicalMetadata,
     TableProfile,
 )
+from app.onboard.progress import ProgressCallback, emit_progress, technical_counts
 from app.services.database import create_db_engine
-from app.utils.text import snake_to_words, tokenize
+from app.utils.text import tokenize
 
 
 LOGGER = get_logger(__name__)
@@ -40,17 +47,62 @@ SENSITIVE_NAME_PARTS = {
 
 
 class DatabaseIntrospector:
-    def introspect_source(self, source: DiscoveredSource) -> SourceTechnicalMetadata:
+    def introspect_source(
+        self,
+        source: DiscoveredSource,
+        progress: ProgressCallback | None = None,
+    ) -> SourceTechnicalMetadata:
+        current_stage = OnboardingStage.CONNECTING_TO_DATABASE
         try:
             engine = create_db_engine(source.connection)
             with engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
-            metadata = self._introspect(engine, source)
+            emit_progress(
+                progress,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.CONNECTING_TO_DATABASE,
+                    step_state=OnboardingStepState.COMPLETED,
+                    level=OnboardingLogLevel.SUCCESS,
+                    message="Connected successfully. Credentials and network path are valid.",
+                ),
+            )
+            current_stage = OnboardingStage.READING_SCHEMA
+            emit_progress(
+                progress,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.READING_SCHEMA,
+                    step_state=OnboardingStepState.RUNNING,
+                    message="Reading schemas, columns, keys, and representative values.",
+                ),
+            )
+            metadata = self._introspect(engine, source, progress=progress)
             metadata.connectivity_ok = True
             metadata.connectivity_notes.append("Connection test succeeded.")
+            emit_progress(
+                progress,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.READING_SCHEMA,
+                    step_state=OnboardingStepState.COMPLETED,
+                    level=OnboardingLogLevel.SUCCESS,
+                    message=(
+                        f"Found {metadata.source_summary.get('table_count', 0)} tables and "
+                        f"{metadata.source_summary.get('column_count', 0)} columns."
+                    ),
+                    counts=technical_counts(metadata),
+                ),
+            )
             return metadata
         except Exception as exc:
             LOGGER.exception("Failed to introspect %s", source.name)
+            emit_progress(
+                progress,
+                OnboardingProgressUpdate(
+                    stage=current_stage,
+                    step_state=OnboardingStepState.ERROR,
+                    level=OnboardingLogLevel.ERROR,
+                    message=f"Introspection failed: {exc}",
+                ),
+            )
             return SourceTechnicalMetadata(
                 source_name=source.name,
                 db_type=source.connection.type,
@@ -59,18 +111,46 @@ class DatabaseIntrospector:
                 connectivity_notes=[str(exc)],
             )
 
-    def _introspect(self, engine: Engine, source: DiscoveredSource) -> SourceTechnicalMetadata:
+    def _introspect(
+        self,
+        engine: Engine,
+        source: DiscoveredSource,
+        progress: ProgressCallback | None = None,
+    ) -> SourceTechnicalMetadata:
         inspector = inspect(engine)
         schema_names = self._schema_names(inspector, source)
         schemas: list[SchemaProfile] = []
 
         for schema_name in schema_names:
+            schema_tables = inspector.get_table_names(schema=schema_name)
+            emit_progress(
+                progress,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.READING_SCHEMA,
+                    message=(
+                        f"Inspecting schema `{schema_name or 'main'}` "
+                        f"with {len(schema_tables)} tables."
+                    ),
+                ),
+            )
             tables = []
-            for table_name in inspector.get_table_names(schema=schema_name):
+            total_tables = len(schema_tables)
+            for index, table_name in enumerate(schema_tables, start=1):
                 table_profile = self._table_profile(engine, inspector, schema_name, table_name)
                 if source.allow_tables and table_profile.table_name not in source.allow_tables:
                     continue
                 tables.append(table_profile)
+                if index == 1 or index % 10 == 0 or index == total_tables:
+                    emit_progress(
+                        progress,
+                        OnboardingProgressUpdate(
+                            stage=OnboardingStage.READING_SCHEMA,
+                            message=(
+                                f"Scanned {index}/{total_tables} tables in "
+                                f"`{schema_name or 'main'}`."
+                            ),
+                        ),
+                    )
             schemas.append(SchemaProfile(schema_name=schema_name or "main", tables=tables))
 
         self._attach_candidate_joins(schemas)

@@ -8,8 +8,10 @@ type Props = {
 
 export default function KnowledgePanel({ state }: Props) {
   const tables = Object.values(state.tables);
-  const confirmedTables = tables.filter(t => t.attribution.source === 'confirmed_by_user');
-  const confirmedPercentage = (confirmedTables.length / Math.max(tables.length, 1)) * 100;
+  const keptTables = tables.filter((table) => table.review_status === "confirmed");
+  const skippedTables = tables.filter((table) => table.review_status === "skipped");
+  const decidedTables = keptTables.length + skippedTables.length;
+  const decisionPercentage = (decidedTables / Math.max(tables.length, 1)) * 100;
 
   return (
     <div className="knowledge-panel">
@@ -32,14 +34,19 @@ export default function KnowledgePanel({ state }: Props) {
       <div className="panel-content stack">
         <div className="card" style={{ padding: '1rem', background: 'rgba(var(--success-rgb), 0.05)', border: '1px solid rgba(var(--success-rgb), 0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Human Audit</span>
-            <span className="hint" style={{ fontSize: '0.8rem' }}>{confirmedTables.length}/{tables.length}</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Table Decisions</span>
+            <span className="hint" style={{ fontSize: '0.8rem' }}>{decidedTables}/{tables.length}</span>
           </div>
           <div className="progress-container" style={{ height: '6px' }}>
             <div 
               className="progress-bar" 
-              style={{ width: `${confirmedPercentage}%`, background: 'var(--success)' }}
+              style={{ width: `${decisionPercentage}%`, background: 'var(--success)' }}
             ></div>
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+            <span className="pill pill-success">{keptTables.length} needed</span>
+            <span className="pill pill-warning">{tables.length - decidedTables} pending</span>
+            <span className="pill">{skippedTables.length} skipped</span>
           </div>
         </div>
 
@@ -69,12 +76,26 @@ export default function KnowledgePanel({ state }: Props) {
 }
 
 function TableSummaryCard({ table }: { table: SemanticTable }) {
+  const statusLabel = {
+    pending: "Pending",
+    confirmed: "Needed",
+    skipped: "Skipped",
+  }[table.review_status];
+  const statusClass = {
+    pending: "pill-warning",
+    confirmed: "pill-success",
+    skipped: "",
+  }[table.review_status];
+
   return (
     <div className="card" style={{ padding: '1.25rem', marginBottom: '1rem' }}>
       <div className="stack">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <h4>{table.table_name}</h4>
-          <span className="pill">{table.columns.length} cols</span>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <span className={`pill ${statusClass}`}>{statusLabel}</span>
+            <span className="pill">{table.columns.length} cols</span>
+          </div>
         </div>
         <p className="hint" style={{ fontSize: '0.8rem' }}>{table.business_meaning}</p>
         

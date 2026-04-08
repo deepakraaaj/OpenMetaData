@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import time
 from types import SimpleNamespace
 import zipfile
 
@@ -17,6 +18,7 @@ from app.models.questionnaire import QuestionnaireBundle
 from app.models.semantic import QueryPattern, SemanticSourceModel, SemanticTable
 from app.models.technical import ColumnProfile, SchemaProfile, SourceTechnicalMetadata, TableProfile
 from app.repositories.filesystem import WorkspaceRepository
+from app.services.onboarding_jobs import InMemoryOnboardingJobStore
 
 
 def _seed_source(repository: WorkspaceRepository, source_name: str) -> None:
@@ -71,6 +73,29 @@ def _seed_source(repository: WorkspaceRepository, source_name: str) -> None:
     repository.save_questionnaire(QuestionnaireBundle(source_name=source_name, questions=[]))
 
 
+def _wait_for_job(
+    client: TestClient,
+    job_id: str,
+    *,
+    expected_status: str,
+    timeout_seconds: float = 5.0,
+) -> dict:
+    deadline = time.monotonic() + timeout_seconds
+    latest_payload: dict | None = None
+
+    while time.monotonic() < deadline:
+        response = client.get(f"/api/onboarding/jobs/{job_id}")
+        assert response.status_code == 200
+        latest_payload = response.json()
+        if latest_payload["status"] == expected_status:
+            return latest_payload
+        if latest_payload["status"] == "failed" and expected_status != "failed":
+            raise AssertionError(f"Onboarding job failed unexpectedly: {latest_payload}")
+        time.sleep(0.05)
+
+    raise AssertionError(f"Timed out waiting for onboarding job {job_id}. Last payload: {latest_payload}")
+
+
 def test_semantic_bundle_api_rebuild_and_publish(tmp_path: Path, monkeypatch) -> None:
     config_dir = tmp_path / "config"
     output_dir = tmp_path / "output"
@@ -79,6 +104,7 @@ def test_semantic_bundle_api_rebuild_and_publish(tmp_path: Path, monkeypatch) ->
     _seed_source(repository, "warehouse_source")
 
     monkeypatch.setattr(api_main, "repository", repository)
+    monkeypatch.setattr(api_main, "onboarding_job_store", InMemoryOnboardingJobStore())
     monkeypatch.setattr(engine_routes, "repository", repository)
     monkeypatch.setattr(engine_routes, "engine", OnboardingEngine(output_dir))
     monkeypatch.setattr(
@@ -151,14 +177,25 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
         },
     )
 
-    assert onboard.status_code == 200
+    assert onboard.status_code == 202
     payload = onboard.json()
     assert payload["source_name"] == "warehouse_direct"
-    assert (output_dir / "warehouse_direct" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
+    assert payload["status"] == "running"
+
+    completed = _wait_for_job(client, payload["job_id"], expected_status="completed")
+    assert completed["result"]["source_name"] == "warehouse_direct"
+    assert completed["result"]["wizard_url"] == "/source/warehouse_direct"
+    assert completed["result"]["chatbot_package_url"] == "/chatbot/warehouse_direct"
+    assert completed["counts"]["table_count"] == 1
     assert (output_dir / "warehouse_direct" / "knowledge_state.json").exists()
     assert (output_dir / "warehouse_direct" / "domain_groups.json").exists()
+    assert not (output_dir / "warehouse_direct" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
+    assert not (output_dir / "warehouse_direct" / "chatbot_package" / "manifest.json").exists()
+
+    prepare = client.post("/api/engine/warehouse_direct/initialize")
+    assert prepare.status_code == 200
+    assert (output_dir / "warehouse_direct" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
     assert (output_dir / "warehouse_direct" / "chatbot_package" / "manifest.json").exists()
-    assert payload["chatbot_package_url"] == "/chatbot/warehouse_direct"
 
     bundle_questions = client.get("/api/sources/warehouse_direct/semantic-bundle/questions")
     assert bundle_questions.status_code == 200
@@ -213,6 +250,7 @@ def test_url_onboarding_rejects_empty_schema(tmp_path: Path, monkeypatch) -> Non
     create_engine(f"sqlite:///{db_path}").dispose()
 
     monkeypatch.setattr(api_main, "repository", repository)
+    monkeypatch.setattr(api_main, "onboarding_job_store", InMemoryOnboardingJobStore())
     monkeypatch.setattr(
         api_main,
         "settings",
@@ -234,8 +272,10 @@ def test_url_onboarding_rejects_empty_schema(tmp_path: Path, monkeypatch) -> Non
         },
     )
 
-    assert response.status_code == 422
-    assert "No tables were discovered" in response.text
+    assert response.status_code == 202
+    payload = response.json()
+    failed = _wait_for_job(client, payload["job_id"], expected_status="failed")
+    assert "No tables were discovered" in failed["error_message"]
 
 
 def test_api_allows_private_network_dev_origin_for_cors_preflight() -> None:

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChatbotPackageResponse, KnowledgeState, UrlOnboardingResponse } from "./types";
+import type { ChatbotPackageResponse, KnowledgeState, OnboardingJobSnapshot } from "./types";
 
 function normalizeBaseUrl(value: string | undefined, fallback = ""): string {
   return (value || fallback).replace(/\/$/, "");
@@ -51,16 +51,20 @@ async function fetchJsonWithTimeout<T>(
   }
 }
 
-export async function onboardFromUrl(payload: {
+export async function startOnboardingJob(payload: {
   db_url: string;
   source_name?: string;
   domain_name?: string;
   description?: string;
-}): Promise<UrlOnboardingResponse> {
-  return fetchJson<UrlOnboardingResponse>("/api/onboarding/url", {
+}): Promise<OnboardingJobSnapshot> {
+  return fetchJson<OnboardingJobSnapshot>("/api/onboarding/url", {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function getOnboardingJob(jobId: string): Promise<OnboardingJobSnapshot> {
+  return fetchJson<OnboardingJobSnapshot>(`/api/onboarding/jobs/${jobId}`);
 }
 
 export async function loadChatbotPackage(sourceName: string): Promise<ChatbotPackageResponse> {
@@ -75,7 +79,7 @@ export async function initializeEngine(sourceName: string): Promise<KnowledgeSta
 }
 
 export async function getEngineState(sourceName: string): Promise<KnowledgeState> {
-  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/state`);
+  return fetchJsonWithTimeout<KnowledgeState>(`/api/engine/${sourceName}/state`, 5000);
 }
 
 export async function getNextQuestion(sourceName: string): Promise<any> {
@@ -116,5 +120,17 @@ export async function confirmTable(
   return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/confirm-table`, {
     method: "POST",
     body: JSON.stringify({ table_name: tableName, reviewer }),
+  });
+}
+
+export async function reviewTable(
+  sourceName: string,
+  tableName: string,
+  reviewStatus: "pending" | "confirmed" | "skipped",
+  reviewer?: string,
+): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/review-table`, {
+    method: "POST",
+    body: JSON.stringify({ table_name: tableName, review_status: reviewStatus, reviewer }),
   });
 }

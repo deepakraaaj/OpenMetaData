@@ -10,6 +10,7 @@ build/
 *.egg-info/
 node_modules/
 .next/
+.next-dev/
 out/
 *.tsbuildinfo
 *.sqlite

@@ -25,14 +25,15 @@ from app.models.artifacts import LLMContextPackage
 from app.models.common import DatabaseType
 from app.models.semantic import SemanticSourceModel
 from app.models.source import DiscoveredSource
-from app.onboard.pipeline import OnboardingPipeline, OnboardingPipelineError
 from app.repositories.filesystem import WorkspaceRepository
 from app.retrieval.service import RetrievalContextBuilder
+from app.services.onboarding_jobs import InMemoryOnboardingJobStore, OnboardingJobService
 from app.utils.serialization import read_json
 
 
 settings = get_settings()
 repository = WorkspaceRepository(settings.config_dir, settings.output_dir)
+onboarding_job_store = InMemoryOnboardingJobStore()
 app = FastAPI(title="OpenMetadata Semantic Onboarding")
 app.include_router(engine_router)
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
@@ -78,6 +79,10 @@ class DeterministicIntrospectionEnvRequest(BaseModel):
     source_name: str | None = None
     schema_name: str | None = None
     allow_tables: list[str] = Field(default_factory=list)
+
+
+def get_onboarding_job_service() -> OnboardingJobService:
+    return OnboardingJobService(settings, repository, onboarding_job_store)
 
 
 @app.get("/healthz")
@@ -232,28 +237,16 @@ def onboard_from_db_url(request: UrlOnboardingRequest) -> JSONResponse:
         notes=["Created from direct DB URL onboarding request."],
     )
 
-    pipeline = OnboardingPipeline(settings, repository)
-    try:
-        output_dir = pipeline.run_source(source, sync_openmetadata=False)
-    except OnboardingPipelineError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    job = get_onboarding_job_service().start_job(source, sync_openmetadata=False)
+    return JSONResponse(job.model_dump(mode="json", exclude_none=True), status_code=202)
 
-    repository.upsert_discovered_source(source)
 
-    return JSONResponse(
-        {
-            "status": "ok",
-            "source_name": source_name,
-            "output_dir": str(output_dir),
-            "bundle_dir": str(repository.semantic_bundle_dir(source_name)),
-            "chatbot_package_dir": str(repository.source_dir(source_name) / CHATBOT_PACKAGE_DIRNAME),
-            "wizard_url": f"/review/{source_name}",
-            "api_wizard_url": f"/api/sources/{source_name}/semantic-bundle/questions",
-            "download_url": f"/api/sources/{source_name}/json-zip",
-            "chatbot_package_url": f"/chatbot/{source_name}",
-            "chatbot_package_download_url": f"/api/sources/{source_name}/chatbot-package/zip",
-        }
-    )
+@app.get("/api/onboarding/jobs/{job_id}")
+def get_onboarding_job(job_id: str) -> JSONResponse:
+    job = get_onboarding_job_service().get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"Onboarding job `{job_id}` was not found.")
+    return JSONResponse(job.model_dump(mode="json", exclude_none=True))
 
 
 @app.get("/api/introspection/env/presets")

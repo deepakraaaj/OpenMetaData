@@ -10,6 +10,7 @@ import re
 
 from app.core.inference_rules import SemanticInferenceRules, load_inference_rules
 from app.models.normalized import NormalizedSource
+from app.models.semantic import TableReviewStatus
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
 from app.models.source_attribution import DiscoverySource
 
@@ -43,6 +44,8 @@ class GapDetector:
         gaps: list[SemanticGap] = []
         for table in normalized.tables:
             existing = state.tables.get(table.table_name)
+            if self._is_skipped_table(existing):
+                continue
             if existing and existing.attribution.source == DiscoverySource.CONFIRMED_BY_USER:
                 continue
             if existing and existing.confidence.score >= 0.65:
@@ -84,6 +87,11 @@ class GapDetector:
     ) -> list[SemanticGap]:
         gaps: list[SemanticGap] = []
         for table in normalized.tables:
+            existing = state.tables.get(table.table_name)
+            if self._is_skipped_table(existing):
+                continue
+            if existing and existing.attribution.source == DiscoverySource.CONFIRMED_BY_USER:
+                continue
             for col in table.columns:
                 if not self._is_meaningful_enum_column(col.column_name, col.enum_values, col.sample_values):
                     continue
@@ -121,9 +129,11 @@ class GapDetector:
         """Ask disambiguation questions only when one left-column maps to a few plausible targets."""
         gaps: list[SemanticGap] = []
         for table in normalized.tables:
+            existing = state.tables.get(table.table_name)
+            if self._is_skipped_table(existing):
+                continue
             if not table.join_candidates:
                 continue
-            existing = state.tables.get(table.table_name)
             if existing and existing.attribution.source == DiscoverySource.CONFIRMED_BY_USER:
                 continue
             for column_name, candidates in self._group_join_candidates(table.join_candidates).items():
@@ -159,11 +169,13 @@ class GapDetector:
     ) -> list[SemanticGap]:
         gaps: list[SemanticGap] = []
         for table in normalized.tables:
+            existing = state.tables.get(table.table_name)
+            if self._is_skipped_table(existing):
+                continue
             for col in table.columns:
                 if not col.sensitivity_hints:
                     continue
                 col_key = f"{table.table_name}.{col.column_name}"
-                existing = state.tables.get(table.table_name)
                 if existing:
                     existing_col = next((c for c in existing.columns if c.column_name == col.column_name), None)
                     if existing_col and existing_col.attribution.source == DiscoverySource.CONFIRMED_BY_USER:
@@ -304,11 +316,21 @@ class GapDetector:
             ranked = [item for item in ranked if item[1] > 0]
         return ranked
 
+    def _is_skipped_table(self, existing: object) -> bool:
+        if existing is None:
+            return False
+        return getattr(existing, "review_status", None) == TableReviewStatus.skipped
+
     def _glossary_gaps(
         self, normalized: NormalizedSource, state: KnowledgeState
     ) -> list[SemanticGap]:
         gaps: list[SemanticGap] = []
         for table in normalized.tables:
+            existing = state.tables.get(table.table_name)
+            if self._is_skipped_table(existing):
+                continue
+            if existing and existing.attribution.source == DiscoverySource.CONFIRMED_BY_USER:
+                continue
             entity = table.entity_hint or table.table_name
             if entity.lower() in {k.lower() for k in state.glossary}:
                 continue

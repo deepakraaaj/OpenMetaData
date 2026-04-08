@@ -37,6 +37,7 @@ export type SemanticColumn = {
 
 export type SemanticTable = {
   table_name: string;
+  review_status: "pending" | "confirmed" | "skipped";
   business_meaning?: string;
   grain?: string;
   likely_entity?: string;
@@ -98,13 +99,76 @@ export type KnowledgeState = {
   readiness: ReadinessState;
 };
 
-export type UrlOnboardingResponse = {
-  status: string;
+export type OnboardingStage =
+  | "connecting_to_database"
+  | "reading_schema"
+  | "extracting_relationships"
+  | "building_semantic_model"
+  | "generating_review_questions"
+  | "ready_for_review";
+
+export type OnboardingStepState = "pending" | "running" | "completed" | "error";
+
+export type OnboardingJobState = "queued" | "running" | "completed" | "failed";
+
+export type OnboardingProgressCounts = {
+  schema_count?: number;
+  table_count?: number;
+  column_count?: number;
+  foreign_key_count?: number;
+  inferred_relationship_count?: number;
+  review_item_count?: number;
+  domain_group_count?: number;
+  unresolved_gap_count?: number;
+};
+
+export type OnboardingStepStatus = {
+  stage: OnboardingStage;
+  label: string;
+  state: OnboardingStepState;
+  message?: string;
+  started_at?: string;
+  completed_at?: string;
+};
+
+export type OnboardingLogEntry = {
+  timestamp: string;
+  stage: OnboardingStage;
+  level: "info" | "success" | "error";
+  message: string;
+};
+
+export type OnboardingResult = {
   source_name: string;
   output_dir: string;
+  bundle_dir: string;
+  chatbot_package_dir: string;
   wizard_url: string;
-  chatbot_package_url?: string;
-  chatbot_package_download_url?: string;
+  api_wizard_url: string;
+  download_url: string;
+  chatbot_package_url: string;
+  chatbot_package_download_url: string;
+  legacy_review_url: string;
+};
+
+export type OnboardingJobSnapshot = {
+  job_id: string;
+  source_name: string;
+  status: OnboardingJobState;
+  current_stage?: OnboardingStage;
+  progress_percent: number;
+  estimated_wait_message: string;
+  counts: OnboardingProgressCounts;
+  steps: OnboardingStepStatus[];
+  logs: OnboardingLogEntry[];
+  status_url: string;
+  wizard_url: string;
+  result?: OnboardingResult;
+  error_message?: string;
+  reused_existing_job?: boolean;
+  created_at: string;
+  updated_at: string;
+  finished_at?: string;
 };
 
 export type BundleResponse = {

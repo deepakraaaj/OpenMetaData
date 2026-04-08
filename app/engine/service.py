@@ -2,6 +2,7 @@
 answer interpretation, and readiness computation together."""
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 
 from app.engine.answer_interpreter import AnswerInterpreter
@@ -10,8 +11,9 @@ from app.engine.prioritizer import GapPrioritizer
 from app.engine.question_generator import GeneratedQuestion, QuestionGenerator
 from app.engine.readiness import ReadinessComputer
 from app.engine.state_manager import StateManager
+from app.models.common import ConfidenceLabel
 from app.models.normalized import NormalizedSource
-from app.models.semantic import SemanticSourceModel
+from app.models.semantic import SemanticSourceModel, TableReviewStatus
 from app.models.state import KnowledgeState
 from app.models.source_attribution import DiscoverySource
 from app.normalization.service import MetadataNormalizer
@@ -137,7 +139,11 @@ class OnboardingEngine:
         return state
 
     def confirm_table(
-        self, source_name: str, table_name: str, reviewer: str | None = None
+        self,
+        source_name: str,
+        table_name: str,
+        reviewer: str | None = None,
+        normalized: NormalizedSource | None = None,
     ) -> KnowledgeState:
         """Mark a table and all its current column mappings as human-confirmed."""
         state = self.state_manager.load(source_name)
@@ -147,28 +153,69 @@ class OnboardingEngine:
         if table_name not in state.tables:
             raise ValueError(f"Table '{table_name}' not found in knowledge state.")
 
-        from datetime import datetime
-        from app.models.source_attribution import DiscoverySource
-
         table = state.tables[table_name]
+        table.review_status = TableReviewStatus.confirmed
         table.attribution.source = DiscoverySource.CONFIRMED_BY_USER
         table.attribution.user = reviewer
-        table.attribution.timestamp = datetime.utcnow().isoformat()
+        table.attribution.timestamp = datetime.now(timezone.utc).isoformat()
         table.confidence.score = 1.0
-        table.confidence.label = "high"
+        table.confidence.label = ConfidenceLabel.high
 
         # Also confirm all columns currently in the model
         for column in table.columns:
             column.attribution.source = DiscoverySource.CONFIRMED_BY_USER
             column.attribution.user = reviewer
-            column.attribution.timestamp = datetime.utcnow().isoformat()
+            column.attribution.timestamp = datetime.now(timezone.utc).isoformat()
             column.confidence.score = 1.0
-            column.confidence.label = "high"
+            column.confidence.label = ConfidenceLabel.high
+
+        if normalized is not None:
+            state.unresolved_gaps = self.gap_detector.detect(normalized, state)
+        else:
+            state.unresolved_gaps = [
+                gap for gap in state.unresolved_gaps if gap.target_entity != table_name
+            ]
 
         # Recompute readiness
         state.readiness = self.readiness_computer.compute(state)
 
         # Persist
+        self.state_manager.save(source_name, state)
+        return state
+
+    def review_table(
+        self,
+        source_name: str,
+        table_name: str,
+        review_status: TableReviewStatus,
+        reviewer: str | None = None,
+        normalized: NormalizedSource | None = None,
+    ) -> KnowledgeState:
+        """Persist a user's keep/skip decision for a table and recompute state."""
+        state = self.state_manager.load(source_name)
+        if state is None:
+            raise ValueError(f"No knowledge state found for source '{source_name}'.")
+
+        if table_name not in state.tables:
+            raise ValueError(f"Table '{table_name}' not found in knowledge state.")
+
+        table = state.tables[table_name]
+        table.review_status = review_status
+        table.attribution.user = reviewer
+        table.attribution.timestamp = datetime.now(timezone.utc).isoformat()
+        if review_status == TableReviewStatus.skipped:
+            table.attribution.tooling_notes = "Skipped from review scope by user."
+        elif table.attribution.tooling_notes == "Skipped from review scope by user.":
+            table.attribution.tooling_notes = None
+
+        if normalized is not None:
+            state.unresolved_gaps = self.gap_detector.detect(normalized, state)
+        elif review_status == TableReviewStatus.skipped:
+            state.unresolved_gaps = [
+                gap for gap in state.unresolved_gaps if gap.target_entity != table_name
+            ]
+
+        state.readiness = self.readiness_computer.compute(state)
         self.state_manager.save(source_name, state)
         return state
 

@@ -11,6 +11,7 @@ const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ||
   .filter(Boolean);
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   outputFileTracingRoot: path.join(__dirname, ".."),
   allowedDevOrigins,
   reactStrictMode: true,

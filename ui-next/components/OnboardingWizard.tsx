@@ -13,7 +13,7 @@ import DomainAuditPanel from "./DomainAuditPanel";
 import ArtifactExplorer from "./ArtifactExplorer";
 
 type Screen = "connect" | "overview" | "workspace" | "enums" | "final";
-type DataMode = "loading" | "live" | "mock";
+type DataMode = "loading" | "live" | "setup" | "mock";
 
 export function OnboardingWizard({ sourceName }: { sourceName: string }) {
   const [screen, setScreen] = useState<Screen>("connect");
@@ -22,6 +22,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
   const [error, setError] = useState<string>("");
   const [question, setQuestion] = useState<GeneratedQuestion | null>(null);
   const [groups, setGroups] = useState<Record<string, string[]>>({});
+  const [isPreparingWorkspace, setIsPreparingWorkspace] = useState(false);
 
   const loadGroups = useCallback(async () => {
     try {
@@ -35,15 +36,21 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
 
   const loadState = useCallback(async () => {
     try {
-      const { getEngineState } = await import("../lib/client-api");
       const engineState = await getEngineState(sourceName);
       setState(engineState);
       setMode("live");
       setError("");
       setScreen((current) => (current === "connect" ? "overview" : current));
       void loadGroups();
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Could not load onboarding workspace.";
+      if (message.includes("No engine state")) {
+        setMode("setup");
+        setError("");
+        return;
+      }
       setMode("mock");
+      setError(message);
     }
   }, [loadGroups, sourceName]);
 
@@ -54,17 +61,17 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
 
   const handleInitialize = async () => {
     setError("");
+    setIsPreparingWorkspace(true);
     try {
-      const { initializeEngine } = await import("../lib/client-api");
       const engineState = await initializeEngine(sourceName);
       setState(engineState);
       setMode("live");
       setScreen("overview");
       void loadGroups();
     } catch (err) {
-      setMode("mock");
-      setScreen("overview");
       setError(err instanceof Error ? err.message : "Could not reach engine API.");
+    } finally {
+      setIsPreparingWorkspace(false);
     }
   };
 
@@ -102,7 +109,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
   const renderScreen = () => {
     switch (screen) {
       case "connect":
-        return <ConnectScreen onNext={handleInitialize} sourceName={sourceName} mode={mode} error={error} />;
+        return <ConnectScreen onNext={handleInitialize} sourceName={sourceName} mode={mode} error={error} busy={isPreparingWorkspace} />;
       case "overview":
         return <OverviewScreen onNext={() => setScreen("workspace")} state={state} sourceName={sourceName} mode={mode} onStateUpdate={setState} groups={groups} />;
       case "workspace":
@@ -137,8 +144,14 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
           <NavItem active={screen === 'final'} label="5. Review" onClick={() => setScreen('final')} />
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <span className={`pill ${mode === 'live' ? 'pill-success' : 'pill-warning'}`}>
-            {mode === 'live' ? '● Live' : mode === 'loading' ? '◌ Loading...' : '○ Mock'}
+          <span className={`pill ${mode === 'live' ? 'pill-success' : mode === 'mock' ? 'pill-danger' : 'pill-warning'}`}>
+            {mode === 'live'
+              ? '● Live'
+              : mode === 'loading'
+                ? '◌ Loading...'
+                : mode === 'setup'
+                  ? '◌ Setup Required'
+                  : '○ Mock'}
           </span>
           <span className="pill">{sourceName}</span>
         </div>
@@ -168,23 +181,39 @@ function NavItem({ active, label, onClick }: { active: boolean; label: string; o
   );
 }
 
-function ConnectScreen({ onNext, sourceName, mode, error }: { onNext: () => void; sourceName: string; mode: DataMode; error: string }) {
+function ConnectScreen({ onNext, sourceName, mode, error, busy }: { onNext: () => void; sourceName: string; mode: DataMode; error: string; busy: boolean }) {
+  const message =
+    mode === "live"
+      ? "A cached review workspace is already available."
+      : mode === "loading"
+        ? "Checking whether a cached review workspace already exists."
+        : mode === "setup"
+          ? "Semantic metadata is ready. Click to prepare the review workspace and deferred review artifacts."
+          : "The engine API could not be reached. You can retry once connectivity is restored.";
+
+  const buttonLabel =
+    mode === "live"
+      ? "Refresh Review Workspace"
+      : busy
+        ? "Preparing Review Workspace..."
+        : "Prepare Review Workspace";
+
   return (
     <div className="hero">
       <span className="eyebrow">Semantic Onboarding</span>
-      <h1>Initialize the engine for {sourceName}.</h1>
-      <p>This will read the normalized schema from Phase 1 and detect all semantic gaps that need your attention.</p>
+      <h1>Prepare the review workspace for {sourceName}.</h1>
+      <p>This step loads the cached semantic model, initializes the review state, and prepares the deferred review outputs only when you ask for them.</p>
 
       <div className="card" style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'left' }}>
         <div className="stack" style={{ gap: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: mode === 'live' ? 'var(--success)' : 'var(--warning)' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: mode === 'live' ? 'var(--success)' : mode === 'mock' ? 'var(--danger)' : 'var(--warning)' }} />
             <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-              {mode === 'live' ? 'Engine is initialized and live.' : 'Engine API ready. Click to bootstrap.'}
+              {message}
             </span>
           </div>
-          <button className="btn btn-primary" onClick={onNext} style={{ width: '100%' }}>
-            {mode === 'live' ? 'Re-initialize Engine' : 'Initialize Onboarding Engine'}
+          <button className="btn btn-primary" onClick={onNext} style={{ width: '100%' }} disabled={busy || mode === 'loading'}>
+            {buttonLabel}
           </button>
           {error && (
             <div style={{ padding: '0.75rem', background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)', borderRadius: '8px', fontSize: '0.8rem', color: '#fca5a5' }}>
@@ -199,6 +228,8 @@ function ConnectScreen({ onNext, sourceName, mode, error }: { onNext: () => void
 
 function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string; onStateUpdate: (s: KnowledgeState) => void, groups: Record<string, string[]> }) {
   const [resolving, setResolving] = useState(false);
+  const [preparingReview, setPreparingReview] = useState(false);
+  const [prepareError, setPrepareError] = useState("");
   const [activeTab, setActiveTab] = useState<'domains' | 'graph'>('domains');
   const [resolveResult, setResolveResult] = useState<{ resolved: number; remaining: number } | null>(null);
 
@@ -220,6 +251,24 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups
     } finally {
       setResolving(false);
     }
+  };
+
+  const handleContinue = async () => {
+    if (mode === "live") {
+      setPrepareError("");
+      setPreparingReview(true);
+      try {
+        const refreshedState = await initializeEngine(sourceName);
+        onStateUpdate(refreshedState);
+      } catch (err) {
+        setPrepareError(err instanceof Error ? err.message : "Failed to prepare the review workspace.");
+        setPreparingReview(false);
+        return;
+      } finally {
+        setPreparingReview(false);
+      }
+    }
+    onNext();
   };
 
   return (
@@ -287,10 +336,22 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups
       )}
 
       <div className="button-row" style={{ marginTop: '1.5rem', justifyContent: 'flex-end' }}>
-        <button className="btn btn-primary" onClick={onNext}>
-          {gapCount > 0 ? `Review ${gapCount} items →` : 'Continue →'}
+        <button className="btn btn-primary" onClick={handleContinue} disabled={preparingReview}>
+          {preparingReview
+            ? 'Preparing review questions...'
+            : gapCount > 0
+              ? `Review ${gapCount} items →`
+              : 'Continue →'}
         </button>
       </div>
+      <p className="hint" style={{ marginTop: '-0.5rem', textAlign: 'right' }}>
+        Review questions and export artifacts are prepared when you continue from this screen.
+      </p>
+      {prepareError ? (
+        <div style={{ padding: '0.75rem', background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)', borderRadius: '8px', fontSize: '0.8rem', color: '#fca5a5' }}>
+          {prepareError}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -390,12 +451,18 @@ function ChatPanel({
 }
 
 function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state: KnowledgeState; sourceName: string; onStateUpdate: (s: KnowledgeState) => void; groups: Record<string, string[]> }) {
+  const skippedTables = Object.values(state.tables).filter((table) => table.review_status === "skipped").length;
+
   return (
     <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <span className="eyebrow">Step 5 — Final Review</span>
-        <h1>Manual Domain Audit</h1>
-        <p className="hint">Review the AI-generated semantic mappings below. Confirm each table to reach 100% readiness for TAG deployment.</p>
+        <h1>Table Scope Review</h1>
+        <p className="hint">
+          Review tables as cards, keep the ones that matter, and skip the ones that should not
+          consume more review time. Open questions stay attached to each table so the user can
+          decide quickly.
+        </p>
       </div>
 
       <DomainAuditPanel 
@@ -411,6 +478,11 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
             <div style={{ height: '100%', width: `${state.readiness.readiness_percentage}%`, background: 'var(--accent)', transition: 'width 0.5s ease' }} />
           </div>
           <h2 style={{ color: 'var(--accent)' }}>{state.readiness.readiness_percentage}% Complete</h2>
+          <p className="hint" style={{ marginTop: '0.75rem' }}>
+            {skippedTables > 0
+              ? `${skippedTables} table(s) have already been removed from the manual review scope.`
+              : 'No tables have been removed from scope yet.'}
+          </p>
           <div className="stack" style={{ marginTop: '1rem' }}>
             {state.readiness.readiness_notes.length > 0 ? (
               state.readiness.readiness_notes.map((note: string, i: number) => (

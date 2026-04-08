@@ -3,10 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
-    "dev": "npm run clean && next dev",
-    "build": "npm run clean && next build",
-    "start": "npm run clean && next build && next start"
+    "clean": "node -e \"for (const dir of ['.next', '.next-dev']) require('fs').rmSync(dir, { recursive: true, force: true })\"",
+    "dev": "next dev",
+    "build": "next build",
+    "rebuild": "npm run clean && next build",
+    "start": "next start",
+    "start:fresh": "npm run clean && next build && next start"
   },
   "dependencies": {
     "d3-force": "^3.0.0",

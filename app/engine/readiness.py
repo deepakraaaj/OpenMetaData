@@ -1,6 +1,7 @@
 """Recompute readiness state after each knowledge state update."""
 from __future__ import annotations
 
+from app.models.semantic import TableReviewStatus
 from app.models.state import KnowledgeState, ReadinessState
 
 
@@ -22,16 +23,17 @@ class ReadinessComputer:
             )
 
         # Weight blocking gaps more heavily
-        table_count = len(state.tables)
-        if table_count == 0:
+        active_tables = [
+            table for table in state.tables.values() if table.review_status != TableReviewStatus.skipped
+        ]
+        if not active_tables:
             pct = 0.0
         else:
-            # Base: ratio of tables that have user-confirmed meaning
+            # Base: ratio of in-scope tables that have user-confirmed meaning
             confirmed_tables = sum(
-                1 for t in state.tables.values()
-                if t.attribution.source == "confirmed_by_user"
+                1 for t in active_tables if t.attribution.source == "confirmed_by_user"
             )
-            base_pct = (confirmed_tables / table_count) * 50  # up to 50% from confirmations
+            base_pct = (confirmed_tables / len(active_tables)) * 50  # up to 50% from confirmations
 
             # Bonus: ratio of non-blocking gaps resolved (assume initial total was larger)
             non_blocking = total - blocking

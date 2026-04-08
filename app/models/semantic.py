@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+from enum import Enum
+
 from pydantic import BaseModel, Field
 
 from app.models.common import NamedConfidence, SensitivityLabel
 from app.models.source_attribution import SourceAttribution
+
+
+class TableReviewStatus(str, Enum):
+    pending = "pending"
+    confirmed = "confirmed"
+    skipped = "skipped"
 
 
 class SemanticColumn(BaseModel):
@@ -21,6 +29,7 @@ class SemanticColumn(BaseModel):
 
 class SemanticTable(BaseModel):
     table_name: str
+    review_status: TableReviewStatus = TableReviewStatus.pending
     business_meaning: str | None = None
     grain: str | None = None
     likely_entity: str | None = None
@@ -89,4 +98,3 @@ class SemanticSourceModel(BaseModel):
     glossary: list[GlossaryTerm] = Field(default_factory=list)
     canonical_entities: list[CanonicalEntity] = Field(default_factory=list)
     query_patterns: list[QueryPattern] = Field(default_factory=list)
-

@@ -10,6 +10,7 @@ export const MOCK_KNOWLEDGE_STATE: KnowledgeState = {
   tables: {
     users: {
       table_name: "users",
+      review_status: "confirmed",
       business_meaning: "Core table for registered platform users.",
       grain: "One row per user account",
       likely_entity: "User",
@@ -52,6 +53,7 @@ export const MOCK_KNOWLEDGE_STATE: KnowledgeState = {
     },
     orders: {
       table_name: "orders",
+      review_status: "pending",
       business_meaning: "Transactional records for sales and subscriptions.",
       grain: "One row per line item purchase",
       important_columns: ["id", "user_id", "status", "amount"],
