@@ -5,6 +5,7 @@ from pathlib import Path
 from app.artifacts.semantic_bundle import SEMANTIC_BUNDLE_FILES, SemanticBundleExporter
 from app.models.common import DatabaseType
 from app.models.questionnaire import QuestionnaireBundle, QuestionnaireQuestion
+from app.models.review import TableReviewDecision, TableRole
 from app.models.semantic import GlossaryTerm, QueryPattern, SemanticColumn, SemanticSourceModel, SemanticTable
 from app.models.technical import ColumnProfile, ForeignKeyProfile, SchemaProfile, SourceTechnicalMetadata, TableProfile
 
@@ -20,11 +21,18 @@ def _semantic() -> SemanticSourceModel:
         tables=[
             SemanticTable(
                 table_name="task_transaction",
+                domain="Warehouse Ops",
+                role=TableRole.transaction,
+                selected=True,
+                recommended_selected=True,
+                review_decision=TableReviewDecision.selected,
                 business_meaning="Operational work orders.",
                 likely_entity="work order",
                 important_columns=["id", "status", "company_id", "assignee_id"],
                 valid_joins=["task_transaction.assignee_id = person.id"],
                 common_business_questions=["show open work orders"],
+                reason_for_classification="Included because it looks like a core business table with strong supporting signals.",
+                related_tables=["person"],
                 columns=[
                     SemanticColumn(column_name="id", technical_type="INTEGER", business_meaning="work order id"),
                     SemanticColumn(column_name="status", technical_type="INTEGER", business_meaning="work order status"),
@@ -145,8 +153,12 @@ def test_semantic_bundle_contains_enums_and_patterns() -> None:
 
     assert schema["tables"][0]["table_name"] == "task_transaction"
     assert schema["tables"][0]["tenant_scope_candidates"] == ["company_id"]
+    assert schema["tables"][0]["role"] == "transaction"
+    assert schema["tables"][0]["selected"] is True
+    assert schema["selection_summary"]["selected_count"] == 1
     assert business["unresolved_questions"][0]["type"] == "chatbot_exposure"
     assert business["unresolved_questions"][0]["answer"] is None
+    assert business["selection_summary"]["selected_count"] == 1
     assert enums["entries"][0]["column_name"] == "status"
     assert patterns["patterns"][0]["intent"] == "work_order_list"
     assert patterns["learned_queries"] == []

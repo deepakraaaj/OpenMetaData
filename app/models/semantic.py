@@ -5,6 +5,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from app.models.common import NamedConfidence, SensitivityLabel
+from app.models.review import TableReviewDecision, TableRole
 from app.models.source_attribution import SourceAttribution
 
 
@@ -30,6 +31,14 @@ class SemanticColumn(BaseModel):
 class SemanticTable(BaseModel):
     table_name: str
     review_status: TableReviewStatus = TableReviewStatus.pending
+    domain: str | None = None
+    role: TableRole = TableRole.core_entity
+    selected: bool = True
+    recommended_selected: bool = True
+    selected_by_default: bool = True
+    review_decision: TableReviewDecision = TableReviewDecision.review
+    needs_review: bool = False
+    requires_review: bool = False
     business_meaning: str | None = None
     grain: str | None = None
     likely_entity: str | None = None
@@ -38,9 +47,29 @@ class SemanticTable(BaseModel):
     common_filters: list[str] = Field(default_factory=list)
     common_business_questions: list[str] = Field(default_factory=list)
     sensitivity_notes: list[str] = Field(default_factory=list)
+    reason_for_classification: str | None = None
+    classification_reason: str | None = None
+    selection_reason: str | None = None
+    review_reason: str | None = None
+    related_tables: list[str] = Field(default_factory=list)
+    impact_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    business_relevance: float = Field(default=0.0, ge=0.0, le=1.0)
+    naming_clarity: float = Field(default=0.0, ge=0.0, le=1.0)
+    graph_connectivity: float = Field(default=0.0, ge=0.0, le=1.0)
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
     attribution: SourceAttribution = Field(default_factory=SourceAttribution)
     columns: list[SemanticColumn] = Field(default_factory=list)
+
+
+class DomainCluster(BaseModel):
+    cluster_name: str
+    member_tables: list[str] = Field(default_factory=list)
+    anchor_tables: list[str] = Field(default_factory=list)
+    inferred_business_meaning: str | None = None
+    confidence: NamedConfidence = Field(default_factory=NamedConfidence)
+    requires_review: bool = False
+    review_reason: str | None = None
+    evidence: list[str] = Field(default_factory=list)
 
 
 class CanonicalEntity(BaseModel):
@@ -95,6 +124,7 @@ class SemanticSourceModel(BaseModel):
     sensitive_areas: list[str] = Field(default_factory=list)
     approved_use_cases: list[str] = Field(default_factory=list)
     tables: list[SemanticTable] = Field(default_factory=list)
+    domain_clusters: list[DomainCluster] = Field(default_factory=list)
     glossary: list[GlossaryTerm] = Field(default_factory=list)
     canonical_entities: list[CanonicalEntity] = Field(default_factory=list)
     query_patterns: list[QueryPattern] = Field(default_factory=list)

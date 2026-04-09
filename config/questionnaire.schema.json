@@ -14,11 +14,50 @@
         "required": ["type", "question"],
         "properties": {
           "type": { "type": "string" },
+          "question_type": { "type": "string" },
           "table": { "type": ["string", "null"] },
           "column": { "type": ["string", "null"] },
           "left_table": { "type": ["string", "null"] },
           "right_table": { "type": ["string", "null"] },
           "question": { "type": "string" },
+          "best_guess": { "type": ["string", "null"] },
+          "confidence": { "type": ["number", "null"] },
+          "evidence": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "candidate_options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["value", "label"],
+              "properties": {
+                "value": { "type": "string" },
+                "label": { "type": "string" },
+                "description": { "type": ["string", "null"] },
+                "is_best_guess": { "type": "boolean" },
+                "is_fallback": { "type": "boolean" }
+              }
+            }
+          },
+          "decision_prompt": { "type": ["string", "null"] },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["value", "label"],
+              "properties": {
+                "value": { "type": "string" },
+                "label": { "type": "string" }
+              }
+            }
+          },
+          "impact_score": { "type": ["number", "null"] },
+          "ambiguity_score": { "type": ["number", "null"] },
+          "business_relevance": { "type": ["number", "null"] },
+          "priority_score": { "type": ["number", "null"] },
+          "allow_free_text": { "type": "boolean" },
+          "free_text_placeholder": { "type": ["string", "null"] },
           "suggested_answer": { "type": ["string", "null"] },
           "suggested_join": { "type": ["string", "null"] },
           "metadata": { "type": "object" },
@@ -38,4 +77,3 @@
     }
   }
 }
-

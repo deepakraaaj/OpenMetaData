@@ -236,6 +236,7 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups
   const tableCount = Object.keys(state.tables).length;
   const totalCols = Object.values(state.tables).reduce((s, t) => s + t.columns.length, 0);
   const gapCount = state.unresolved_gaps.length;
+  const reviewCount = state.review_summary?.review_count || 0;
 
   const handleAiResolve = async () => {
     setResolving(true);
@@ -279,9 +280,11 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups
             {sourceName} — {tableCount} tables, {totalCols} columns
           </h2>
           <p className="hint" style={{ margin: 0 }}>
-            {gapCount > 0
-              ? `The system understood most of the schema but needs your input on ${gapCount} items.`
-              : 'Everything looks good. The schema is fully understood.'}
+            {reviewCount > 0
+              ? `The system preselected the schema and only ${reviewCount} high-impact table decisions still need your confirmation.`
+              : gapCount > 0
+                ? `The system understood most of the schema but needs your input on ${gapCount} semantic items.`
+                : "Everything looks good. The schema is fully understood."}
           </p>
         </div>
         
@@ -339,8 +342,10 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups
         <button className="btn btn-primary" onClick={handleContinue} disabled={preparingReview}>
           {preparingReview
             ? 'Preparing review questions...'
-            : gapCount > 0
-              ? `Review ${gapCount} items →`
+            : reviewCount > 0
+              ? `Review ${reviewCount} table decisions →`
+              : gapCount > 0
+                ? `Review ${gapCount} semantic items →`
               : 'Continue →'}
         </button>
       </div>
@@ -370,6 +375,14 @@ function ChatPanel({
   groups: Record<string, string[]>;
 }) {
   const [answer, setAnswer] = useState("");
+  const [showAlternatives, setShowAlternatives] = useState(false);
+  const [showFreeText, setShowFreeText] = useState(false);
+
+  useEffect(() => {
+    setAnswer("");
+    setShowAlternatives(false);
+    setShowFreeText(false);
+  }, [question?.gap_id]);
 
   if (mode !== "live") {
     return <Chatbot state={state} />;
@@ -387,11 +400,38 @@ function ChatPanel({
 
   // Determine domain context
   const domain = [...Object.entries(groups)].find(([_, tables]) => tables.includes(question.target_entity || ""))?.[0];
+  const alternativeOptions = (question.candidate_options || []).filter((option) => !option.is_best_guess);
+  const canConfirm = Boolean(question.best_guess || question.suggested_answer);
+  const shouldShowTextInput =
+    showFreeText ||
+    (showAlternatives && question.allow_free_text) ||
+    !question.candidate_options?.length ||
+    question.input_type === "text" ||
+    question.input_type === "tags";
 
   const handleSubmit = () => {
     if (!answer.trim()) return;
     onSubmit(question.gap_id, answer);
     setAnswer("");
+    setShowFreeText(false);
+    setShowAlternatives(false);
+  };
+
+  const handleConfirm = () => {
+    onSubmit(question.gap_id, "__confirm__");
+  };
+
+  const handleSkip = () => {
+    onSubmit(question.gap_id, "__skip__");
+  };
+
+  const handleOption = (value: string) => {
+    if (value === "__other__") {
+      setShowAlternatives(true);
+      setShowFreeText(true);
+      return;
+    }
+    onSubmit(question.gap_id, value);
   };
 
   return (
@@ -401,15 +441,34 @@ function ChatPanel({
           <span className={`pill ${question.input_type === 'boolean' ? 'pill-warning' : ''}`}>
             {question.gap_id}
           </span>
-          {domain && (
-            <span className="pill pill-success" style={{ textTransform: 'uppercase', fontSize: '0.7rem' }}>
-              Domain: {domain}
-            </span>
-          )}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {question.confidence !== undefined && question.confidence !== null ? (
+              <span className="pill" style={{ fontSize: '0.7rem' }}>
+                {Math.round(question.confidence * 100)}% confidence
+              </span>
+            ) : null}
+            {question.question_type ? (
+              <span className="pill pill-warning" style={{ textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                {question.question_type.replaceAll("_", " ")}
+              </span>
+            ) : null}
+            {domain && (
+              <span className="pill pill-success" style={{ textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                Domain: {domain}
+              </span>
+            )}
+          </div>
         </div>
-        <h3 style={{ marginTop: '0.5rem' }}>{question.question}</h3>
+        <h3 style={{ marginTop: '0.5rem' }}>{question.decision_prompt || question.question}</h3>
         <p className="hint" style={{ marginTop: '0.5rem' }}>{question.context}</p>
       </div>
+
+      {question.best_guess ? (
+        <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', padding: '1rem', borderRadius: '8px' }}>
+          <strong style={{ color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>System Belief</strong>
+          <div style={{ marginTop: '0.4rem', fontSize: '1rem' }}>{question.best_guess}</div>
+        </div>
+      ) : null}
 
       {question.evidence.length > 0 && (
         <div style={{ background: 'var(--bg-surface-alt)', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem' }}>
@@ -420,32 +479,61 @@ function ChatPanel({
         </div>
       )}
 
-      {(question.input_type === 'boolean' || question.input_type === 'select') && question.choices.length > 0 ? (
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          {question.choices.map((choice) => (
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        {canConfirm ? (
+          <button className="btn btn-primary" onClick={handleConfirm}>
+            Confirm
+          </button>
+        ) : null}
+        <button
+          className="btn btn-outline"
+          onClick={() => {
+            setShowAlternatives((value) => !value);
+            if (!question.candidate_options?.length) {
+              setShowFreeText(true);
+            }
+          }}
+        >
+          Change
+        </button>
+        <button className="btn btn-outline" onClick={handleSkip}>
+          Skip
+        </button>
+      </div>
+
+      {showAlternatives && alternativeOptions.length > 0 ? (
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
+          {alternativeOptions.map((option) => (
             <button
-              key={choice}
+              key={option.value}
               className="btn btn-outline"
-              style={{ flex: question.input_type === 'boolean' ? 1 : 'unset' }}
-              onClick={() => onSubmit(question.gap_id, choice)}
+              style={{ justifyContent: 'flex-start', textAlign: 'left', padding: '0.9rem 1rem' }}
+              onClick={() => handleOption(option.value)}
             >
-              {choice}
+              <div style={{ display: 'grid', gap: '0.25rem' }}>
+                <strong>{option.label}</strong>
+                {option.description ? (
+                  <span className="hint" style={{ fontSize: '0.8rem' }}>{option.description}</span>
+                ) : null}
+              </div>
             </button>
           ))}
         </div>
-      ) : (
+      ) : null}
+
+      {shouldShowTextInput ? (
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto' }}>
           <input
             type="text"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            placeholder={question.suggested_answer || "Type your answer..."}
+            placeholder={question.free_text_placeholder || question.suggested_answer || "Type your answer..."}
             style={{ flex: 1 }}
           />
           <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -457,11 +545,10 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
     <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <span className="eyebrow">Step 5 — Final Review</span>
-        <h1>Table Scope Review</h1>
+        <h1>AI-Preselected Table Scope</h1>
         <p className="hint">
-          Review tables as cards, keep the ones that matter, and skip the ones that should not
-          consume more review time. Open questions stay attached to each table so the user can
-          decide quickly.
+          The system already grouped and preselected the schema. Confirm the uncertain decisions,
+          correct anything obvious, and avoid table-by-table discovery work.
         </p>
       </div>
 

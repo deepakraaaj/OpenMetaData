@@ -1,6 +1,11 @@
 "use client";
 
-import type { ChatbotPackageResponse, KnowledgeState, OnboardingJobSnapshot } from "./types";
+import type {
+  BulkReviewAction,
+  ChatbotPackageResponse,
+  KnowledgeState,
+  OnboardingJobSnapshot,
+} from "./types";
 
 function normalizeBaseUrl(value: string | undefined, fallback = ""): string {
   return (value || fallback).replace(/\/$/, "");
@@ -132,5 +137,16 @@ export async function reviewTable(
   return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/review-table`, {
     method: "POST",
     body: JSON.stringify({ table_name: tableName, review_status: reviewStatus, reviewer }),
+  });
+}
+
+export async function bulkReviewTables(
+  sourceName: string,
+  action: BulkReviewAction,
+  reviewer?: string,
+): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/bulk-review`, {
+    method: "POST",
+    body: JSON.stringify({ action, reviewer }),
   });
 }

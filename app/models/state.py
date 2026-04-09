@@ -4,6 +4,8 @@ from enum import Enum
 from typing import Any
 from pydantic import BaseModel, Field
 
+from app.models.questionnaire import QuestionAction, QuestionOption
+from app.models.review import DomainReviewGroup, ReviewQueueItem, TableSelectionSummary
 from app.models.semantic import (
     SemanticTable,
     CanonicalEntity,
@@ -32,6 +34,19 @@ class SemanticGap(BaseModel):
     target_property: str | None = None
     description: str
     suggested_question: str | None = None
+    question_type: str = "meaning_confirmation"
+    best_guess: str | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    evidence: list[str] = Field(default_factory=list)
+    candidate_options: list[QuestionOption] = Field(default_factory=list)
+    decision_prompt: str | None = None
+    actions: list[QuestionAction] = Field(default_factory=list)
+    impact_score: float = Field(default=0.0, ge=0, le=1)
+    ambiguity_score: float = Field(default=0.0, ge=0, le=1)
+    business_relevance: float = Field(default=0.0, ge=0, le=1)
+    priority_score: float = Field(default=0.0, ge=0)
+    allow_free_text: bool = False
+    free_text_placeholder: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     is_blocking: bool = False
     priority: int = Field(default=3, ge=1, le=3)  # 1=blocking, 2=high, 3=nice-to-have
@@ -56,3 +71,6 @@ class KnowledgeState(BaseModel):
 
     unresolved_gaps: list[SemanticGap] = Field(default_factory=list)
     readiness: ReadinessState = Field(default_factory=ReadinessState)
+    review_summary: TableSelectionSummary = Field(default_factory=TableSelectionSummary)
+    domain_groups: list[DomainReviewGroup] = Field(default_factory=list)
+    review_queue: list[ReviewQueueItem] = Field(default_factory=list)

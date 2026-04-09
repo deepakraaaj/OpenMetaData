@@ -107,6 +107,60 @@ def test_semantic_enrichment_inferrs_audit_actor_user_reference() -> None:
     assert created_by.confidence.score >= 0.9
 
 
+def test_semantic_enrichment_treats_status_foreign_key_as_status_reference() -> None:
+    source = DiscoveredSource(
+        name="vts_demo",
+        connection=SourceConnection(type=DatabaseType.mysql, database="vts_demo"),
+    )
+    technical = SourceTechnicalMetadata(
+        source_name="vts_demo",
+        db_type=DatabaseType.mysql,
+        database_name="vts_demo",
+        connectivity_ok=True,
+        schemas=[
+            SchemaProfile(
+                schema_name="vts_demo",
+                tables=[
+                    TableProfile(
+                        schema_name="vts_demo",
+                        table_name="trip",
+                        primary_key=["id"],
+                        columns=[
+                            ColumnProfile(name="id", data_type="int", is_primary_key=True, is_identifier_like=True),
+                            ColumnProfile(
+                                name="recent_state_id",
+                                data_type="int",
+                                is_foreign_key=True,
+                                enum_values=["10", "20", "30"],
+                                sample_values=["10", "20", "30"],
+                                is_status_like=True,
+                            ),
+                        ],
+                    ),
+                    TableProfile(
+                        schema_name="vts_demo",
+                        table_name="trip_status_master",
+                        primary_key=["id"],
+                        columns=[
+                            ColumnProfile(name="id", data_type="int", is_primary_key=True, is_identifier_like=True),
+                            ColumnProfile(name="display_type", data_type="varchar", sample_values=["Created", "En route", "Reached"]),
+                        ],
+                    ),
+                ],
+            )
+        ],
+    )
+
+    normalized = MetadataNormalizer().normalize(source, technical)
+    semantic = SemanticGuessService().enrich(normalized)
+
+    trip = next(table for table in semantic.tables if table.table_name == "trip")
+    recent_state_id = next(column for column in trip.columns if column.column_name == "recent_state_id")
+
+    assert recent_state_id.business_meaning == "Reference to the workflow or lifecycle state for the record."
+    assert recent_state_id.example_values == ["10", "20", "30"]
+
+
 def test_semantic_enrichment_inferrs_support_directory_meaning_without_table_name_hardcode() -> None:
     source = DiscoveredSource(
         name="vts_demo",

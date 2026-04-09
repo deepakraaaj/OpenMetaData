@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { reviewTable } from "../lib/client-api";
+import { bulkReviewTables, reviewTable } from "../lib/client-api";
 import { formatDomainGroupLabel } from "../lib/domain-groups";
-import { KnowledgeState, SemanticGap, SemanticTable } from "../lib/types";
+import {
+  BulkReviewAction,
+  DomainReviewGroup,
+  KnowledgeState,
+  SemanticGap,
+  SemanticTable,
+} from "../lib/types";
 
 type Props = {
   state: KnowledgeState;
@@ -22,17 +28,52 @@ const GAP_LABELS: Record<string, string> = {
   other: "Review",
 };
 
+const QUICK_ACTIONS: Array<{
+  action: BulkReviewAction;
+  label: string;
+  description: string;
+}> = [
+  {
+    action: "select_recommended",
+    label: "Select All Recommended",
+    description: "Accept the AI include/exclude recommendations in one pass.",
+  },
+  {
+    action: "exclude_noise",
+    label: "Exclude Logs / History",
+    description: "Remove logs, audit trails, and system tables from scope.",
+  },
+  {
+    action: "include_lookup_tables",
+    label: "Include Lookup Tables",
+    description: "Bring optional lookup/master tables into the selected set.",
+  },
+  {
+    action: "include_all",
+    label: "Include All",
+    description: "Force every table into review scope.",
+  },
+];
+
 export default function DomainAuditPanel({ state, groups, onStateUpdate }: Props) {
-  const [activeDomain, setActiveDomain] = useState<string>(Object.keys(groups)[0] || "");
+  const [activeDomain, setActiveDomain] = useState<string>("");
   const [savingTable, setSavingTable] = useState<string | null>(null);
+  const [runningAction, setRunningAction] = useState<BulkReviewAction | null>(null);
   const [error, setError] = useState("");
 
+  const domainGroups = useMemo(() => {
+    if (state.domain_groups.length > 0) {
+      return state.domain_groups;
+    }
+    return fallbackGroups(state, groups);
+  }, [groups, state]);
+
   useEffect(() => {
-    if (activeDomain && groups[activeDomain]) {
+    if (activeDomain && domainGroups.some((domain) => domain.domain === activeDomain)) {
       return;
     }
-    setActiveDomain(Object.keys(groups)[0] || "");
-  }, [activeDomain, groups]);
+    setActiveDomain(domainGroups[0]?.domain || "");
+  }, [activeDomain, domainGroups]);
 
   const gapsByTable = useMemo(() => {
     const grouped: Record<string, SemanticGap[]> = {};
@@ -46,42 +87,27 @@ export default function DomainAuditPanel({ state, groups, onStateUpdate }: Props
     return grouped;
   }, [state.unresolved_gaps]);
 
-  const domainNames = Object.keys(groups);
+  const activeGroup = domainGroups.find((domain) => domain.domain === activeDomain) || domainGroups[0];
   const tablesInDomain = useMemo(() => {
-    const tables =
-      groups[activeDomain]
-        ?.map((name) => state.tables[name])
-        .filter(Boolean) ?? [];
+    const names = activeGroup?.tables || [];
+    return names
+      .map((name) => state.tables[name])
+      .filter(Boolean)
+      .sort((left, right) => {
+        const leftScore = reviewPriority(left, gapsByTable[left.table_name] || []);
+        const rightScore = reviewPriority(right, gapsByTable[right.table_name] || []);
+        if (leftScore !== rightScore) {
+          return rightScore - leftScore;
+        }
+        return left.table_name.localeCompare(right.table_name);
+      });
+  }, [activeGroup, gapsByTable, state.tables]);
 
-    return [...tables].sort((left, right) => {
-      const statusRank = { pending: 0, confirmed: 1, skipped: 2 };
-      const leftRank = statusRank[left.review_status];
-      const rightRank = statusRank[right.review_status];
-      if (leftRank !== rightRank) {
-        return leftRank - rightRank;
-      }
-      const leftGapCount = gapsByTable[left.table_name]?.length || 0;
-      const rightGapCount = gapsByTable[right.table_name]?.length || 0;
-      if (leftGapCount !== rightGapCount) {
-        return rightGapCount - leftGapCount;
-      }
-      return left.table_name.localeCompare(right.table_name);
-    });
-  }, [activeDomain, gapsByTable, groups, state.tables]);
-
-  const handleReview = async (
-    tableName: string,
-    reviewStatus: SemanticTable["review_status"],
-  ) => {
+  const handleReview = async (tableName: string, reviewStatus: SemanticTable["review_status"]) => {
     setError("");
     setSavingTable(tableName);
     try {
-      const updated = await reviewTable(
-        state.source_name,
-        tableName,
-        reviewStatus,
-        "Admin User",
-      );
+      const updated = await reviewTable(state.source_name, tableName, reviewStatus, "Admin User");
       onStateUpdate(updated);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save table decision.");
@@ -90,157 +116,214 @@ export default function DomainAuditPanel({ state, groups, onStateUpdate }: Props
     }
   };
 
-  if (domainNames.length === 0) {
+  const handleQuickAction = async (action: BulkReviewAction) => {
+    setError("");
+    setRunningAction(action);
+    try {
+      const updated = await bulkReviewTables(state.source_name, action, "Admin User");
+      onStateUpdate(updated);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to apply bulk review action.");
+    } finally {
+      setRunningAction(null);
+    }
+  };
+
+  if (domainGroups.length === 0) {
     return (
       <div className="card" style={{ padding: "4rem", textAlign: "center" }}>
-        <p className="hint">No domains identified for auditing yet.</p>
+        <p className="hint">No domain recommendations are available yet.</p>
       </div>
     );
   }
 
-  const activeQuestionCount = tablesInDomain.reduce(
-    (sum, table) => sum + (gapsByTable[table.table_name]?.length || 0),
-    0,
-  );
-  const activeNeededCount = tablesInDomain.filter(
-    (table) => table.review_status === "confirmed",
-  ).length;
-  const activeSkippedCount = tablesInDomain.filter(
-    (table) => table.review_status === "skipped",
-  ).length;
+  const summary = state.review_summary;
 
   return (
-    <div className="audit-panel">
-      <div className="audit-sidebar">
-        <span
-          className="eyebrow"
-          style={{ padding: "0 1rem", marginBottom: "1rem", display: "block" }}
-        >
-          Business Domains
-        </span>
-        {domainNames.map((domain) => {
-          const domainTables = groups[domain]
-            .map((name) => state.tables[name])
-            .filter(Boolean);
-          const decidedCount = domainTables.filter(
-            (table) => table.review_status !== "pending",
-          ).length;
-          const openQuestions = domainTables.reduce(
-            (sum, table) => sum + (gapsByTable[table.table_name]?.length || 0),
-            0,
-          );
-
-          return (
-            <div
-              key={domain}
-              className={`audit-nav-item ${activeDomain === domain ? "active" : ""}`}
-              onClick={() => setActiveDomain(domain)}
-            >
-              <div className="stack" style={{ gap: "0.25rem" }}>
-                <span className="domain-label">{formatDomainGroupLabel(domain)}</span>
-                <span className="hint" style={{ fontSize: "0.7rem" }}>
-                  {decidedCount}/{domainTables.length} decided
-                </span>
-              </div>
-              <span className="pill" style={{ fontSize: "0.7rem" }}>
-                {openQuestions} open
-              </span>
-            </div>
-          );
-        })}
+    <div style={{ display: "grid", gap: "1.5rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem" }}>
+        <SummaryCard label="Analyzed" value={summary.analyzed_table_count} />
+        <SummaryCard label="Selected" value={summary.selected_count} tone="success" />
+        <SummaryCard label="Excluded" value={summary.excluded_count} />
+        <SummaryCard label="Needs Review" value={summary.review_count} tone="warning" />
       </div>
 
-      <div className="audit-main">
-        <div className="audit-header">
-          <div className="stack" style={{ gap: "0.75rem" }}>
-            <div>
-              <h2>{formatDomainGroupLabel(activeDomain)}</h2>
-              <p className="hint" style={{ margin: 0 }}>
-                Review the table cards below, decide what stays in scope, and skip tables
-                that do not matter for this source.
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              <span className="pill">{tablesInDomain.length} tables</span>
-              <span className="pill pill-warning">{activeQuestionCount} open questions</span>
-              <span className="pill pill-success">{activeNeededCount} needed</span>
-              <span className="pill">{activeSkippedCount} skipped</span>
-            </div>
+      <div className="card" style={{ padding: "1.25rem 1.5rem", display: "grid", gap: "1rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+          <div className="stack" style={{ gap: "0.35rem" }}>
+            <span className="eyebrow">Quick Actions</span>
+            <p className="hint" style={{ margin: 0 }}>
+              Accept the AI defaults or correct broad classes of tables without drilling into each one.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            {QUICK_ACTIONS.map((item) => (
+              <button
+                key={item.action}
+                className="btn btn-outline"
+                disabled={runningAction !== null}
+                onClick={() => handleQuickAction(item.action)}
+              >
+                {runningAction === item.action ? "Applying..." : item.label}
+              </button>
+            ))}
           </div>
         </div>
-
-        <div className="audit-content stack" style={{ gap: "1.5rem" }}>
-          {error ? (
-            <div className="audit-error">{error}</div>
-          ) : null}
-
-          {tablesInDomain.map((table) => (
-            <TableAuditCard
-              key={table.table_name}
-              table={table}
-              questions={gapsByTable[table.table_name] || []}
-              isSaving={savingTable === table.table_name}
-              onReview={handleReview}
-            />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem" }}>
+          {QUICK_ACTIONS.map((item) => (
+            <div key={item.action} style={{ padding: "0.85rem 0.9rem", borderRadius: "12px", background: "var(--bg-surface-alt)" }}>
+              <strong style={{ display: "block", marginBottom: "0.35rem" }}>{item.label}</strong>
+              <span className="hint" style={{ fontSize: "0.76rem" }}>{item.description}</span>
+            </div>
           ))}
         </div>
       </div>
 
+      {state.review_queue.length > 0 ? (
+        <div className="card" style={{ padding: "1.25rem 1.5rem" }}>
+          <div className="stack" style={{ gap: "0.35rem", marginBottom: "1rem" }}>
+            <span className="eyebrow">Review Queue</span>
+            <p className="hint" style={{ margin: 0 }}>
+              Only high-impact or low-confidence tables are shown here first.
+            </p>
+          </div>
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {state.review_queue.slice(0, 8).map((item) => (
+              <div
+                key={item.table_name}
+                style={{
+                  padding: "0.95rem 1rem",
+                  borderRadius: "14px",
+                  background: "var(--bg-surface-alt)",
+                  display: "grid",
+                  gap: "0.45rem",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "center" }}>
+                  <strong>{item.table_name}</strong>
+                  <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                    <span className="pill">{item.role.replace(/_/g, " ")}</span>
+                    <span className={`pill ${item.selected ? "pill-success" : ""}`}>
+                      {item.selected ? "Selected" : "Excluded"}
+                    </span>
+                  </div>
+                </div>
+                <span className="hint" style={{ fontSize: "0.75rem" }}>
+                  {item.selection_reason || item.reason_for_classification || "Needs review."}
+                </span>
+                <span className="hint" style={{ fontSize: "0.72rem" }}>
+                  {formatDomainGroupLabel(item.domain || "Configuration / Internal")} • {item.open_gap_count} open issue(s)
+                </span>
+                {item.review_reason ? (
+                  <span className="hint" style={{ fontSize: "0.72rem" }}>
+                    Review: {item.review_reason}
+                  </span>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1rem" }}>
+        {domainGroups.map((domain) => (
+          <button
+            key={domain.domain}
+            type="button"
+            onClick={() => setActiveDomain(domain.domain)}
+            className="card"
+            style={{
+              textAlign: "left",
+              border: activeDomain === domain.domain ? "1px solid var(--accent)" : "1px solid var(--border)",
+              background: activeDomain === domain.domain ? "rgba(var(--accent-rgb), 0.08)" : "var(--bg-surface)",
+              padding: "1.2rem 1.25rem",
+              cursor: "pointer",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "flex-start" }}>
+              <div className="stack" style={{ gap: "0.35rem" }}>
+                <strong>{formatDomainGroupLabel(domain.domain)}</strong>
+                <span className="hint" style={{ fontSize: "0.75rem" }}>
+                  {domain.tables.length} tables
+                </span>
+                {domain.inferred_business_meaning ? (
+                  <span className="hint" style={{ fontSize: "0.72rem" }}>
+                    {domain.inferred_business_meaning}
+                  </span>
+                ) : null}
+              </div>
+              <span
+                className={`pill ${
+                  domain.confidence.label === "high"
+                    ? "pill-success"
+                    : domain.confidence.label === "low"
+                      ? "pill-warning"
+                      : ""
+                }`}
+              >
+                {domain.confidence.label}
+              </span>
+            </div>
+            <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.9rem" }}>
+              <span className="pill pill-success">{domain.selected_count} selected</span>
+              <span className="pill">{domain.excluded_count} excluded</span>
+              <span className="pill pill-warning">{domain.review_count} review</span>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {error ? (
+        <div className="audit-error">{error}</div>
+      ) : null}
+
+      {activeGroup ? (
+        <div className="card" style={{ padding: "1.5rem", display: "grid", gap: "1rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+            <div className="stack" style={{ gap: "0.4rem" }}>
+              <span className="eyebrow">Domain Review</span>
+              <h2 style={{ margin: 0 }}>{formatDomainGroupLabel(activeGroup.domain)}</h2>
+              <p className="hint" style={{ margin: 0 }}>
+                Expand a table only when you need more detail. Most tables should be a one-click confirmation.
+              </p>
+              {activeGroup.review_reason ? (
+                <p className="hint" style={{ margin: 0 }}>
+                  Review focus: {activeGroup.review_reason}
+                </p>
+              ) : null}
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <span className="pill pill-success">{activeGroup.selected_count} selected</span>
+              <span className="pill">{activeGroup.excluded_count} excluded</span>
+              <span className="pill pill-warning">{activeGroup.review_count} pending</span>
+            </div>
+          </div>
+
+          {activeGroup.anchor_tables.length > 0 ? (
+            <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap" }}>
+              {activeGroup.anchor_tables.map((tableName) => (
+                <span key={tableName} className="pill">
+                  Anchor: {tableName}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <div style={{ display: "grid", gap: "0.85rem" }}>
+            {tablesInDomain.map((table) => (
+              <TableAuditDisclosure
+                key={table.table_name}
+                table={table}
+                questions={gapsByTable[table.table_name] || []}
+                isSaving={savingTable === table.table_name}
+                onReview={handleReview}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <style jsx>{`
-        .audit-panel {
-          display: grid;
-          grid-template-columns: 260px 1fr;
-          min-height: 700px;
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-        .audit-sidebar {
-          background: var(--bg-surface-alt);
-          border-right: 1px solid var(--border);
-          padding: 1.5rem 0;
-          overflow-y: auto;
-        }
-        .audit-nav-item {
-          padding: 1rem 1.25rem;
-          cursor: pointer;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          transition: all 0.2s ease;
-          border-left: 3px solid transparent;
-          gap: 0.75rem;
-        }
-        .audit-nav-item:hover {
-          background: rgba(255, 255, 255, 0.04);
-        }
-        .audit-nav-item.active {
-          background: rgba(var(--accent-rgb), 0.1);
-          border-left-color: var(--accent);
-        }
-        .domain-label {
-          font-weight: 600;
-          text-transform: capitalize;
-          font-size: 0.9rem;
-        }
-        .audit-main {
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-        }
-        .audit-header {
-          padding: 1.5rem 2rem;
-          border-bottom: 1px solid var(--border);
-          background: var(--bg-surface);
-        }
-        .audit-content {
-          padding: 2rem;
-          overflow-y: auto;
-          flex: 1;
-          background: rgba(15, 15, 15, 0.3);
-        }
         .audit-error {
           padding: 0.9rem 1rem;
           border: 1px solid var(--danger);
@@ -254,7 +337,7 @@ export default function DomainAuditPanel({ state, groups, onStateUpdate }: Props
   );
 }
 
-function TableAuditCard({
+function TableAuditDisclosure({
   table,
   questions,
   isSaving,
@@ -265,231 +348,191 @@ function TableAuditCard({
   isSaving: boolean;
   onReview: (tableName: string, reviewStatus: SemanticTable["review_status"]) => void;
 }) {
-  const isNeeded = table.review_status === "confirmed";
-  const isSkipped = table.review_status === "skipped";
-  const statusLabel = isSkipped ? "Skipped" : isNeeded ? "Needed" : "Pending";
-  const statusClass = isSkipped ? "" : isNeeded ? "pill-success" : "pill-warning";
+  const selectionLabel =
+    table.review_status === "confirmed"
+      ? "Included"
+      : table.review_status === "skipped"
+        ? "Excluded"
+        : table.selected
+          ? "AI Selected"
+          : "AI Excluded";
+  const selectionTone =
+    table.review_status === "confirmed" || (table.review_status === "pending" && table.selected)
+      ? "pill-success"
+      : table.requires_review || table.needs_review
+        ? "pill-warning"
+        : "";
 
   return (
-    <div
-      className={`card table-audit-card ${isSkipped ? "is-skipped" : ""}`}
-      style={{ padding: "1.5rem" }}
+    <details
+      style={{
+        border: "1px solid var(--border)",
+        borderRadius: "16px",
+        background: "var(--bg-surface-alt)",
+        overflow: "hidden",
+      }}
     >
-      <div className="card-top">
-        <div className="stack" style={{ gap: "0.75rem" }}>
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
-            <h3 style={{ margin: 0, fontSize: "1.15rem" }}>{table.table_name}</h3>
-            <span className={`pill ${statusClass}`}>{statusLabel}</span>
-            {table.likely_entity ? <span className="pill">{table.likely_entity}</span> : null}
+      <summary
+        style={{
+          listStyle: "none",
+          cursor: "pointer",
+          padding: "1rem 1.1rem",
+          display: "grid",
+          gap: "0.65rem",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div className="stack" style={{ gap: "0.3rem" }}>
+            <strong style={{ fontSize: "1rem" }}>{table.table_name}</strong>
+            <span className="hint" style={{ fontSize: "0.76rem" }}>
+              {table.selection_reason || table.reason_for_classification || table.business_meaning || "Awaiting classification explanation"}
+            </span>
+            {table.review_reason ? (
+              <span className="hint" style={{ fontSize: "0.72rem" }}>
+                Review: {table.review_reason}
+              </span>
+            ) : null}
           </div>
-
-          <p style={{ margin: 0, color: "var(--text-main)", maxWidth: "760px" }}>
-            {table.business_meaning || "No stable business meaning has been confirmed yet."}
-          </p>
-
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            <span className="pill">{table.columns.length} columns</span>
-            <span className="pill">{table.valid_joins.length} joins</span>
-            <span className="pill pill-warning">{questions.length} open questions</span>
+          <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <span className="pill">{table.role.replace(/_/g, " ")}</span>
+            <span className={`pill ${selectionTone}`}>{selectionLabel}</span>
+            <span className="pill">{table.confidence.label} confidence</span>
           </div>
         </div>
+      </summary>
 
-        <div className="action-row">
+      <div style={{ padding: "0 1.1rem 1.1rem", display: "grid", gap: "1rem" }}>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <span className="pill">{table.columns.length} columns</span>
+          <span className="pill">{table.related_tables.length} related tables</span>
+          <span className="pill pill-warning">{questions.length} open review items</span>
+          <span className="pill">impact {table.impact_score.toFixed(2)}</span>
+        </div>
+
+        <p style={{ margin: 0, color: "var(--text-main)" }}>
+          {table.business_meaning || "No stable business meaning has been confirmed yet."}
+        </p>
+
+        {table.related_tables.length > 0 ? (
+          <div>
+            <div className="eyebrow" style={{ marginBottom: "0.5rem" }}>
+              Related Tables
+            </div>
+            <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap" }}>
+              {table.related_tables.slice(0, 8).map((item) => (
+                <span key={item} className="pill">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {questions.length > 0 ? (
+          <div style={{ display: "grid", gap: "0.6rem" }}>
+            <div className="eyebrow">Open Questions</div>
+            {questions.slice(0, 3).map((gap) => (
+              <div
+                key={gap.gap_id}
+                style={{
+                  padding: "0.8rem 0.9rem",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.04)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "center", marginBottom: "0.35rem" }}>
+                  <span className="pill pill-warning">{GAP_LABELS[gap.category] || "Review"}</span>
+                  <span className="hint" style={{ fontSize: "0.72rem" }}>
+                    Priority {gap.priority}
+                  </span>
+                </div>
+                <p className="hint" style={{ margin: 0 }}>
+                  {gap.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
           <button
-            className={`btn ${isNeeded ? "btn-success" : "btn-primary"}`}
+            className={`btn ${table.selected ? "btn-success" : "btn-primary"}`}
             onClick={() => onReview(table.table_name, "confirmed")}
             disabled={isSaving}
           >
-            {isSaving && !isSkipped ? "Saving..." : isNeeded ? "Needed" : "Keep Table"}
+            {isSaving && table.selected ? "Saving..." : "Include Table"}
           </button>
           <button
             className="btn btn-outline"
             onClick={() => onReview(table.table_name, "skipped")}
             disabled={isSaving}
           >
-            {isSaving && isSkipped ? "Saving..." : isSkipped ? "Skipped" : "Skip Table"}
+            {isSaving && !table.selected ? "Saving..." : "Exclude Table"}
           </button>
         </div>
       </div>
+    </details>
+  );
+}
 
-      <div className="table-grid">
-        <div className="stack" style={{ gap: "0.75rem" }}>
-          <span className="eyebrow">Open Review Questions</span>
-          {questions.length > 0 ? (
-            questions.map((gap) => (
-              <div key={gap.gap_id} className="question-item">
-                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
-                  <span className={`pill ${gap.is_blocking ? "pill-danger" : "pill-warning"}`}>
-                    {GAP_LABELS[gap.category] || "Review"}
-                  </span>
-                  {gap.target_property ? (
-                    <span className="question-property">{gap.target_property}</span>
-                  ) : null}
-                </div>
-                <p>{gap.suggested_question || gap.description}</p>
-                <span className="hint" style={{ fontSize: "0.75rem" }}>
-                  {gap.description}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="empty-state">
-              No open semantic questions for this table. Keep it if it matters for downstream
-              TAG usage, or skip it to reduce review scope.
-            </div>
-          )}
-        </div>
-
-        <div className="stack" style={{ gap: "0.75rem" }}>
-          <span className="eyebrow">What The System Found</span>
-
-          <div className="detail-block">
-            <strong>Important columns</strong>
-            <div className="detail-list">
-              {table.important_columns.length > 0 ? (
-                table.important_columns.slice(0, 6).map((columnName) => (
-                  <span key={columnName} className="detail-chip">
-                    {columnName}
-                  </span>
-                ))
-              ) : (
-                <span className="hint">No standout columns detected yet.</span>
-              )}
-            </div>
-          </div>
-
-          <div className="detail-block">
-            <strong>Relationships</strong>
-            <div className="detail-list">
-              {table.valid_joins.length > 0 ? (
-                table.valid_joins.slice(0, 5).map((join) => (
-                  <span key={join} className="detail-chip detail-chip-mono">
-                    {join}
-                  </span>
-                ))
-              ) : (
-                <span className="hint">No clear joins detected.</span>
-              )}
-            </div>
-          </div>
-
-          {table.common_business_questions.length > 0 ? (
-            <div className="detail-block">
-              <strong>Business questions this table supports</strong>
-              <div className="stack" style={{ gap: "0.5rem" }}>
-                {table.common_business_questions.slice(0, 3).map((question) => (
-                  <div key={question} className="question-preview">
-                    {question}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
+function SummaryCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "success" | "warning";
+}) {
+  const color =
+    tone === "success" ? "var(--success)" : tone === "warning" ? "var(--warning)" : "var(--accent)";
+  return (
+    <div className="card" style={{ padding: "1.15rem 1.2rem" }}>
+      <div className="hint" style={{ fontSize: "0.8rem", marginBottom: "0.45rem" }}>
+        {label}
       </div>
-
-      <style jsx>{`
-        .table-audit-card {
-          border: 1px solid var(--border);
-          transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-        }
-        .table-audit-card:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-        }
-        .table-audit-card.is-skipped {
-          opacity: 0.72;
-          background: rgba(255, 255, 255, 0.02);
-        }
-        .card-top {
-          display: flex;
-          justify-content: space-between;
-          gap: 1rem;
-          align-items: flex-start;
-          margin-bottom: 1.5rem;
-        }
-        .action-row {
-          display: flex;
-          gap: 0.75rem;
-          flex-wrap: wrap;
-        }
-        .table-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-          gap: 1.25rem;
-        }
-        .question-item {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          padding: 0.9rem 1rem;
-          border-radius: 10px;
-          border: 1px solid var(--border);
-          background: rgba(255, 255, 255, 0.03);
-        }
-        .question-item p {
-          margin: 0;
-          font-size: 0.92rem;
-          line-height: 1.45;
-        }
-        .question-property {
-          padding: 0.2rem 0.45rem;
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.08);
-          font-size: 0.72rem;
-          font-family: monospace;
-        }
-        .empty-state {
-          padding: 1rem;
-          border-radius: 10px;
-          border: 1px dashed var(--border);
-          color: var(--text-muted);
-          background: rgba(255, 255, 255, 0.02);
-          font-size: 0.85rem;
-          line-height: 1.5;
-        }
-        .detail-block {
-          padding: 0.9rem 1rem;
-          border-radius: 10px;
-          border: 1px solid var(--border);
-          background: var(--bg-surface-alt);
-        }
-        .detail-block strong {
-          display: block;
-          margin-bottom: 0.75rem;
-          font-size: 0.82rem;
-        }
-        .detail-list {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-        .detail-chip {
-          padding: 0.3rem 0.55rem;
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.05);
-          font-size: 0.76rem;
-        }
-        .detail-chip-mono {
-          font-family: monospace;
-        }
-        .question-preview {
-          padding: 0.75rem 0.85rem;
-          border-radius: 10px;
-          background: rgba(var(--accent-rgb), 0.08);
-          border: 1px solid rgba(var(--accent-rgb), 0.18);
-          font-size: 0.82rem;
-          line-height: 1.45;
-        }
-        @media (max-width: 1100px) {
-          .card-top {
-            flex-direction: column;
-          }
-          .table-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
+      <div style={{ fontSize: "2rem", fontWeight: 700, color }}>{value}</div>
     </div>
   );
+}
+
+function reviewPriority(table: SemanticTable, gaps: SemanticGap[]) {
+  const selectionWeight = table.selected ? 2 : 1;
+  const uncertaintyWeight = table.requires_review || table.needs_review ? 2 : 0;
+  return selectionWeight + uncertaintyWeight + gaps.length * 2 + (1 - table.confidence.score) + table.impact_score;
+}
+
+function fallbackGroups(state: KnowledgeState, groups: Record<string, string[]>): DomainReviewGroup[] {
+  return Object.entries(groups).map(([domain, tables]) => {
+    const members = tables.map((name) => state.tables[name]).filter(Boolean);
+    const avgScore =
+      members.reduce((total, table) => total + (table?.confidence.score || 0), 0) / Math.max(members.length, 1);
+    return {
+      domain,
+      tables,
+      core_tables: members
+        .filter((table) => table.role === "core_entity" || table.role === "transaction")
+        .slice(0, 3)
+        .map((table) => table.table_name),
+      selected_count: members.filter((table) => table.selected).length,
+      excluded_count: members.filter((table) => !table.selected).length,
+      review_count: members.filter((table) => table.requires_review || table.needs_review).length,
+      anchor_tables: members
+        .slice()
+        .sort((left, right) => (right.impact_score || 0) - (left.impact_score || 0))
+        .slice(0, 3)
+        .map((table) => table.table_name),
+      inferred_business_meaning:
+        members.length > 0
+          ? `Business area centered on ${members.slice(0, 3).map((table) => table.table_name).join(", ")}.`
+          : undefined,
+      requires_review: members.some((table) => table.requires_review),
+      review_reason: members.find((table) => table.review_reason)?.review_reason,
+      confidence: {
+        label: avgScore >= 0.78 ? "high" : avgScore >= 0.55 ? "medium" : "low",
+        score: Number(avgScore.toFixed(2)),
+        rationale: ["Derived from table confidence scores"],
+      },
+    };
+  });
 }

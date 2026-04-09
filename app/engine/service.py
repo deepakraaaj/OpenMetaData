@@ -11,8 +11,10 @@ from app.engine.prioritizer import GapPrioritizer
 from app.engine.question_generator import GeneratedQuestion, QuestionGenerator
 from app.engine.readiness import ReadinessComputer
 from app.engine.state_manager import StateManager
+from app.engine.table_review_planner import TableReviewPlanner
 from app.models.common import ConfidenceLabel
 from app.models.normalized import NormalizedSource
+from app.models.review import BulkReviewAction, TableReviewDecision, TableRole
 from app.models.semantic import SemanticSourceModel, TableReviewStatus
 from app.models.state import KnowledgeState
 from app.models.source_attribution import DiscoverySource
@@ -38,6 +40,7 @@ class OnboardingEngine:
         self.question_generator = QuestionGenerator()
         self.answer_interpreter = AnswerInterpreter()
         self.readiness_computer = ReadinessComputer()
+        self.review_planner = TableReviewPlanner()
         self.normalizer = MetadataNormalizer()
         self.semantic_service = SemanticGuessService()
 
@@ -57,6 +60,7 @@ class OnboardingEngine:
         gaps = self.gap_detector.detect(normalized, state)
         state.unresolved_gaps = gaps
         state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
 
         self.state_manager.save(source_name, state)
         return state
@@ -79,6 +83,7 @@ class OnboardingEngine:
         self._merge_inferred_semantics(state, refreshed_semantic)
         state.unresolved_gaps = self.gap_detector.detect(normalized, state)
         state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
         self.state_manager.save(source_name, state)
         return state
 
@@ -133,6 +138,7 @@ class OnboardingEngine:
 
         # Recompute readiness
         state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
 
         # Persist
         self.state_manager.save(source_name, state)
@@ -160,6 +166,8 @@ class OnboardingEngine:
         table.attribution.timestamp = datetime.now(timezone.utc).isoformat()
         table.confidence.score = 1.0
         table.confidence.label = ConfidenceLabel.high
+        table.selected = True
+        table.needs_review = False
 
         # Also confirm all columns currently in the model
         for column in table.columns:
@@ -178,6 +186,7 @@ class OnboardingEngine:
 
         # Recompute readiness
         state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
 
         # Persist
         self.state_manager.save(source_name, state)
@@ -203,6 +212,15 @@ class OnboardingEngine:
         table.review_status = review_status
         table.attribution.user = reviewer
         table.attribution.timestamp = datetime.now(timezone.utc).isoformat()
+        if review_status == TableReviewStatus.confirmed:
+            table.selected = True
+            table.needs_review = False
+        elif review_status == TableReviewStatus.skipped:
+            table.selected = False
+            table.needs_review = False
+        else:
+            table.selected = table.recommended_selected
+            table.needs_review = table.review_decision == TableReviewDecision.review
         if review_status == TableReviewStatus.skipped:
             table.attribution.tooling_notes = "Skipped from review scope by user."
         elif table.attribution.tooling_notes == "Skipped from review scope by user.":
@@ -216,6 +234,78 @@ class OnboardingEngine:
             ]
 
         state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
+        self.state_manager.save(source_name, state)
+        return state
+
+    def bulk_review(
+        self,
+        source_name: str,
+        action: BulkReviewAction,
+        reviewer: str | None = None,
+        normalized: NormalizedSource | None = None,
+    ) -> KnowledgeState:
+        state = self.state_manager.load(source_name)
+        if state is None:
+            raise ValueError(f"No knowledge state found for source '{source_name}'.")
+
+        for table in state.tables.values():
+            if action == BulkReviewAction.select_recommended:
+                self._set_table_selection(
+                    table,
+                    selected=table.recommended_selected,
+                    reviewer=reviewer,
+                )
+                continue
+            if action == BulkReviewAction.exclude_noise:
+                if table.role in {TableRole.log_event, TableRole.history_audit, TableRole.config_system}:
+                    self._set_table_selection(table, selected=False, reviewer=reviewer)
+                continue
+            if action == BulkReviewAction.include_lookup_tables:
+                if table.role == TableRole.lookup_master:
+                    self._set_table_selection(table, selected=True, reviewer=reviewer)
+                continue
+            if action == BulkReviewAction.include_all:
+                self._set_table_selection(table, selected=True, reviewer=reviewer)
+
+        if normalized is not None:
+            state.unresolved_gaps = self.gap_detector.detect(normalized, state)
+        else:
+            state.unresolved_gaps = [
+                gap
+                for gap in state.unresolved_gaps
+                if state.tables.get(gap.target_entity or "", None) is None
+                or state.tables[gap.target_entity].selected
+            ]
+
+        state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
+        self.state_manager.save(source_name, state)
+        return state
+
+    def apply_review_plan(
+        self,
+        source_name: str,
+        normalized: NormalizedSource,
+        *,
+        technical,
+        semantic: SemanticSourceModel,
+        domain_groups: dict[str, list[str]] | None = None,
+    ) -> KnowledgeState:
+        state = self.state_manager.load(source_name)
+        if state is None:
+            state = self.initialize(source_name, normalized, semantic)
+
+        self.review_planner.annotate(
+            normalized=normalized,
+            technical=technical,
+            semantic=semantic,
+            state=state,
+            domain_groups=domain_groups,
+        )
+        state.unresolved_gaps = self.gap_detector.detect(normalized, state)
+        state.readiness = self.readiness_computer.compute(state)
+        self.review_planner.refresh_state_view(state)
         self.state_manager.save(source_name, state)
         return state
 
@@ -276,3 +366,16 @@ class OnboardingEngine:
             "Timestamp used for audit",
         )
         return current_text.startswith(generic_prefixes) and current_text != incoming_text
+
+    def _set_table_selection(
+        self,
+        table,
+        *,
+        selected: bool,
+        reviewer: str | None,
+    ) -> None:
+        table.selected = selected
+        table.review_status = TableReviewStatus.confirmed if selected else TableReviewStatus.skipped
+        table.needs_review = False
+        table.attribution.user = reviewer
+        table.attribution.timestamp = datetime.now(timezone.utc).isoformat()

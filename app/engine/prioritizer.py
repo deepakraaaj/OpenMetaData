@@ -21,11 +21,12 @@ class GapPrioritizer:
     """Sorts gaps and returns the highest-priority unresolved gap."""
 
     def prioritize(self, gaps: list[SemanticGap]) -> list[SemanticGap]:
-        """Sort gaps: blocking first, then by priority, then alphabetically by gap_id."""
+        """Sort gaps: blocking first, then by scored priority, then alphabetically by gap_id."""
         return sorted(
             gaps,
             key=lambda g: (
                 0 if g.is_blocking else 1,
+                -getattr(g, "priority_score", 0.0),
                 g.priority,
                 _CATEGORY_RANK.get(g.category, 99),
                 -len(g.metadata.get("neighbor_tables", [])) if isinstance(g.metadata, dict) else 0,

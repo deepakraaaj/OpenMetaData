@@ -139,7 +139,7 @@ class SemanticGuessService:
             column_name=column.column_name,
             technical_type=column.technical_type,
             business_meaning=meaning,
-            example_values=column.sample_values[:5],
+            example_values=(column.enum_values or column.sample_values)[:5],
             synonyms=synonyms,
             filterable=filterable,
             displayable=displayable,
@@ -354,10 +354,22 @@ class SemanticGuessService:
         name = column.column_name.lower()
         reasons: list[str] = []
         score = 0.45
+        status_signal = column.is_status_like or any(token in name for token in column_rules.status_tokens)
+        classification_signal = any(token in name for token in column_rules.classification_tokens)
         if column.is_primary_key:
             return (
                 f"Unique identifier for each {snake_to_words(table.table_name.rstrip('s'))}.",
                 self._confidence(0.95, ["primary key"]),
+            )
+        if status_signal and column.is_foreign_key:
+            return (
+                "Reference to the workflow or lifecycle state for the record.",
+                self._confidence(0.92, ["status/state naming", "foreign-key status reference"]),
+            )
+        if classification_signal and column.is_foreign_key:
+            return (
+                "Reference to the classification or category assigned to the record.",
+                self._confidence(0.88, ["type/category naming", "foreign-key classification reference"]),
             )
         if column.is_foreign_key:
             score = 0.85
@@ -366,12 +378,12 @@ class SemanticGuessService:
                 f"Reference to a related {snake_to_words(column.column_name.replace('_id', ''))}.",
                 self._confidence(score, reasons),
             )
-        if any(token in name for token in column_rules.status_tokens):
+        if status_signal:
             return (
                 "Lifecycle or workflow status for the record.",
                 self._confidence(0.9, ["status/state naming"]),
             )
-        if any(token in name for token in column_rules.classification_tokens):
+        if classification_signal:
             return (
                 "Classification or category for the record.",
                 self._confidence(0.8, ["type/category naming"]),

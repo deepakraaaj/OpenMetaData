@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.core.settings import get_settings
 from app.engine.service import OnboardingEngine
+from app.models.review import BulkReviewAction
 from app.models.semantic import TableReviewStatus
 from app.onboard.pipeline import OnboardingPipeline
 from app.repositories.filesystem import WorkspaceRepository
@@ -83,8 +84,7 @@ def submit_answer(source_name: str, request: AnswerRequest) -> JSONResponse:
 
 @router.get("/{source_name}/ai-group")
 def ai_group(source_name: str) -> JSONResponse:
-    """Group tables using full schema structure plus LLM reasoning."""
-    from app.engine.ai_resolver import group_tables_by_relationships
+    """Return deterministic table grouping derived from the schema intelligence layer."""
 
     try:
         cached_groups = repository.load_domain_groups(source_name)
@@ -94,25 +94,31 @@ def ai_group(source_name: str) -> JSONResponse:
     if cached_groups:
         return JSONResponse({"source_name": source_name, "groups": cached_groups, "cached": True})
 
-    state = engine.get_state(source_name)
-    if state is None:
-        raise HTTPException(status_code=404, detail=f"No engine state for '{source_name}'.")
+    try:
+        normalized = repository.load_normalized_metadata(source_name)
+        semantic_model = repository.load_semantic_model(source_name)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"Missing semantic metadata for '{source_name}'.") from exc
 
     try:
         technical_metadata = repository.load_technical_metadata(source_name)
     except FileNotFoundError:
         technical_metadata = None
 
-    try:
-        semantic_model = repository.load_semantic_model(source_name)
-    except FileNotFoundError:
-        semantic_model = None
+    state = engine.get_state(source_name)
+    if state is None:
+        state = engine.initialize(source_name, normalized, semantic_model)
 
-    groups = group_tables_by_relationships(
-        state,
-        technical_metadata=technical_metadata,
-        semantic_model=semantic_model,
+    engine.apply_review_plan(
+        source_name,
+        normalized,
+        technical=technical_metadata,
+        semantic=semantic_model,
     )
+    repository.save_semantic_model(semantic_model)
+    groups = engine.review_planner.groups_from_semantic(semantic_model)
+    if groups:
+        repository.save_domain_groups(source_name, groups)
     return JSONResponse({"source_name": source_name, "groups": groups, "cached": False})
 
 
@@ -155,6 +161,11 @@ class ReviewTableRequest(BaseModel):
     reviewer: str | None = None
 
 
+class BulkReviewRequest(BaseModel):
+    action: BulkReviewAction
+    reviewer: str | None = None
+
+
 @router.post("/{source_name}/review-table")
 def review_table(source_name: str, request: ReviewTableRequest) -> JSONResponse:
     """Mark a table as needed or skipped for the remaining review flow."""
@@ -168,6 +179,25 @@ def review_table(source_name: str, request: ReviewTableRequest) -> JSONResponse:
             source_name,
             request.table_name,
             request.review_status,
+            request.reviewer,
+            normalized=normalized,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JSONResponse(state.model_dump(mode="json"))
+
+
+@router.post("/{source_name}/bulk-review")
+def bulk_review(source_name: str, request: BulkReviewRequest) -> JSONResponse:
+    try:
+        normalized = repository.load_normalized_metadata(source_name)
+    except FileNotFoundError:
+        normalized = None
+
+    try:
+        state = engine.bulk_review(
+            source_name,
+            request.action,
             request.reviewer,
             normalized=normalized,
         )

@@ -235,6 +235,8 @@ class ChatbotPackageExporter:
         domain = html.escape(str(semantic.domain or semantic.source_name))
         description = html.escape(str(semantic.description or "No domain description available."))
         table_count = sum(len(schema.tables) for schema in technical.schemas)
+        selected_count = sum(1 for table in semantic.tables if table.selected)
+        review_count = sum(1 for table in semantic.tables if table.needs_review)
         question_count = sum(len(section.get("questions") or []) for section in sections)
         db_type = html.escape(str(getattr(technical.db_type, "value", technical.db_type)))
         key_entities = self._render_tag_list(semantic.key_entities[:10], fallback="No key entities inferred.")
@@ -404,6 +406,14 @@ class ChatbotPackageExporter:
           <article class="card">
             <p class="muted">Tables</p>
             <div class="stat">{table_count}</div>
+          </article>
+          <article class="card">
+            <p class="muted">Selected</p>
+            <div class="stat">{selected_count}</div>
+          </article>
+          <article class="card">
+            <p class="muted">Needs Review</p>
+            <div class="stat">{review_count}</div>
           </article>
           <article class="card">
             <p class="muted">Review Questions</p>

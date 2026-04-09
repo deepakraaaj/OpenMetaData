@@ -24,7 +24,7 @@ class ReadinessComputer:
 
         # Weight blocking gaps more heavily
         active_tables = [
-            table for table in state.tables.values() if table.review_status != TableReviewStatus.skipped
+            table for table in state.tables.values() if table.selected and table.review_status != TableReviewStatus.skipped
         ]
         if not active_tables:
             pct = 0.0

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import shutil
 
-from app.models.questionnaire import QuestionnaireBundle
+from app.models.questionnaire import QuestionnaireBundle, QuestionnaireQuestion
 from app.models.semantic import GlossaryTerm, QueryPattern, SemanticSourceModel
 from app.models.technical import ColumnProfile, SourceTechnicalMetadata, TableProfile
 from app.utils.files import ensure_dir
@@ -155,6 +155,8 @@ class SemanticBundleExporter:
         domain: str,
         generated_at: str,
     ) -> dict:
+        selection_summary = self._selection_summary_payload(semantic.tables)
+        domain_groups = self._domain_group_payload(semantic)
         tables: list[dict] = []
         for semantic_table in semantic.tables:
             technical_table = technical_tables.get(semantic_table.table_name)
@@ -178,6 +180,24 @@ class SemanticBundleExporter:
                     "tenant_scope_candidates": tenant_candidates,
                     "status_columns": list(technical_table.status_columns if technical_table else []),
                     "timestamp_columns": list(technical_table.timestamp_columns if technical_table else []),
+                    "domain": semantic_table.domain,
+                    "role": semantic_table.role.value,
+                    "confidence": semantic_table.confidence.model_dump(mode="json"),
+                    "selected": semantic_table.selected,
+                    "selected_by_default": semantic_table.selected_by_default,
+                    "recommended_selected": semantic_table.recommended_selected,
+                    "review_decision": semantic_table.review_decision.value,
+                    "needs_review": semantic_table.needs_review,
+                    "requires_review": semantic_table.requires_review,
+                    "reason_for_classification": semantic_table.reason_for_classification,
+                    "classification_reason": semantic_table.classification_reason,
+                    "selection_reason": semantic_table.selection_reason,
+                    "review_reason": semantic_table.review_reason,
+                    "impact_score": semantic_table.impact_score,
+                    "business_relevance": semantic_table.business_relevance,
+                    "naming_clarity": semantic_table.naming_clarity,
+                    "graph_connectivity": semantic_table.graph_connectivity,
+                    "related_tables": list(semantic_table.related_tables),
                     "important_columns": [
                         {
                             "column_name": column_name,
@@ -207,6 +227,8 @@ class SemanticBundleExporter:
                 "connectivity_ok": technical.connectivity_ok,
                 "source_summary": technical.source_summary,
             },
+            "selection_summary": selection_summary,
+            "domain_groups": domain_groups,
             "tables": tables,
         }
 
@@ -237,16 +259,7 @@ class SemanticBundleExporter:
                     continue
                 if question.answer not in (None, "", []):
                     continue
-                unresolved.append(
-                    {
-                        "type": question.type,
-                        "question": question.question,
-                        "table": question.table,
-                        "column": question.column,
-                        "suggested_answer": question.suggested_answer,
-                        "answer": question.answer,
-                    }
-                )
+                unresolved.append(self._question_payload(question))
 
         entities = []
         for entity in semantic.canonical_entities:
@@ -265,6 +278,8 @@ class SemanticBundleExporter:
             "domain_name": domain,
             "generated_at": generated_at,
             "scope": str(semantic.description or f"{semantic.source_name} business operations").strip(),
+            "selection_summary": self._selection_summary_payload(semantic.tables),
+            "domain_groups": self._domain_group_payload(semantic),
             "key_entities": list(semantic.key_entities),
             "approved_use_cases": list(semantic.approved_use_cases),
             "sensitive_areas": list(semantic.sensitive_areas),
@@ -330,17 +345,9 @@ class SemanticBundleExporter:
         review_questions = []
         if questionnaire:
             for question in questionnaire.questions:
-                if question.type != "relationship_validation":
+                if question.type not in {"relationship_validation", "relationship_disambiguation"}:
                     continue
-                review_questions.append(
-                    {
-                        "question": question.question,
-                        "left_table": question.left_table,
-                        "right_table": question.right_table,
-                        "suggested_join": question.suggested_join,
-                        "answer": question.answer,
-                    }
-                )
+                review_questions.append(self._question_payload(question))
 
         return {
             "version": SEMANTIC_BUNDLE_VERSION,
@@ -411,15 +418,7 @@ class SemanticBundleExporter:
             for question in questionnaire.questions:
                 if question.type not in {"table_business_meaning", "column_business_meaning"}:
                     continue
-                review_hints.append(
-                    {
-                        "question": question.question,
-                        "table": question.table,
-                        "column": question.column,
-                        "suggested_answer": question.suggested_answer,
-                        "answer": question.answer,
-                    }
-                )
+                review_hints.append(self._question_payload(question))
 
         return {
             "version": SEMANTIC_BUNDLE_VERSION,
@@ -442,6 +441,41 @@ class SemanticBundleExporter:
             "rendering_guidance": pattern.rendering_guidance,
         }
 
+    def _question_payload(self, question: QuestionnaireQuestion) -> dict:
+        return {
+            "type": question.type,
+            "question_type": question.question_type,
+            "question": question.question,
+            "decision_prompt": question.decision_prompt,
+            "table": question.table,
+            "column": question.column,
+            "left_table": question.left_table,
+            "right_table": question.right_table,
+            "best_guess": question.best_guess,
+            "confidence": question.confidence,
+            "evidence": list(question.evidence),
+            "candidate_options": [
+                {
+                    "value": option.value,
+                    "label": option.label,
+                    "description": option.description,
+                    "is_best_guess": option.is_best_guess,
+                    "is_fallback": option.is_fallback,
+                }
+                for option in question.candidate_options
+            ],
+            "actions": [{"value": action.value, "label": action.label} for action in question.actions],
+            "impact_score": question.impact_score,
+            "ambiguity_score": question.ambiguity_score,
+            "business_relevance": question.business_relevance,
+            "priority_score": question.priority_score,
+            "allow_free_text": question.allow_free_text,
+            "free_text_placeholder": question.free_text_placeholder,
+            "suggested_answer": question.suggested_answer,
+            "suggested_join": question.suggested_join,
+            "answer": question.answer,
+        }
+
     def _column_description(
         self,
         *,
@@ -454,6 +488,70 @@ class SemanticBundleExporter:
             if column.column_name == technical_column.name and str(column.business_meaning or "").strip():
                 return str(column.business_meaning).strip()
         return f"{_humanize(technical_column.name)} ({technical_column.data_type})"
+
+    def _selection_summary_payload(self, tables) -> dict:
+        items = list(tables or [])
+        return {
+            "analyzed_table_count": len(items),
+            "selected_count": sum(1 for table in items if table.selected),
+            "excluded_count": sum(1 for table in items if not table.selected),
+            "review_count": sum(1 for table in items if table.requires_review or table.needs_review),
+            "detected_domains": _dedupe_keep_order(
+                [str(table.domain or "").strip() for table in items if str(table.domain or "").strip()]
+            ),
+        }
+
+    def _domain_group_payload(self, semantic: SemanticSourceModel) -> list[dict]:
+        if semantic.domain_clusters:
+            payload: list[dict] = []
+            table_map = {table.table_name: table for table in semantic.tables}
+            for cluster in semantic.domain_clusters:
+                members = [table_map[name] for name in cluster.member_tables if name in table_map]
+                payload.append(
+                    {
+                        "domain": cluster.cluster_name,
+                        "table_count": len(cluster.member_tables),
+                        "selected_count": sum(1 for table in members if table.selected),
+                        "excluded_count": sum(1 for table in members if not table.selected),
+                        "review_count": sum(1 for table in members if table.requires_review or table.needs_review),
+                        "confidence": cluster.confidence.score,
+                        "tables": list(cluster.member_tables),
+                        "anchor_tables": list(cluster.anchor_tables),
+                        "inferred_business_meaning": cluster.inferred_business_meaning,
+                        "requires_review": cluster.requires_review,
+                        "review_reason": cluster.review_reason,
+                        "evidence": list(cluster.evidence),
+                    }
+                )
+            return sorted(payload, key=lambda item: (-item["selected_count"], -item["table_count"], item["domain"].lower()))
+
+        grouped: dict[str, list] = {}
+        for table in semantic.tables:
+            label = str(table.domain or "").strip() or "System / Internal"
+            grouped.setdefault(label, []).append(table)
+        payload = []
+        for label, members in grouped.items():
+            anchors = [table.table_name for table in sorted(members, key=lambda item: (-item.impact_score, item.table_name))[:3]]
+            payload.append(
+                {
+                    "domain": label,
+                    "table_count": len(members),
+                    "selected_count": sum(1 for table in members if table.selected),
+                    "excluded_count": sum(1 for table in members if not table.selected),
+                    "review_count": sum(1 for table in members if table.requires_review or table.needs_review),
+                    "confidence": round(
+                        sum(table.confidence.score for table in members) / max(len(members), 1),
+                        2,
+                    ),
+                    "tables": [table.table_name for table in members],
+                    "anchor_tables": anchors,
+                    "inferred_business_meaning": f"Business area centered on {', '.join(anchors)}." if anchors else None,
+                    "requires_review": any(table.requires_review for table in members),
+                    "review_reason": next((table.review_reason for table in members if table.review_reason), None),
+                    "evidence": [],
+                }
+            )
+        return sorted(payload, key=lambda item: (-item["selected_count"], -item["table_count"], item["domain"].lower()))
 
 
 __all__ = [

@@ -28,22 +28,50 @@ def _pick_table_choice(table_choices: list[dict], keywords: tuple[str, ...]) -> 
     return ""
 
 
-def _unresolved_kind(question_type: str) -> str:
-    if question_type == "status_semantics":
-        return "textarea"
-    if question_type == "chatbot_exposure":
+def _question_kind(item: dict) -> str:
+    if list(item.get("candidate_options") or []):
         return "select"
+    if _clean(item.get("type")) == "status_semantics":
+        return "textarea"
     return "text"
 
 
-def _unresolved_choices(question_type: str) -> list[dict]:
-    if question_type != "chatbot_exposure":
+def _question_choices(item: dict) -> list[dict]:
+    options = list(item.get("candidate_options") or [])
+    if options:
+        return [
+            {
+                "label": _clean(option.get("label")),
+                "value": _clean(option.get("value")),
+                "description": _clean(option.get("description")),
+                "is_best_guess": bool(option.get("is_best_guess")),
+                "is_fallback": bool(option.get("is_fallback")),
+            }
+            for option in options
+            if _clean(option.get("label"))
+        ]
+    if _clean(item.get("type")) != "chatbot_exposure":
         return []
     return [
-        {"label": "yes"},
-        {"label": "no"},
-        {"label": "review"},
+        {"label": "yes", "value": "yes"},
+        {"label": "no", "value": "no"},
+        {"label": "review", "value": "review"},
     ]
+
+
+def _question_evidence(item: dict) -> list[str]:
+    evidence = list(item.get("evidence") or [])
+    best_guess = _clean(item.get("best_guess")) or _clean(item.get("suggested_answer"))
+    if best_guess:
+        evidence = [f"System belief: {best_guess}", *evidence]
+    return _dedupe_strings(
+        evidence + [item.get("table"), item.get("column")],
+        limit=8,
+    )
+
+
+def _question_label(item: dict) -> str:
+    return _clean(item.get("decision_prompt")) or _clean(item.get("question"))
 
 
 def _is_meaningful_enum_entry(item: dict) -> bool:
@@ -84,12 +112,18 @@ def build_semantic_bundle_questions(bundle: dict[str, dict]) -> list[dict]:
     pattern_entries = list(patterns.get("patterns") or [])
     review_hints = list(patterns.get("review_hints") or [])
 
+    review_scope_tables = [
+        item
+        for item in tables
+        if bool(item.get("selected")) or bool(item.get("needs_review"))
+    ] or tables
+
     table_choices = [
         {
             "label": _clean(item.get("table_name")),
             "hint": _clean(item.get("description")),
         }
-        for item in tables
+        for item in review_scope_tables
         if _clean(item.get("table_name"))
     ]
     primary_table = _clean((semantics.get("table_roles") or {}).get("primary_table")) or (
@@ -148,7 +182,7 @@ def build_semantic_bundle_questions(bundle: dict[str, dict]) -> list[dict]:
                     "suggested_answer": primary_table,
                     "evidence": _dedupe_strings([
                         f"{item.get('table_name')}: rows={item.get('estimated_row_count')}"
-                        for item in tables[:8]
+                        for item in review_scope_tables[:8]
                     ]),
                 },
                 {
@@ -202,13 +236,13 @@ def build_semantic_bundle_questions(bundle: dict[str, dict]) -> list[dict]:
                             "table_name": item.get("table_name"),
                             "columns": list(item.get("tenant_scope_candidates") or []),
                         }
-                        for item in tables
+                        for item in review_scope_tables
                         if list(item.get("tenant_scope_candidates") or [])
                     ],
                     "suggested_answer": "",
                     "evidence": _dedupe_strings([
                         f"{item.get('table_name')}: {', '.join(item.get('tenant_scope_candidates') or [])}"
-                        for item in tables
+                        for item in review_scope_tables
                         if item.get("tenant_scope_candidates")
                     ], limit=8),
                 },
@@ -242,20 +276,18 @@ def build_semantic_bundle_questions(bundle: dict[str, dict]) -> list[dict]:
             "questions": [
                 {
                     "id": f"review-hint-{index}",
-                    "label": _clean(item.get("question"))
+                    "label": _question_label(item)
                     or (
                         f"What does `{item.get('table')}.{item.get('column')}` mean?"
                         if _clean(item.get("column"))
                         else f"What does `{item.get('table')}` represent in business language?"
                     ),
-                    "kind": "text",
+                    "kind": _question_kind(item),
                     "bundle_file": "query_patterns.json",
                     "field_path": ["review_hints", index, "answer"],
-                    "suggested_answer": item.get("answer") if item.get("answer") not in (None, "") else item.get("suggested_answer"),
-                    "evidence": _dedupe_strings(
-                        [item.get("table"), item.get("column"), item.get("suggested_answer")],
-                        limit=5,
-                    ),
+                    "suggested_answer": item.get("answer") if item.get("answer") not in (None, "") else item.get("best_guess") or item.get("suggested_answer"),
+                    "choices": _question_choices(item),
+                    "evidence": _question_evidence(item),
                 }
                 for index, item in enumerate(review_hints[:12])
                 if _clean(item.get("table")) or _clean(item.get("question"))
@@ -268,16 +300,13 @@ def build_semantic_bundle_questions(bundle: dict[str, dict]) -> list[dict]:
             "questions": [
                 {
                     "id": f"unresolved-{index}",
-                    "label": _clean(item.get("question")),
-                    "kind": _unresolved_kind(_clean(item.get("type"))),
+                    "label": _question_label(item),
+                    "kind": _question_kind(item),
                     "bundle_file": "business_semantics.json",
                     "field_path": ["unresolved_questions", index, "answer"],
-                    "suggested_answer": item.get("answer") if item.get("answer") not in (None, "") else item.get("suggested_answer"),
-                    "choices": _unresolved_choices(_clean(item.get("type"))),
-                    "evidence": _dedupe_strings(
-                        [item.get("table"), item.get("column"), item.get("suggested_answer")],
-                        limit=6,
-                    ),
+                    "suggested_answer": item.get("answer") if item.get("answer") not in (None, "") else item.get("best_guess") or item.get("suggested_answer"),
+                    "choices": _question_choices(item),
+                    "evidence": _question_evidence(item),
                 }
                 for index, item in enumerate(unresolved[:12])
                 if _clean(item.get("question"))
@@ -347,12 +376,13 @@ def build_semantic_bundle_questions(bundle: dict[str, dict]) -> list[dict]:
             "questions": [
                 {
                     "id": f"relationship-{index}",
-                    "label": str(item.get("question") or "").strip(),
-                    "kind": "boolean",
+                    "label": _question_label(item) or str(item.get("question") or "").strip(),
+                    "kind": "select" if _question_choices(item) else "boolean",
                     "bundle_file": "relationship_map.json",
                     "field_path": ["review_questions", index, "answer"],
-                    "suggested_answer": item.get("answer"),
-                    "evidence": _dedupe_strings([item.get("suggested_join")], limit=1),
+                    "suggested_answer": item.get("answer") if item.get("answer") not in (None, "") else item.get("best_guess"),
+                    "choices": _question_choices(item),
+                    "evidence": _question_evidence(item) or _dedupe_strings([item.get("suggested_join")], limit=1),
                 }
                 for index, item in enumerate(relationship_questions[:12])
                 if _clean(item.get("question"))

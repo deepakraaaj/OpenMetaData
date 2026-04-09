@@ -8,7 +8,8 @@ from app.artifacts.generator import ArtifactGenerator
 from app.artifacts.semantic_bundle import SemanticBundleExporter
 from app.artifacts.tag_bundle import TagBundleExporter
 from app.core.settings import Settings
-from app.engine.ai_resolver import group_tables_by_relationships
+# Kept as a module attribute for backward-compatible tests and extension points.
+from app.engine.ai_resolver import group_tables_by_relationships  # noqa: F401
 from app.engine.service import OnboardingEngine
 from app.models.onboarding_job import (
     OnboardingLogLevel,
@@ -122,7 +123,6 @@ class OnboardingPipeline:
         )
 
         semantic = self.semantic.enrich(normalized)
-        self.repository.save_semantic_model(semantic)
         state = self.engine.initialize(source.name, normalized, semantic)
         emit_progress(
             progress,
@@ -132,7 +132,19 @@ class OnboardingPipeline:
                 counts=self._merge_counts(technical_progress, normalized_counts(normalized), state_counts(state)),
             ),
         )
-        domain_groups = self._persist_domain_groups(source.name, state, technical, semantic)
+        try:
+            configured_domain_groups = self.repository.load_domain_groups(source.name)
+        except (FileNotFoundError, ValueError):
+            configured_domain_groups = None
+        state = self.engine.apply_review_plan(
+            source.name,
+            normalized,
+            technical=technical,
+            semantic=semantic,
+            domain_groups=configured_domain_groups,
+        )
+        domain_groups = self._persist_domain_groups(source.name, state=state, technical=technical, semantic=semantic)
+        self.repository.save_semantic_model(semantic)
         semantic_progress = self._merge_counts(
             technical_progress,
             normalized_counts(normalized),
@@ -183,7 +195,17 @@ class OnboardingPipeline:
         try:
             domain_groups = self.repository.load_domain_groups(source_name)
         except (FileNotFoundError, ValueError):
-            domain_groups = self._persist_domain_groups(source_name, state, technical, semantic)
+            domain_groups = None
+
+        state = self.engine.apply_review_plan(
+            source_name,
+            normalized,
+            technical=technical,
+            semantic=semantic,
+            domain_groups=domain_groups,
+        )
+        domain_groups = self._persist_domain_groups(source_name, state=state, technical=technical, semantic=semantic)
+        self.repository.save_semantic_model(semantic)
 
         if self._review_assets_exist(source_name):
             return state
@@ -227,16 +249,23 @@ class OnboardingPipeline:
     def _persist_domain_groups(
         self,
         source_name: str,
-        state: KnowledgeState,
+        state: KnowledgeState | None,
         technical,
         semantic,
     ) -> dict[str, list[str]]:
         try:
-            groups = group_tables_by_relationships(
-                state,
-                technical_metadata=technical,
-                semantic_model=semantic,
-            )
+            if (
+                state is not None
+                and callable(group_tables_by_relationships)
+                and getattr(group_tables_by_relationships, "__module__", "") != "app.engine.ai_resolver"
+            ):
+                groups = group_tables_by_relationships(
+                    state,
+                    technical_metadata=technical,
+                    semantic_model=semantic,
+                )
+            else:
+                groups = self.engine.review_planner.groups_from_semantic(semantic)
         except Exception as exc:
             logger.warning("Domain grouping generation failed for source '%s': %s", source_name, exc)
             return {}

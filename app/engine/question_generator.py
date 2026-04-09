@@ -1,8 +1,9 @@
-"""Convert a SemanticGap into a human-readable question with context."""
+"""Convert a SemanticGap into a structured confirmation question."""
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from app.models.questionnaire import QuestionAction, QuestionOption
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
 
 
@@ -11,19 +12,89 @@ class GeneratedQuestion(BaseModel):
     question: str
     context: str = ""
     evidence: list[str] = Field(default_factory=list)
-    input_type: str = "text"  # text, boolean, select, tags
+    input_type: str = "text"
     choices: list[str] = Field(default_factory=list)
     suggested_answer: str | None = None
     target_entity: str | None = None
     target_property: str | None = None
+    question_type: str = "meaning_confirmation"
+    best_guess: str | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    candidate_options: list[QuestionOption] = Field(default_factory=list)
+    decision_prompt: str | None = None
+    actions: list[QuestionAction] = Field(default_factory=list)
+    impact_score: float = Field(default=0.0, ge=0, le=1)
+    ambiguity_score: float = Field(default=0.0, ge=0, le=1)
+    business_relevance: float = Field(default=0.0, ge=0, le=1)
+    priority_score: float = Field(default=0.0, ge=0)
+    allow_free_text: bool = False
+    free_text_placeholder: str | None = None
 
 
 class QuestionGenerator:
-    """Transforms a semantic gap into a natural, context-rich question."""
+    """Transforms a semantic gap into a context-rich confirmation question."""
 
     def generate(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
+        if (
+            gap.best_guess
+            or gap.candidate_options
+            or gap.evidence
+            or gap.decision_prompt
+            or gap.actions
+            or gap.priority_score > 0
+            or gap.allow_free_text
+        ):
+            return self._structured_question(gap, state)
         handler = self._handlers.get(gap.category, self._default_question)
         return handler(self, gap, state)
+
+    def _structured_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
+        del state  # Structured gaps already carry the needed evidence bundle.
+        choices = [option.label for option in gap.candidate_options if not option.is_fallback]
+        input_type = "select" if gap.candidate_options else "text"
+        return GeneratedQuestion(
+            gap_id=gap.gap_id,
+            question=gap.decision_prompt or gap.suggested_question or gap.description,
+            context=self._context_for_question_type(gap.question_type),
+            evidence=list(gap.evidence),
+            input_type=input_type,
+            choices=choices,
+            suggested_answer=gap.best_guess,
+            target_entity=gap.target_entity,
+            target_property=gap.target_property,
+            question_type=gap.question_type,
+            best_guess=gap.best_guess,
+            confidence=gap.confidence,
+            candidate_options=list(gap.candidate_options),
+            decision_prompt=gap.decision_prompt or gap.suggested_question,
+            actions=list(gap.actions) or self._default_actions(),
+            impact_score=gap.impact_score,
+            ambiguity_score=gap.ambiguity_score,
+            business_relevance=gap.business_relevance,
+            priority_score=gap.priority_score,
+            allow_free_text=gap.allow_free_text,
+            free_text_placeholder=gap.free_text_placeholder,
+        )
+
+    def _context_for_question_type(self, question_type: str) -> str:
+        contexts = {
+            "meaning_confirmation": "Review the system belief first, then confirm or correct it. Free text is only needed if none of the options fits.",
+            "role_confirmation": "Pick the real business target so joins attach to the correct entity.",
+            "pattern_confirmation": "Confirm the kind of business pattern this field represents. Add custom text only if the pattern or labels need correction.",
+            "domain_confirmation": "Confirm the business-facing label users should see.",
+            "ignore_confirmation": "Confirm whether this should stay masked, ignored, or deprioritized in user-facing flows.",
+        }
+        return contexts.get(
+            str(question_type or "").strip(),
+            "Confirm the best guess when it looks right. Use free text only as a fallback.",
+        )
+
+    def _default_actions(self) -> list[QuestionAction]:
+        return [
+            QuestionAction(value="confirm", label="Confirm"),
+            QuestionAction(value="change", label="Change"),
+            QuestionAction(value="skip", label="Skip"),
+        ]
 
     def _meaning_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
         evidence: list[str] = []
@@ -56,6 +127,8 @@ class QuestionGenerator:
             suggested_answer=suggested,
             target_entity=gap.target_entity,
             target_property=gap.target_property,
+            question_type="meaning_confirmation",
+            best_guess=suggested,
         )
 
     def _enum_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -86,6 +159,7 @@ class QuestionGenerator:
             choices=choices,
             target_entity=gap.target_entity,
             target_property=gap.target_property,
+            question_type="pattern_confirmation",
         )
 
     def _pk_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -109,6 +183,8 @@ class QuestionGenerator:
             suggested_answer=choices[0] if choices else None,
             target_entity=gap.target_entity,
             target_property=gap.target_property,
+            question_type="role_confirmation",
+            best_guess=choices[0] if choices else None,
         )
 
     def _relationship_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
@@ -125,9 +201,12 @@ class QuestionGenerator:
             choices=list(candidate_tables or ["Yes, this is valid", "No, this is incorrect", "None of these"]),
             target_entity=gap.target_entity,
             target_property=gap.target_property,
+            question_type="role_confirmation",
+            best_guess=str(candidate_tables[0]) if candidate_tables else None,
         )
 
     def _sensitivity_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
+        del state
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,
@@ -137,9 +216,12 @@ class QuestionGenerator:
             choices=["Yes, mask this column", "No, it is safe to display"],
             target_entity=gap.target_entity,
             target_property=gap.target_property,
+            question_type="ignore_confirmation",
+            best_guess="Yes, mask this column",
         )
 
     def _glossary_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
+        del state
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,
@@ -148,9 +230,11 @@ class QuestionGenerator:
             input_type="text",
             target_entity=gap.target_entity,
             target_property=gap.target_property,
+            question_type="domain_confirmation",
         )
 
     def _default_question(self, gap: SemanticGap, state: KnowledgeState) -> GeneratedQuestion:
+        del state
         return GeneratedQuestion(
             gap_id=gap.gap_id,
             question=gap.suggested_question or gap.description,

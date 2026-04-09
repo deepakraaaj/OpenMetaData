@@ -322,6 +322,33 @@ def test_question_builder_filters_junk_enum_questions_and_binds_answers() -> Non
                     {
                         "type": "chatbot_exposure",
                         "question": "Should `dispatches` be exposed to chatbot workflows?",
+                        "question_type": "ignore_confirmation",
+                        "best_guess": "Keep this table deprioritized until a business use case needs it.",
+                        "decision_prompt": "What should we do with `dispatches` in the first review pass?",
+                        "candidate_options": [
+                            {
+                                "value": "review",
+                                "label": "Keep deprioritized",
+                                "description": "Leave it out of the initial chatbot scope.",
+                                "is_best_guess": True,
+                                "is_fallback": False,
+                            },
+                            {
+                                "value": "include_full",
+                                "label": "Include as a normal business table",
+                                "description": "Treat it as part of the main operational review scope.",
+                                "is_best_guess": False,
+                                "is_fallback": False,
+                            },
+                            {
+                                "value": "__other__",
+                                "label": "Something else",
+                                "description": "Use a custom inclusion rule.",
+                                "is_best_guess": False,
+                                "is_fallback": True,
+                            },
+                        ],
+                        "evidence": ["few business joins: 0", "important columns: status, company_id"],
                         "table": "dispatches",
                         "suggested_answer": "review",
                         "answer": None,
@@ -368,6 +395,7 @@ def test_question_builder_filters_junk_enum_questions_and_binds_answers() -> Non
     business_rules = section_map["business-rules"]["questions"]
     assert business_rules[0]["field_path"] == ["unresolved_questions", 0, "answer"]
     assert business_rules[0]["kind"] == "select"
+    assert business_rules[0]["choices"][0]["label"] == "Keep deprioritized"
 
     review_hints = section_map["review-hints"]["questions"]
     assert review_hints[0]["field_path"] == ["review_hints", 0, "answer"]

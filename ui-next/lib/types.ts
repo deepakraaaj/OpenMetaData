@@ -14,6 +14,24 @@ export type SourceAttribution = {
 
 export type ConfidenceLabel = "high" | "medium" | "low";
 
+export type TableRole =
+  | "core_entity"
+  | "transaction"
+  | "lookup_master"
+  | "mapping_bridge"
+  | "log_event"
+  | "history_audit"
+  | "config_system"
+  | "unknown";
+
+export type TableReviewDecision = "selected" | "excluded" | "review";
+
+export type BulkReviewAction =
+  | "select_recommended"
+  | "exclude_noise"
+  | "include_lookup_tables"
+  | "include_all";
+
 export type NamedConfidence = {
   label: ConfidenceLabel;
   score: number;
@@ -38,6 +56,14 @@ export type SemanticColumn = {
 export type SemanticTable = {
   table_name: string;
   review_status: "pending" | "confirmed" | "skipped";
+  domain?: string;
+  role: TableRole;
+  selected: boolean;
+  recommended_selected: boolean;
+  selected_by_default: boolean;
+  review_decision: TableReviewDecision;
+  needs_review: boolean;
+  requires_review: boolean;
   business_meaning?: string;
   grain?: string;
   likely_entity?: string;
@@ -46,6 +72,15 @@ export type SemanticTable = {
   common_filters: string[];
   common_business_questions: string[];
   sensitivity_notes: string[];
+  reason_for_classification?: string;
+  classification_reason?: string;
+  selection_reason?: string;
+  review_reason?: string;
+  related_tables: string[];
+  impact_score: number;
+  business_relevance: number;
+  naming_clarity: number;
+  graph_connectivity: number;
   confidence: NamedConfidence;
   attribution: SourceAttribution;
   columns: SemanticColumn[];
@@ -75,6 +110,19 @@ export type SemanticGap = {
   target_property?: string;
   description: string;
   suggested_question?: string;
+  question_type?: string;
+  best_guess?: string;
+  confidence?: number;
+  evidence?: string[];
+  candidate_options?: QuestionOption[];
+  decision_prompt?: string;
+  actions?: QuestionAction[];
+  impact_score?: number;
+  ambiguity_score?: number;
+  business_relevance?: number;
+  priority_score?: number;
+  allow_free_text?: boolean;
+  free_text_placeholder?: string;
   is_blocking: boolean;
   priority: number;
 };
@@ -87,6 +135,46 @@ export type ReadinessState = {
   readiness_notes: string[];
 };
 
+export type TableSelectionSummary = {
+  analyzed_table_count: number;
+  selected_count: number;
+  excluded_count: number;
+  review_count: number;
+  high_confidence_count: number;
+  medium_confidence_count: number;
+  low_confidence_count: number;
+  detected_domains: string[];
+};
+
+export type DomainReviewGroup = {
+  domain: string;
+  tables: string[];
+  core_tables: string[];
+  anchor_tables: string[];
+  selected_count: number;
+  excluded_count: number;
+  review_count: number;
+  inferred_business_meaning?: string;
+  requires_review: boolean;
+  review_reason?: string;
+  confidence: NamedConfidence;
+};
+
+export type ReviewQueueItem = {
+  table_name: string;
+  domain?: string;
+  role: TableRole;
+  confidence: NamedConfidence;
+  selected: boolean;
+  open_gap_count: number;
+  reason_for_classification?: string;
+  selection_reason?: string;
+  review_reason?: string;
+  impact_score: number;
+  business_relevance: number;
+  related_tables: string[];
+};
+
 export type KnowledgeState = {
   source_name: string;
   tables: Record<string, SemanticTable>;
@@ -97,6 +185,9 @@ export type KnowledgeState = {
   query_patterns: unknown[];
   unresolved_gaps: SemanticGap[];
   readiness: ReadinessState;
+  review_summary: TableSelectionSummary;
+  domain_groups: DomainReviewGroup[];
+  review_queue: ReviewQueueItem[];
 };
 
 export type OnboardingStage =
@@ -209,6 +300,19 @@ export type QuestionsResponse = {
   sections: Array<Record<string, unknown>>;
 };
 
+export type QuestionOption = {
+  value: string;
+  label: string;
+  description?: string;
+  is_best_guess?: boolean;
+  is_fallback?: boolean;
+};
+
+export type QuestionAction = {
+  value: string;
+  label: string;
+};
+
 export type GeneratedQuestion = {
   gap_id: string;
   question: string;
@@ -219,6 +323,18 @@ export type GeneratedQuestion = {
   target_entity?: string;
   target_property?: string;
   suggested_answer?: string;
+  question_type?: string;
+  best_guess?: string;
+  confidence?: number;
+  candidate_options: QuestionOption[];
+  decision_prompt?: string;
+  actions: QuestionAction[];
+  impact_score?: number;
+  ambiguity_score?: number;
+  business_relevance?: number;
+  priority_score?: number;
+  allow_free_text?: boolean;
+  free_text_placeholder?: string;
 };
 
 export type SourceSummary = {

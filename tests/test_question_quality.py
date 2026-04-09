@@ -3,8 +3,11 @@ from app.engine.answer_interpreter import AnswerInterpreter
 from app.engine.gap_detector import GapDetector
 from app.engine.prioritizer import GapPrioritizer
 from app.engine.question_generator import QuestionGenerator
+from app.models.common import ConfidenceLabel, NamedConfidence
 from app.models.normalized import NormalizedColumn, NormalizedSource, NormalizedTable
-from app.models.semantic import SemanticTable
+from app.models.questionnaire import QuestionAction, QuestionOption
+from app.models.semantic import SemanticColumn, SemanticTable
+from app.models.source_attribution import DiscoverySource
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
 
 
@@ -30,7 +33,7 @@ def _column(
     )
 
 
-def test_gap_detector_skips_audit_enum_noise_and_prioritizes_table_meaning() -> None:
+def test_gap_detector_suppresses_low_value_enum_noise_and_prioritizes_structured_table_meaning() -> None:
     normalized = NormalizedSource(
         source_name="demo",
         db_type="sqlite",
@@ -50,16 +53,28 @@ def test_gap_detector_skips_audit_enum_noise_and_prioritizes_table_meaning() -> 
     )
     state = KnowledgeState(
         source_name="demo",
-        tables={"alert_cfg": SemanticTable(table_name="alert_cfg")},
+        tables={
+            "alert_cfg": SemanticTable(
+                table_name="alert_cfg",
+                confidence=NamedConfidence(label=ConfidenceLabel.low, score=0.2),
+            )
+        },
     )
 
     gaps = GapDetector().detect(normalized, state)
 
     assert not any(gap.gap_id == "enum-alert_cfg.created_by" for gap in gaps)
-    assert any(gap.gap_id == "enum-alert_cfg.status" for gap in gaps)
+    assert not any(gap.gap_id == "enum-alert_cfg.status" for gap in gaps)
+
+    meaning_gap = next(gap for gap in gaps if gap.gap_id == "meaning-alert_cfg")
+    assert meaning_gap.question_type == "meaning_confirmation"
+    assert meaning_gap.best_guess
+    assert meaning_gap.candidate_options
+    assert meaning_gap.candidate_options[-1].is_fallback is True
 
     top_gap = GapPrioritizer().next_gap(gaps)
     assert top_gap is not None
+    assert top_gap.gap_id == "meaning-alert_cfg"
     assert top_gap.category == GapCategory.UNKNOWN_BUSINESS_MEANING
     assert top_gap.target_entity == "alert_cfg"
 
@@ -111,6 +126,26 @@ def test_question_generator_and_answer_interpreter_handle_relationship_choices()
         target_entity="api_key",
         target_property="user_id",
         description="Column 'api_key.user_id' may reference one of several user entities.",
+        question_type="role_confirmation",
+        best_guess="user",
+        confidence=0.58,
+        evidence=["column name overlaps with user", "candidate joins: user, user_role"],
+        candidate_options=[
+            QuestionOption(value="user", label="user", is_best_guess=True),
+            QuestionOption(value="user_role", label="user_role"),
+            QuestionOption(value="__other__", label="Something else", is_fallback=True),
+        ],
+        decision_prompt="Which entity does `api_key.user_id` most likely reference?",
+        actions=[
+            QuestionAction(value="confirm", label="Confirm"),
+            QuestionAction(value="change", label="Change"),
+            QuestionAction(value="skip", label="Skip"),
+        ],
+        impact_score=0.62,
+        ambiguity_score=0.74,
+        business_relevance=0.81,
+        priority_score=0.37,
+        allow_free_text=True,
         metadata={
             "candidate_tables": ["user", "user_role"],
             "candidate_joins": {
@@ -123,10 +158,12 @@ def test_question_generator_and_answer_interpreter_handle_relationship_choices()
     question = QuestionGenerator().generate(gap, state)
 
     assert question.input_type == "select"
-    assert question.choices == ["user", "user_role"]
+    assert question.best_guess == "user"
+    assert question.question_type == "role_confirmation"
+    assert [option.value for option in question.candidate_options[:2]] == ["user", "user_role"]
     assert question.target_entity == "api_key"
 
-    updated = AnswerInterpreter().apply(state, gap, "user")
+    updated = AnswerInterpreter().apply(state, gap, "__confirm__")
     assert "api_key.user_id=user.id" in updated.tables["api_key"].valid_joins
     assert "api_key.user_id=user_role.id" not in updated.tables["api_key"].valid_joins
 
@@ -139,8 +176,12 @@ def test_gap_detector_uses_configured_enum_tokens() -> None:
             NormalizedTable(
                 schema_name="main",
                 table_name="shipment",
+                row_count=4200,
+                join_candidates=["shipment.order_id=order.id"],
+                entity_hint="Shipment",
                 columns=[
-                    _column("phase", enum_values=["queued", "loaded"], sample_values=["queued", "loaded"]),
+                    _column("phase", enum_values=["0", "1"], sample_values=["0", "1"]),
+                    _column("status", enum_values=["ready", "complete"], sample_values=["ready", "complete"], is_status_like=True),
                 ],
             )
         ],
@@ -159,4 +200,88 @@ def test_gap_detector_uses_configured_enum_tokens() -> None:
         )
     ).detect(normalized, state)
 
-    assert any(gap.gap_id == "enum-shipment.phase" for gap in gaps)
+    phase_gap = next(gap for gap in gaps if gap.gap_id == "enum-shipment.phase")
+    assert phase_gap.question_type == "pattern_confirmation"
+    assert phase_gap.best_guess
+    assert phase_gap.priority_score > 0
+
+
+def test_gap_detector_keeps_lookup_backed_status_id_as_enum_gap() -> None:
+    normalized = NormalizedSource(
+        source_name="demo",
+        db_type="sqlite",
+        tables=[
+            NormalizedTable(
+                schema_name="main",
+                table_name="trip",
+                row_count=4200,
+                join_candidates=["trip.recent_state_id=trip_status_master.id"],
+                entity_hint="Trip",
+                columns=[
+                    _column(
+                        "recent_state_id",
+                        enum_values=["10", "20", "30"],
+                        sample_values=["10", "20", "30"],
+                        is_status_like=True,
+                        is_foreign_key=True,
+                    ),
+                ],
+            ),
+            NormalizedTable(
+                schema_name="main",
+                table_name="trip_status_master",
+                columns=[
+                    _column("id", sample_values=["10", "20", "30"], is_identifier_like=True),
+                    _column("display_type", sample_values=["Created", "En Route", "Reached"]),
+                ],
+            ),
+        ],
+    )
+    state = KnowledgeState(
+        source_name="demo",
+        tables={"trip": SemanticTable(table_name="trip")},
+    )
+
+    gaps = GapDetector().detect(normalized, state)
+    gap = next(gap for gap in gaps if gap.gap_id == "enum-trip.recent_state_id")
+
+    assert gap.metadata["lookup_tables"] == ["trip_status_master"]
+    assert gap.metadata["auto_labels"] == ["Created", "En Route", "Reached"]
+    assert any("trip_status_master" in item for item in gap.evidence)
+
+
+def test_answer_interpreter_confirms_enum_pattern_without_fake_numeric_mapping() -> None:
+    state = KnowledgeState(
+        source_name="demo",
+        tables={
+            "trip": SemanticTable(
+                table_name="trip",
+                columns=[
+                    SemanticColumn(
+                        column_name="recent_state_id",
+                        technical_type="INTEGER",
+                    )
+                ],
+            )
+        },
+    )
+    gap = SemanticGap(
+        gap_id="enum-trip.recent_state_id",
+        category=GapCategory.UNCONFIRMED_ENUM_MAPPING,
+        target_entity="trip",
+        target_property="recent_state_id",
+        description="Column 'trip.recent_state_id' has unconfirmed business value interpretation.",
+        question_type="pattern_confirmation",
+        best_guess="Workflow or lifecycle status.",
+        metadata={
+            "observed_values": ["10", "20", "30"],
+            "auto_labels": [],
+        },
+    )
+
+    updated = AnswerInterpreter().apply(state, gap, "status_pattern")
+    column = updated.tables["trip"].columns[0]
+
+    assert "trip.recent_state_id" not in updated.enums
+    assert column.business_meaning == "Lifecycle or workflow status for the record."
+    assert column.attribution.source == DiscoverySource.CONFIRMED_BY_USER
