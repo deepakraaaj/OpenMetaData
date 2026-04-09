@@ -16,6 +16,7 @@ from app.engine.service import OnboardingEngine
 from app.models.common import DatabaseType
 from app.models.questionnaire import QuestionnaireBundle
 from app.models.semantic import QueryPattern, SemanticSourceModel, SemanticTable
+from app.models.state import KnowledgeState, ReadinessState
 from app.models.technical import ColumnProfile, SchemaProfile, SourceTechnicalMetadata, TableProfile
 from app.repositories.filesystem import WorkspaceRepository
 from app.services.onboarding_jobs import InMemoryOnboardingJobStore
@@ -133,6 +134,49 @@ def test_semantic_bundle_api_rebuild_and_publish(tmp_path: Path, monkeypatch) ->
     )
     assert publish.status_code == 200
     assert (tag_domains_dir / "warehouse_ops" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
+
+
+def test_publish_is_blocked_when_state_is_not_publish_ready(tmp_path: Path, monkeypatch) -> None:
+    config_dir = tmp_path / "config"
+    output_dir = tmp_path / "output"
+    tag_domains_dir = tmp_path / "tag-domains"
+    repository = WorkspaceRepository(config_dir, output_dir)
+    _seed_source(repository, "warehouse_source")
+    (output_dir / "warehouse_source" / "knowledge_state.json").write_text(
+        KnowledgeState(
+            source_name="warehouse_source",
+            readiness=ReadinessState(
+                is_ready=False,
+                continue_ready=True,
+                publish_ready=False,
+                publish_blockers_count=1,
+                publish_notes=["1 publish blocker still needs confirmation before publish."],
+            ),
+        ).model_dump_json(indent=2),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(api_main, "repository", repository)
+    monkeypatch.setattr(api_main, "onboarding_job_store", InMemoryOnboardingJobStore())
+    monkeypatch.setattr(engine_routes, "repository", repository)
+    monkeypatch.setattr(engine_routes, "engine", OnboardingEngine(output_dir))
+    monkeypatch.setattr(
+        api_main,
+        "settings",
+        SimpleNamespace(
+            admin_origins=["http://localhost:3000"],
+            tag_domains_dir=tag_domains_dir,
+        ),
+    )
+
+    client = TestClient(api_main.app)
+    publish = client.post(
+        "/api/sources/warehouse_source/semantic-bundle/publish",
+        json={"domain_name": "warehouse_ops"},
+    )
+
+    assert publish.status_code == 409
+    assert "publish blocker" in publish.json()["detail"].lower()
 
 
 def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path, monkeypatch) -> None:

@@ -5,6 +5,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from app.models.common import NamedConfidence, SensitivityLabel
+from app.models.decision import DecisionActor, DecisionRecord, DecisionStatus, ReviewDebtItem, ReviewMode, RiskLevel
 from app.models.review import TableReviewDecision, TableRole
 from app.models.source_attribution import SourceAttribution
 
@@ -26,6 +27,15 @@ class SemanticColumn(BaseModel):
     sensitive: SensitivityLabel = SensitivityLabel.none
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
     attribution: SourceAttribution = Field(default_factory=SourceAttribution)
+    decision_id: str | None = None
+    decision_status: DecisionStatus | None = None
+    decision_actor: DecisionActor | None = None
+    risk_level: RiskLevel | None = None
+    policy_reason: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
+    review_debt: bool = False
+    publish_blocker: bool = False
+    needs_acknowledgement: bool = False
 
 
 class SemanticTable(BaseModel):
@@ -58,6 +68,15 @@ class SemanticTable(BaseModel):
     graph_connectivity: float = Field(default=0.0, ge=0.0, le=1.0)
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
     attribution: SourceAttribution = Field(default_factory=SourceAttribution)
+    decision_id: str | None = None
+    decision_status: DecisionStatus | None = None
+    decision_actor: DecisionActor | None = None
+    risk_level: RiskLevel | None = None
+    policy_reason: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
+    review_debt: bool = False
+    publish_blocker: bool = False
+    needs_acknowledgement: bool = False
     columns: list[SemanticColumn] = Field(default_factory=list)
 
 
@@ -118,6 +137,7 @@ class BusinessRule(BaseModel):
 class SemanticSourceModel(BaseModel):
     source_name: str
     db_type: str
+    review_mode: ReviewMode = ReviewMode.guided
     domain: str | None = None
     description: str | None = None
     key_entities: list[str] = Field(default_factory=list)
@@ -128,3 +148,5 @@ class SemanticSourceModel(BaseModel):
     glossary: list[GlossaryTerm] = Field(default_factory=list)
     canonical_entities: list[CanonicalEntity] = Field(default_factory=list)
     query_patterns: list[QueryPattern] = Field(default_factory=list)
+    decision_history: list[DecisionRecord] = Field(default_factory=list)
+    review_debt: list[ReviewDebtItem] = Field(default_factory=list)

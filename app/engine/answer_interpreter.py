@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import re
 
 from app.models.common import ConfidenceLabel, NamedConfidence, SensitivityLabel
+from app.models.decision import DecisionActor
 from app.models.semantic import EnumMapping, GlossaryTerm
 from app.models.source_attribution import DiscoverySource, SourceAttribution
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
@@ -13,39 +14,78 @@ _CONFIRM_SENTINELS = {"confirm", "__confirm__"}
 _SKIP_SENTINELS = {"skip", "__skip__"}
 
 
-def _user_attribution() -> SourceAttribution:
+def _named_confidence(score: float, rationale: str) -> NamedConfidence:
+    clamped = max(0.0, min(float(score), 1.0))
+    if clamped >= 0.8:
+        label = ConfidenceLabel.high
+    elif clamped >= 0.55:
+        label = ConfidenceLabel.medium
+    else:
+        label = ConfidenceLabel.low
+    return NamedConfidence(label=label, score=clamped, rationale=[rationale])
+
+
+def _attribution_for(actor: DecisionActor, reviewer: str | None = None) -> SourceAttribution:
+    source = (
+        DiscoverySource.CONFIRMED_BY_USER
+        if actor in {DecisionActor.user_confirmed, DecisionActor.user_overridden}
+        else DiscoverySource.INFERRED_BY_SYSTEM
+    )
     return SourceAttribution(
-        source=DiscoverySource.CONFIRMED_BY_USER,
+        source=source,
+        user=reviewer,
         timestamp=datetime.now(timezone.utc).isoformat(),
+        tooling_notes=f"Applied via {actor.value}.",
     )
 
 
-def _high_confidence() -> NamedConfidence:
-    return NamedConfidence(
-        label=ConfidenceLabel.high,
-        score=0.95,
-        rationale=["confirmed by user"],
-    )
+def _confidence_for(actor: DecisionActor, gap: SemanticGap) -> NamedConfidence:
+    if actor in {DecisionActor.user_confirmed, DecisionActor.user_overridden}:
+        return NamedConfidence(
+            label=ConfidenceLabel.high,
+            score=0.95,
+            rationale=["confirmed by user"],
+        )
+    return _named_confidence(gap.confidence or 0.7, f"resolved by {actor.value}")
 
 
 class AnswerInterpreter:
     """Translates user answers into concrete KnowledgeState mutations."""
 
-    def apply(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> KnowledgeState:
+    def apply(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor = DecisionActor.user_confirmed,
+        reviewer: str | None = None,
+        retain_gap: bool = False,
+    ) -> KnowledgeState:
         normalized = str(answer or "").strip().lower()
         if normalized in _SKIP_SENTINELS:
-            state.unresolved_gaps = [g for g in state.unresolved_gaps if g.gap_id != gap.gap_id]
+            if not retain_gap:
+                state.unresolved_gaps = [g for g in state.unresolved_gaps if g.gap_id != gap.gap_id]
             return state
 
         handler = self._handlers.get(gap.category, self._apply_generic)
         resolved_answer = self._resolve_answer(gap, answer)
-        handler(self, state, gap, resolved_answer)
+        handler(self, state, gap, resolved_answer, actor=actor, reviewer=reviewer)
 
         # Remove the resolved gap
-        state.unresolved_gaps = [g for g in state.unresolved_gaps if g.gap_id != gap.gap_id]
+        if not retain_gap:
+            state.unresolved_gaps = [g for g in state.unresolved_gaps if g.gap_id != gap.gap_id]
         return state
 
-    def _apply_business_meaning(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_business_meaning(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         table = state.tables.get(gap.target_entity or "")
         if not table:
             return
@@ -58,16 +98,24 @@ class AnswerInterpreter:
             for col in table.columns:
                 if col.column_name == gap.target_property:
                     col.business_meaning = final_answer
-                    col.attribution = _user_attribution()
-                    col.confidence = _high_confidence()
+                    col.attribution = _attribution_for(actor, reviewer)
+                    col.confidence = _confidence_for(actor, gap)
                     break
         else:
             # Table-level meaning
             table.business_meaning = final_answer
-            table.attribution = _user_attribution()
-            table.confidence = _high_confidence()
+            table.attribution = _attribution_for(actor, reviewer)
+            table.confidence = _confidence_for(actor, gap)
 
-    def _apply_enum_mapping(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_enum_mapping(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         col_key = f"{gap.target_entity}.{gap.target_property}"
         mappings: list[EnumMapping] = []
         normalized = str(answer).strip().lower()
@@ -81,7 +129,13 @@ class AnswerInterpreter:
         }
 
         if pattern_choice:
-            self._apply_enum_pattern_meaning(state, gap, normalized)
+            self._apply_enum_pattern_meaning(
+                state,
+                gap,
+                normalized,
+                actor=actor,
+                reviewer=reviewer,
+            )
             labels = auto_labels or [value.replace("_", " ").title() for value in observed_values]
             if self._labels_are_meaningful(observed_values, labels):
                 for index, value in enumerate(observed_values):
@@ -90,7 +144,7 @@ class AnswerInterpreter:
                         EnumMapping(
                             database_value=value,
                             business_label=label,
-                            attribution=_user_attribution(),
+                            attribution=_attribution_for(actor, reviewer),
                         )
                     )
             if mappings:
@@ -106,7 +160,7 @@ class AnswerInterpreter:
                     EnumMapping(
                         database_value=db_val.strip(),
                         business_label=label.strip(),
-                        attribution=_user_attribution(),
+                        attribution=_attribution_for(actor, reviewer),
                     )
                 )
             elif pair:
@@ -114,13 +168,21 @@ class AnswerInterpreter:
                     EnumMapping(
                         database_value=pair,
                         business_label=pair,
-                        attribution=_user_attribution(),
+                        attribution=_attribution_for(actor, reviewer),
                     )
                 )
         if mappings:
             state.enums[col_key] = mappings
 
-    def _apply_enum_pattern_meaning(self, state: KnowledgeState, gap: SemanticGap, normalized_answer: str) -> None:
+    def _apply_enum_pattern_meaning(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        normalized_answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         table = state.tables.get(gap.target_entity or "")
         if not table or not gap.target_property:
             return
@@ -142,8 +204,8 @@ class AnswerInterpreter:
             if col.column_name != gap.target_property:
                 continue
             col.business_meaning = meaning
-            col.attribution = _user_attribution()
-            col.confidence = _high_confidence()
+            col.attribution = _attribution_for(actor, reviewer)
+            col.confidence = _confidence_for(actor, gap)
             break
 
     def _labels_are_meaningful(self, observed_values: list[str], labels: list[str]) -> bool:
@@ -163,7 +225,15 @@ class AnswerInterpreter:
     def _normalized_token(value: str) -> str:
         return re.sub(r"[^a-z0-9]", "", str(value or "").strip().lower())
 
-    def _apply_primary_key(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_primary_key(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         table = state.tables.get(gap.target_entity or "")
         if not table:
             return
@@ -172,10 +242,18 @@ class AnswerInterpreter:
             pk_col = str(gap.best_guess).strip()
         if pk_col not in table.important_columns:
             table.important_columns.insert(0, pk_col)
-        table.attribution = _user_attribution()
-        table.confidence = _high_confidence()
+        table.attribution = _attribution_for(actor, reviewer)
+        table.confidence = _confidence_for(actor, gap)
 
-    def _apply_relationship(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_relationship(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         table = state.tables.get(gap.target_entity or "")
         if not table:
             return
@@ -196,7 +274,7 @@ class AnswerInterpreter:
                     table.valid_joins.remove(join_value)
             if selected_join:
                 table.valid_joins.append(selected_join)
-                table.attribution = _user_attribution()
+                table.attribution = _attribution_for(actor, reviewer)
                 return
 
         is_valid = choice_key in {"yes", "true", "yes, this is valid", "1"}
@@ -204,9 +282,17 @@ class AnswerInterpreter:
             table.valid_joins.append(gap.target_property)
         elif gap.target_property and gap.target_property in table.valid_joins:
             table.valid_joins.remove(gap.target_property)
-        table.attribution = _user_attribution()
+        table.attribution = _attribution_for(actor, reviewer)
 
-    def _apply_sensitivity(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_sensitivity(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         table = state.tables.get(gap.target_entity or "")
         if not table:
             return
@@ -225,10 +311,19 @@ class AnswerInterpreter:
             if col.column_name == gap.target_property:
                 col.sensitive = SensitivityLabel.sensitive if is_sensitive else SensitivityLabel.none
                 col.displayable = not is_sensitive
-                col.attribution = _user_attribution()
+                col.attribution = _attribution_for(actor, reviewer)
+                col.confidence = _confidence_for(actor, gap)
                 break
 
-    def _apply_glossary(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_glossary(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
         entity = gap.target_entity or ""
         final_answer = str(gap.best_guess or answer).strip() if str(answer).strip().lower() in _CONFIRM_SENTINELS else answer.strip()
         if not final_answer:
@@ -237,10 +332,23 @@ class AnswerInterpreter:
             term=final_answer,
             meaning=f"User-defined business term for {entity}.",
             related_tables=[entity],
-            attribution=_user_attribution(),
+            attribution=_attribution_for(actor, reviewer),
         )
 
-    def _apply_generic(self, state: KnowledgeState, gap: SemanticGap, answer: str) -> None:
+    def _apply_generic(
+        self,
+        state: KnowledgeState,
+        gap: SemanticGap,
+        answer: str,
+        *,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
+        del state
+        del gap
+        del answer
+        del actor
+        del reviewer
         pass  # No-op for unknown gap types
 
     def _resolve_answer(self, gap: SemanticGap, answer: str) -> str:

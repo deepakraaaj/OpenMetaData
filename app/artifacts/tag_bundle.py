@@ -115,6 +115,7 @@ class TagBundleExporter:
             description = f"I help explain and query {domain} data."
 
         return {
+            "review_mode": semantic.review_mode.value,
             "description": description,
             "categorized_examples": categorized,
             "examples": examples[:10],
@@ -171,6 +172,7 @@ class TagBundleExporter:
             scope = f"{semantic.source_name} business operations"
 
         return {
+            "review_mode": semantic.review_mode.value,
             "scope": scope,
             "primary_entities": _dedupe_keep_order(
                 [str(item or "").strip().lower() for item in semantic.key_entities if str(item or "").strip()]
@@ -178,6 +180,16 @@ class TagBundleExporter:
             "business_terms": business_terms,
             "example_queries": example_queries[:10],
             "categorized_examples": categorized_examples,
+            "review_debt": [
+                {
+                    "title": item.title,
+                    "table_name": item.table_name,
+                    "decision_status": item.decision_status.value,
+                    "risk_level": item.risk_level.value,
+                    "publish_blocker": item.publish_blocker,
+                }
+                for item in semantic.review_debt[:24]
+            ],
             "workflows": workflows[:8],
             "reasoning_profile": {
                 "name": "OpenMetaData semantic overlay",
@@ -237,6 +249,12 @@ class TagBundleExporter:
                 "description": str(
                     semantic_table.business_meaning or f"{_humanize(semantic_table.table_name)} records"
                 ).strip(),
+                "decision_status": semantic_table.decision_status.value if semantic_table.decision_status else None,
+                "decision_actor": semantic_table.decision_actor.value if semantic_table.decision_actor else None,
+                "risk_level": semantic_table.risk_level.value if semantic_table.risk_level else None,
+                "review_debt": semantic_table.review_debt,
+                "publish_blocker": semantic_table.publish_blocker,
+                "needs_acknowledgement": semantic_table.needs_acknowledgement,
                 "primary_key": technical_table.primary_key[0] if technical_table and technical_table.primary_key else "id",
                 "joins": joins,
                 "important_columns": {

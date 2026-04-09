@@ -183,6 +183,15 @@ class SemanticBundleExporter:
                     "domain": semantic_table.domain,
                     "role": semantic_table.role.value,
                     "confidence": semantic_table.confidence.model_dump(mode="json"),
+                    "decision_id": semantic_table.decision_id,
+                    "decision_status": semantic_table.decision_status.value if semantic_table.decision_status else None,
+                    "decision_actor": semantic_table.decision_actor.value if semantic_table.decision_actor else None,
+                    "risk_level": semantic_table.risk_level.value if semantic_table.risk_level else None,
+                    "policy_reason": semantic_table.policy_reason,
+                    "evidence_refs": list(semantic_table.evidence_refs),
+                    "review_debt": semantic_table.review_debt,
+                    "publish_blocker": semantic_table.publish_blocker,
+                    "needs_acknowledgement": semantic_table.needs_acknowledgement,
                     "selected": semantic_table.selected,
                     "selected_by_default": semantic_table.selected_by_default,
                     "recommended_selected": semantic_table.recommended_selected,
@@ -220,6 +229,7 @@ class SemanticBundleExporter:
             "version": SEMANTIC_BUNDLE_VERSION,
             "source_name": semantic.source_name,
             "domain_name": domain,
+            "review_mode": semantic.review_mode.value,
             "generated_at": generated_at,
             "database": {
                 "db_type": str(technical.db_type),
@@ -276,6 +286,7 @@ class SemanticBundleExporter:
             "version": SEMANTIC_BUNDLE_VERSION,
             "source_name": semantic.source_name,
             "domain_name": domain,
+            "review_mode": semantic.review_mode.value,
             "generated_at": generated_at,
             "scope": str(semantic.description or f"{semantic.source_name} business operations").strip(),
             "selection_summary": self._selection_summary_payload(semantic.tables),
@@ -285,6 +296,21 @@ class SemanticBundleExporter:
             "sensitive_areas": list(semantic.sensitive_areas),
             "glossary": glossary,
             "canonical_entities": entities,
+            "review_debt": [
+                {
+                    "decision_id": item.decision_id,
+                    "item_key": item.item_key,
+                    "title": item.title,
+                    "table_name": item.table_name,
+                    "decision_status": item.decision_status.value,
+                    "decision_actor": item.decision_actor.value,
+                    "risk_level": item.risk_level.value,
+                    "policy_reason": item.policy_reason,
+                    "publish_blocker": item.publish_blocker,
+                    "needs_acknowledgement": item.needs_acknowledgement,
+                }
+                for item in semantic.review_debt[:32]
+            ],
             "unresolved_questions": unresolved[:24],
         }
 
@@ -353,6 +379,7 @@ class SemanticBundleExporter:
             "version": SEMANTIC_BUNDLE_VERSION,
             "source_name": semantic.source_name,
             "domain_name": domain,
+            "review_mode": semantic.review_mode.value,
             "generated_at": generated_at,
             "relationships": relationships,
             "review_questions": review_questions,
@@ -400,6 +427,7 @@ class SemanticBundleExporter:
             "version": SEMANTIC_BUNDLE_VERSION,
             "source_name": semantic.source_name,
             "domain_name": domain,
+            "review_mode": semantic.review_mode.value,
             "generated_at": generated_at,
             "entries": entries,
         }
@@ -424,6 +452,7 @@ class SemanticBundleExporter:
             "version": SEMANTIC_BUNDLE_VERSION,
             "source_name": semantic.source_name,
             "domain_name": domain,
+            "review_mode": semantic.review_mode.value,
             "generated_at": generated_at,
             "patterns": patterns,
             "learned_queries": [],
@@ -474,6 +503,7 @@ class SemanticBundleExporter:
             "suggested_answer": question.suggested_answer,
             "suggested_join": question.suggested_join,
             "answer": question.answer,
+            "metadata": dict(question.metadata),
         }
 
     def _column_description(
@@ -496,6 +526,25 @@ class SemanticBundleExporter:
             "selected_count": sum(1 for table in items if table.selected),
             "excluded_count": sum(1 for table in items if not table.selected),
             "review_count": sum(1 for table in items if table.requires_review or table.needs_review),
+            "auto_accepted_count": sum(
+                1 for table in items if getattr(table.decision_status, "value", table.decision_status) == "auto_accepted"
+            ),
+            "user_confirmed_count": sum(
+                1 for table in items if getattr(table.decision_status, "value", table.decision_status) == "user_confirmed"
+            ),
+            "user_overridden_count": sum(
+                1 for table in items if getattr(table.decision_status, "value", table.decision_status) == "user_overridden"
+            ),
+            "deferred_review_count": sum(
+                1 for table in items if getattr(table.decision_status, "value", table.decision_status) == "deferred_review"
+            ),
+            "publish_blocked_count": sum(
+                1 for table in items if getattr(table.decision_status, "value", table.decision_status) == "publish_blocked"
+            ),
+            "warning_ack_required_count": sum(
+                1 for table in items if getattr(table.decision_status, "value", table.decision_status) == "warning_ack_required"
+            ),
+            "review_debt_count": sum(1 for table in items if getattr(table, "review_debt", False)),
             "detected_domains": _dedupe_keep_order(
                 [str(table.domain or "").strip() for table in items if str(table.domain or "").strip()]
             ),

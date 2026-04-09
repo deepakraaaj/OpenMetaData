@@ -26,7 +26,17 @@ class QuestionnaireMergeService:
             if resolved_answer in (None, "", []):
                 continue
             applied += 1
-            if question.type == "table_business_meaning" and question.table and question.table in table_map:
+            if question.type == "table_scope_review" and question.table and question.table in table_map:
+                answer = str(resolved_answer).strip().lower()
+                table_map[question.table].selected = answer in {"selected", "keep in scope", "confirm", "__confirm__"}
+                table_map[question.table].review_decision = (
+                    TableReviewDecision.selected
+                    if table_map[question.table].selected
+                    else TableReviewDecision.excluded
+                )
+                table_map[question.table].needs_review = False
+                updated_tables.add(question.table)
+            elif question.type == "table_business_meaning" and question.table and question.table in table_map:
                 table_map[question.table].business_meaning = str(resolved_answer)
                 updated_tables.add(question.table)
             elif question.type == "table_role_confirmation" and question.table and question.table in table_map:

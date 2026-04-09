@@ -5,6 +5,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from app.models.common import NamedConfidence
+from app.models.decision import DecisionActor, DecisionStatus, RiskLevel
 
 
 class TableRole(str, Enum):
@@ -44,6 +45,13 @@ class ReviewQueueItem(BaseModel):
     impact_score: float = Field(default=0.0, ge=0.0, le=1.0)
     business_relevance: float = Field(default=0.0, ge=0.0, le=1.0)
     related_tables: list[str] = Field(default_factory=list)
+    decision_status: DecisionStatus = DecisionStatus.deferred_review
+    decision_actor: DecisionActor = DecisionActor.rule_default
+    risk_level: RiskLevel = RiskLevel.medium
+    policy_reason: str | None = None
+    review_debt: bool = False
+    publish_blocker: bool = False
+    needs_acknowledgement: bool = False
 
 
 class DomainReviewGroup(BaseModel):
@@ -58,6 +66,9 @@ class DomainReviewGroup(BaseModel):
     requires_review: bool = False
     review_reason: str | None = None
     confidence: NamedConfidence = Field(default_factory=NamedConfidence)
+    review_debt_count: int = 0
+    publish_blocker_count: int = 0
+    warning_ack_required_count: int = 0
 
 
 class TableSelectionSummary(BaseModel):
@@ -69,3 +80,10 @@ class TableSelectionSummary(BaseModel):
     medium_confidence_count: int = 0
     low_confidence_count: int = 0
     detected_domains: list[str] = Field(default_factory=list)
+    auto_accepted_count: int = 0
+    user_confirmed_count: int = 0
+    user_overridden_count: int = 0
+    deferred_review_count: int = 0
+    publish_blocked_count: int = 0
+    warning_ack_required_count: int = 0
+    review_debt_count: int = 0

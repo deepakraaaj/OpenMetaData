@@ -10,7 +10,10 @@ from typing import Any
 from urllib import error as urllib_error
 from urllib import request as urllib_request
 
-from openai import OpenAI
+try:
+    from openai import OpenAI
+except ModuleNotFoundError:  # pragma: no cover - optional dependency for LLM grouping only
+    OpenAI = None
 
 from app.core.settings import get_settings
 from app.models.semantic import SemanticSourceModel
@@ -583,6 +586,9 @@ def _group_tables_with_llm(
     technical_metadata: SourceTechnicalMetadata | None,
     semantic_model: SemanticSourceModel | None,
 ) -> dict[str, list[str]] | None:
+    if OpenAI is None:
+        logger.warning("AI table grouping fell back because the OpenAI SDK is not installed")
+        return None
     prompt = _build_full_schema_grouping_prompt(
         state,
         adjacency,
@@ -772,6 +778,8 @@ def _sort_groups(groups: dict[str, list[str]]) -> dict[str, list[str]]:
 # ── LLM-powered gap resolution ────────────────────────────────────────────
 
 def _get_client() -> OpenAI:
+    if OpenAI is None:  # pragma: no cover - optional dependency guard
+        raise RuntimeError("The OpenAI SDK is not installed.")
     settings = get_settings()
     return OpenAI(
         base_url=settings.llm_base_url,

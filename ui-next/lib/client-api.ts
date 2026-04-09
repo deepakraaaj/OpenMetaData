@@ -5,6 +5,7 @@ import type {
   ChatbotPackageResponse,
   KnowledgeState,
   OnboardingJobSnapshot,
+  ReviewMode,
 } from "./types";
 
 function normalizeBaseUrl(value: string | undefined, fallback = ""): string {
@@ -95,10 +96,21 @@ export async function submitAnswer(
   sourceName: string,
   gapId: string,
   answer: string,
+  reviewer?: string,
 ): Promise<KnowledgeState> {
   return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/answer`, {
     method: "POST",
-    body: JSON.stringify({ gap_id: gapId, answer }),
+    body: JSON.stringify({ gap_id: gapId, answer, reviewer }),
+  });
+}
+
+export async function setReviewMode(
+  sourceName: string,
+  reviewMode: ReviewMode,
+): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/review-mode`, {
+    method: "POST",
+    body: JSON.stringify({ review_mode: reviewMode }),
   });
 }
 
@@ -116,6 +128,16 @@ export async function aiResolveGaps(sourceName: string): Promise<{
   readiness: any;
 }> {
   return fetchJson(`/api/engine/${sourceName}/ai-resolve`, { method: "POST" });
+}
+
+export async function applyAIDefaults(
+  sourceName: string,
+  payload: { domain_name?: string; table_name?: string } = {},
+): Promise<KnowledgeState> {
+  return fetchJson<KnowledgeState>(`/api/engine/${sourceName}/ai-defaults`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 export async function confirmTable(
   sourceName: string,

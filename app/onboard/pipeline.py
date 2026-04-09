@@ -30,8 +30,8 @@ from app.onboard.progress import (
     technical_counts,
 )
 from app.repositories.filesystem import WorkspaceRepository
+from app.questionnaire.builder import PolicyQuestionnaireBuilder
 from app.retrieval.service import RetrievalContextBuilder
-from app.semantics.ambiguity import AmbiguityDetector
 from app.semantics.service import SemanticGuessService
 from app.models.source import DiscoveredSource
 
@@ -49,12 +49,12 @@ class OnboardingPipeline:
         self.introspector = DatabaseIntrospector()
         self.normalizer = MetadataNormalizer()
         self.semantic = SemanticGuessService()
-        self.ambiguity = AmbiguityDetector()
         self.artifacts = ArtifactGenerator()
         self.semantic_bundle = SemanticBundleExporter()
         self.tag_bundle = TagBundleExporter()
         self.chatbot_package = ChatbotPackageExporter()
         self.retrieval = RetrievalContextBuilder()
+        self.questionnaire_builder = PolicyQuestionnaireBuilder()
         self.openmetadata = OpenMetadataService(settings)
         self.engine = OnboardingEngine(settings.output_dir)
 
@@ -207,10 +207,8 @@ class OnboardingPipeline:
         domain_groups = self._persist_domain_groups(source_name, state=state, technical=technical, semantic=semantic)
         self.repository.save_semantic_model(semantic)
 
-        if self._review_assets_exist(source_name):
-            return state
-
-        questionnaire = self.ambiguity.generate_questions(semantic)
+        semantic = self.repository.load_semantic_model(source_name)
+        questionnaire = self.questionnaire_builder.build(state)
         self.repository.save_questionnaire(questionnaire)
 
         self.artifacts.generate(semantic, output_dir)

@@ -43,10 +43,35 @@ export default function KnowledgePanel({ state }: Props) {
             border: "1px solid rgba(var(--success-rgb), 0.18)",
           }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "0.75rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "0.75rem" }}>
             <Metric label="Selected" value={summary.selected_count} tone="success" />
             <Metric label="Excluded" value={summary.excluded_count} />
             <Metric label="Review" value={summary.review_count} tone="warning" />
+            <Metric label="Debt" value={summary.review_debt_count} tone="warning" />
+          </div>
+        </div>
+
+        <div className="card" style={{ padding: "1rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
+            <span className="eyebrow" style={{ marginBottom: 0 }}>
+              Review Mode
+            </span>
+            <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+              <span className="pill pill-success">{state.review_mode.replaceAll("_", " ")}</span>
+              <span className={`pill ${state.readiness.continue_ready ? "pill-success" : "pill-warning"}`}>
+                Continue {state.readiness.continue_ready ? "Ready" : "Blocked"}
+              </span>
+              <span className={`pill ${state.readiness.publish_ready ? "pill-success" : "pill-warning"}`}>
+                Publish {state.readiness.publish_ready ? "Ready" : "Blocked"}
+              </span>
+            </div>
+          </div>
+          <div style={{ display: "grid", gap: "0.5rem", marginTop: "0.8rem" }}>
+            {state.readiness.continue_notes.concat(state.readiness.publish_notes).slice(0, 3).map((note) => (
+              <p key={note} className="hint" style={{ margin: 0 }}>
+                {note}
+              </p>
+            ))}
           </div>
         </div>
 
@@ -137,6 +162,40 @@ export default function KnowledgePanel({ state }: Props) {
             ) : (
               <p className="hint" style={{ margin: 0 }}>
                 No high-impact review items remain.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="card" style={{ padding: "1rem" }}>
+          <span className="eyebrow">Review Later</span>
+          <div style={{ display: "grid", gap: "0.75rem", marginTop: "0.9rem" }}>
+            {state.review_debt.length > 0 ? (
+              state.review_debt.slice(0, 6).map((item) => (
+                <div
+                  key={item.decision_id}
+                  style={{
+                    padding: "0.9rem 0.95rem",
+                    borderRadius: "12px",
+                    background: "var(--bg-surface-alt)",
+                    display: "grid",
+                    gap: "0.45rem",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "center" }}>
+                    <strong>{item.table_name || item.title}</strong>
+                    <span className={`pill ${item.publish_blocker ? "pill-warning" : item.decision_status === "auto_accepted" ? "pill-success" : ""}`}>
+                      {item.publish_blocker ? "Publish Blocker" : item.decision_status.replaceAll("_", " ")}
+                    </span>
+                  </div>
+                  <span className="hint" style={{ fontSize: "0.75rem" }}>
+                    {item.policy_reason || "AI decided for now and left this available for later review."}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="hint" style={{ margin: 0 }}>
+                No review debt is currently tracked.
               </p>
             )}
           </div>

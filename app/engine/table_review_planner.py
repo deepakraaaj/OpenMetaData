@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from app.models.common import NamedConfidence
+from app.models.decision import DecisionActor, DecisionStatus, RiskLevel
 from app.models.review import (
     DomainReviewGroup,
     ReviewQueueItem,
@@ -123,6 +124,13 @@ class TableReviewPlanner:
             medium_confidence_count=sum(1 for table in tables if table.confidence.label == "medium"),
             low_confidence_count=sum(1 for table in tables if table.confidence.label == "low"),
             detected_domains=detected_domains,
+            auto_accepted_count=sum(1 for table in tables if table.decision_status == DecisionStatus.auto_accepted),
+            user_confirmed_count=sum(1 for table in tables if table.decision_status == DecisionStatus.user_confirmed),
+            user_overridden_count=sum(1 for table in tables if table.decision_status == DecisionStatus.user_overridden),
+            deferred_review_count=sum(1 for table in tables if table.decision_status == DecisionStatus.deferred_review),
+            publish_blocked_count=sum(1 for table in tables if table.decision_status == DecisionStatus.publish_blocked),
+            warning_ack_required_count=sum(1 for table in tables if table.decision_status == DecisionStatus.warning_ack_required),
+            review_debt_count=len(state.review_debt),
         )
         state.domain_groups = self._state_domain_groups(tables, existing_groups)
         state.review_queue = self._state_review_queue(tables, gaps_by_table)
@@ -314,6 +322,9 @@ class TableReviewPlanner:
                     requires_review=requires_review,
                     review_reason=review_reason,
                     confidence=domain_confidence,
+                    review_debt_count=sum(1 for table in ordered if table.review_debt),
+                    publish_blocker_count=sum(1 for table in ordered if table.publish_blocker),
+                    warning_ack_required_count=sum(1 for table in ordered if table.needs_acknowledgement),
                 )
             )
         return sorted(
@@ -362,6 +373,13 @@ class TableReviewPlanner:
                         impact_score=table.impact_score,
                         business_relevance=table.business_relevance,
                         related_tables=list(table.related_tables[:8]),
+                        decision_status=table.decision_status or DecisionStatus.deferred_review,
+                        decision_actor=table.decision_actor or DecisionActor.rule_default,
+                        risk_level=table.risk_level or RiskLevel.medium,
+                        policy_reason=table.policy_reason,
+                        review_debt=table.review_debt,
+                        publish_blocker=table.publish_blocker,
+                        needs_acknowledgement=table.needs_acknowledgement,
                     ),
                 )
             )

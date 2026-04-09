@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.core.settings import get_settings
 from app.engine.service import OnboardingEngine
+from app.models.decision import ReviewMode
 from app.models.review import BulkReviewAction
 from app.models.semantic import TableReviewStatus
 from app.onboard.pipeline import OnboardingPipeline
@@ -22,6 +23,16 @@ router = APIRouter(prefix="/api/engine", tags=["onboarding-engine"])
 class AnswerRequest(BaseModel):
     gap_id: str
     answer: str
+    reviewer: str | None = None
+
+
+class ReviewModeRequest(BaseModel):
+    review_mode: ReviewMode
+
+
+class AIDefaultsRequest(BaseModel):
+    domain_name: str | None = None
+    table_name: str | None = None
 
 
 @router.post("/{source_name}/initialize")
@@ -76,7 +87,45 @@ def submit_answer(source_name: str, request: AnswerRequest) -> JSONResponse:
         normalized = None
 
     try:
-        state = engine.submit_answer(source_name, request.gap_id, request.answer, normalized=normalized)
+        state = engine.submit_answer(
+            source_name,
+            request.gap_id,
+            request.answer,
+            reviewer=request.reviewer,
+            normalized=normalized,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JSONResponse(state.model_dump(mode="json"))
+
+
+@router.post("/{source_name}/review-mode")
+def set_review_mode(source_name: str, request: ReviewModeRequest) -> JSONResponse:
+    try:
+        normalized = repository.load_normalized_metadata(source_name)
+        semantic = repository.load_semantic_model(source_name)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"Missing semantic metadata for '{source_name}'.") from exc
+
+    try:
+        technical = repository.load_technical_metadata(source_name)
+    except FileNotFoundError:
+        technical = None
+
+    try:
+        domain_groups = repository.load_domain_groups(source_name)
+    except (FileNotFoundError, ValueError):
+        domain_groups = None
+
+    try:
+        state = engine.set_review_mode(
+            source_name,
+            request.review_mode,
+            normalized,
+            technical=technical,
+            semantic=semantic,
+            domain_groups=domain_groups,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return JSONResponse(state.model_dump(mode="json"))
@@ -149,6 +198,25 @@ def ai_resolve(source_name: str) -> JSONResponse:
         "remaining_gaps": len(state.unresolved_gaps),
         "readiness": state.readiness.model_dump(mode="json"),
     })
+
+
+@router.post("/{source_name}/ai-defaults")
+def apply_ai_defaults(source_name: str, request: AIDefaultsRequest) -> JSONResponse:
+    try:
+        normalized = repository.load_normalized_metadata(source_name)
+    except FileNotFoundError:
+        normalized = None
+
+    try:
+        state = engine.apply_ai_defaults(
+            source_name,
+            domain_name=request.domain_name,
+            table_name=request.table_name,
+            normalized=normalized,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JSONResponse(state.model_dump(mode="json"))
 
 class ConfirmTableRequest(BaseModel):
     table_name: str

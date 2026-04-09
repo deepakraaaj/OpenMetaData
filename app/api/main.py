@@ -24,6 +24,7 @@ from app.introspection.service import IntrospectionService
 from app.models.artifacts import LLMContextPackage
 from app.models.common import DatabaseType
 from app.models.semantic import SemanticSourceModel
+from app.models.state import KnowledgeState
 from app.models.source import DiscoveredSource
 from app.repositories.filesystem import WorkspaceRepository
 from app.retrieval.service import RetrievalContextBuilder
@@ -417,6 +418,15 @@ def publish_semantic_bundle(source_name: str, request: PublishBundleRequest) -> 
         business_semantics = repository.load_semantic_bundle_file(source_name, "business_semantics.json")
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.") from exc
+
+    state_path = repository.source_dir(source_name) / "knowledge_state.json"
+    if state_path.exists():
+        state = KnowledgeState.model_validate(read_json(state_path))
+        if not state.readiness.publish_ready:
+            reasons = state.readiness.publish_notes or state.readiness.readiness_notes or [
+                "Publish blockers still need confirmation.",
+            ]
+            raise HTTPException(status_code=409, detail=" ".join(reasons))
 
     domain_name = str(request.domain_name or business_semantics.get("domain_name") or source_name).strip()
     if not domain_name:

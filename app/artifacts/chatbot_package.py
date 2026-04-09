@@ -154,6 +154,9 @@ class ChatbotPackageExporter:
                 "key_entity_count": len(semantic.key_entities),
                 "question_count": question_count,
                 "domain_group_count": len(domain_groups or {}),
+                "review_mode": semantic.review_mode.value,
+                "review_debt_count": len(semantic.review_debt),
+                "publish_blocker_count": sum(1 for item in semantic.review_debt if item.publish_blocker),
             },
             "entrypoints": {
                 "visual_summary": "visuals/overview.html",
@@ -237,6 +240,8 @@ class ChatbotPackageExporter:
         table_count = sum(len(schema.tables) for schema in technical.schemas)
         selected_count = sum(1 for table in semantic.tables if table.selected)
         review_count = sum(1 for table in semantic.tables if table.needs_review)
+        review_debt_count = len(semantic.review_debt)
+        publish_blocker_count = sum(1 for item in semantic.review_debt if item.publish_blocker)
         question_count = sum(len(section.get("questions") or []) for section in sections)
         db_type = html.escape(str(getattr(technical.db_type, "value", technical.db_type)))
         key_entities = self._render_tag_list(semantic.key_entities[:10], fallback="No key entities inferred.")
@@ -416,12 +421,20 @@ class ChatbotPackageExporter:
             <div class="stat">{review_count}</div>
           </article>
           <article class="card">
-            <p class="muted">Review Questions</p>
-            <div class="stat">{question_count}</div>
+            <p class="muted">Review Debt</p>
+            <div class="stat">{review_debt_count}</div>
+          </article>
+          <article class="card">
+            <p class="muted">Publish Blockers</p>
+            <div class="stat">{publish_blocker_count}</div>
           </article>
           <article class="card">
             <p class="muted">DB Type</p>
             <div class="stat">{db_type}</div>
+          </article>
+          <article class="card">
+            <p class="muted">Review Questions</p>
+            <div class="stat">{question_count}</div>
           </article>
         </div>
       </section>

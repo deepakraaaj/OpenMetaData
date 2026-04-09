@@ -25,6 +25,16 @@ export type TableRole =
   | "unknown";
 
 export type TableReviewDecision = "selected" | "excluded" | "review";
+export type ReviewMode = "full_ai" | "guided" | "deep_review";
+export type RiskLevel = "low" | "medium" | "high";
+export type DecisionActor = "ai_auto" | "user_confirmed" | "user_overridden" | "rule_default";
+export type DecisionStatus =
+  | "auto_accepted"
+  | "user_confirmed"
+  | "user_overridden"
+  | "deferred_review"
+  | "publish_blocked"
+  | "warning_ack_required";
 
 export type BulkReviewAction =
   | "select_recommended"
@@ -51,6 +61,15 @@ export type SemanticColumn = {
   sensitive: SensitivityLabel;
   confidence: NamedConfidence;
   attribution: SourceAttribution;
+  decision_id?: string;
+  decision_status?: DecisionStatus;
+  decision_actor?: DecisionActor;
+  risk_level?: RiskLevel;
+  policy_reason?: string;
+  evidence_refs: string[];
+  review_debt: boolean;
+  publish_blocker: boolean;
+  needs_acknowledgement: boolean;
 };
 
 export type SemanticTable = {
@@ -83,6 +102,15 @@ export type SemanticTable = {
   graph_connectivity: number;
   confidence: NamedConfidence;
   attribution: SourceAttribution;
+  decision_id?: string;
+  decision_status?: DecisionStatus;
+  decision_actor?: DecisionActor;
+  risk_level?: RiskLevel;
+  policy_reason?: string;
+  evidence_refs: string[];
+  review_debt: boolean;
+  publish_blocker: boolean;
+  needs_acknowledgement: boolean;
   columns: SemanticColumn[];
 };
 
@@ -125,14 +153,27 @@ export type SemanticGap = {
   free_text_placeholder?: string;
   is_blocking: boolean;
   priority: number;
+  decision_status?: DecisionStatus;
+  risk_level?: RiskLevel;
+  policy_reason?: string;
+  review_debt?: boolean;
+  publish_blocker?: boolean;
+  needs_acknowledgement?: boolean;
 };
 
 export type ReadinessState = {
   is_ready: boolean;
+  continue_ready: boolean;
+  publish_ready: boolean;
   readiness_percentage: number;
   blocking_gaps_count: number;
+  publish_blockers_count: number;
+  warning_ack_required_count: number;
+  review_debt_count: number;
   total_gaps_count: number;
   readiness_notes: string[];
+  continue_notes: string[];
+  publish_notes: string[];
 };
 
 export type TableSelectionSummary = {
@@ -144,6 +185,13 @@ export type TableSelectionSummary = {
   medium_confidence_count: number;
   low_confidence_count: number;
   detected_domains: string[];
+  auto_accepted_count: number;
+  user_confirmed_count: number;
+  user_overridden_count: number;
+  deferred_review_count: number;
+  publish_blocked_count: number;
+  warning_ack_required_count: number;
+  review_debt_count: number;
 };
 
 export type DomainReviewGroup = {
@@ -158,6 +206,9 @@ export type DomainReviewGroup = {
   requires_review: boolean;
   review_reason?: string;
   confidence: NamedConfidence;
+  review_debt_count: number;
+  publish_blocker_count: number;
+  warning_ack_required_count: number;
 };
 
 export type ReviewQueueItem = {
@@ -173,10 +224,69 @@ export type ReviewQueueItem = {
   impact_score: number;
   business_relevance: number;
   related_tables: string[];
+  decision_status: DecisionStatus;
+  decision_actor: DecisionActor;
+  risk_level: RiskLevel;
+  policy_reason?: string;
+  review_debt: boolean;
+  publish_blocker: boolean;
+  needs_acknowledgement: boolean;
+};
+
+export type DecisionRecord = {
+  decision_id: string;
+  item_key: string;
+  item_type: string;
+  title: string;
+  target_entity?: string;
+  target_property?: string;
+  decision_actor: DecisionActor;
+  review_mode: ReviewMode;
+  decision_status: DecisionStatus;
+  confidence?: number;
+  risk_level: RiskLevel;
+  evidence_refs: string[];
+  policy_reason?: string;
+  applied_value?: string | boolean | string[] | Record<string, unknown>;
+  suggested_value?: string | boolean | string[] | Record<string, unknown>;
+  provisional: boolean;
+  review_debt: boolean;
+  needs_human_review: boolean;
+  publish_blocker: boolean;
+  needs_acknowledgement: boolean;
+  supersedes?: string;
+  overridden_by?: string;
+  timestamp: string;
+  metadata: Record<string, unknown>;
+};
+
+export type ReviewDebtItem = {
+  decision_id: string;
+  item_key: string;
+  item_type: string;
+  title: string;
+  target_entity?: string;
+  target_property?: string;
+  decision_actor: DecisionActor;
+  review_mode: ReviewMode;
+  decision_status: DecisionStatus;
+  confidence?: number;
+  risk_level: RiskLevel;
+  policy_reason?: string;
+  evidence_refs: string[];
+  domain?: string;
+  table_name?: string;
+  review_debt: boolean;
+  needs_human_review: boolean;
+  publish_blocker: boolean;
+  needs_acknowledgement: boolean;
+  timestamp: string;
+  metadata: Record<string, unknown>;
 };
 
 export type KnowledgeState = {
   source_name: string;
+  review_mode: ReviewMode;
   tables: Record<string, SemanticTable>;
   canonical_entities: Record<string, unknown>;
   enums: Record<string, EnumMapping[]>;
@@ -188,6 +298,8 @@ export type KnowledgeState = {
   review_summary: TableSelectionSummary;
   domain_groups: DomainReviewGroup[];
   review_queue: ReviewQueueItem[];
+  decision_history: DecisionRecord[];
+  review_debt: ReviewDebtItem[];
 };
 
 export type OnboardingStage =
@@ -281,6 +393,9 @@ export type ChatbotPackageManifest = {
     key_entity_count?: number;
     question_count?: number;
     domain_group_count?: number;
+    review_mode?: string;
+    review_debt_count?: number;
+    publish_blocker_count?: number;
   };
   entrypoints: Record<string, string>;
   next_steps: string[];

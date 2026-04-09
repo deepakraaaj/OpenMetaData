@@ -68,9 +68,12 @@ class StateManager:
 
         state = KnowledgeState(
             source_name=source_name,
+            review_mode=semantic.review_mode,
             tables=tables,
             canonical_entities=entities,
             glossary=glossary,
             query_patterns=semantic.query_patterns,
+            decision_history=list(semantic.decision_history),
+            review_debt=list(semantic.review_debt),
         )
         return state

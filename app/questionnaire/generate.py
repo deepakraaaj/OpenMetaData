@@ -4,8 +4,8 @@ import typer
 
 from app.core.settings import get_settings
 from app.engine.service import OnboardingEngine
+from app.questionnaire.builder import PolicyQuestionnaireBuilder
 from app.repositories.filesystem import WorkspaceRepository
-from app.semantics.ambiguity import AmbiguityDetector
 
 
 app = typer.Typer(add_completion=False, help="Generate a questionnaire for a source.")
@@ -19,16 +19,20 @@ def main(source: str = typer.Option(..., help="Source name.")) -> None:
     try:
         normalized = repository.load_normalized_metadata(source)
         technical = repository.load_technical_metadata(source)
-        planner = OnboardingEngine(settings.output_dir).review_planner
-        planner.annotate(
-            normalized=normalized,
+        engine = OnboardingEngine(settings.output_dir)
+        state = engine.apply_review_plan(
+            source,
+            normalized,
             technical=technical,
             semantic=semantic,
         )
-        repository.save_semantic_model(semantic)
     except FileNotFoundError:
-        pass
-    questionnaire = AmbiguityDetector().generate_questions(semantic)
+        state = engine.get_state(source) if "engine" in locals() else None
+        if state is None:
+            state = OnboardingEngine(settings.output_dir).get_state(source)
+    if state is None:
+        raise typer.BadParameter(f"No knowledge state or semantic model found for '{source}'.")
+    questionnaire = PolicyQuestionnaireBuilder().build(state)
     path = repository.save_questionnaire(questionnaire)
     typer.echo(f"Wrote questionnaire to {path}")
 

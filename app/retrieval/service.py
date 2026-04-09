@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from app.models.artifacts import LLMContextPackage
+from app.models.decision import DecisionStatus
 from app.models.semantic import SemanticSourceModel
 from app.utils.text import tokenize
 
@@ -33,25 +34,38 @@ class RetrievalContextBuilder:
 
         safe_joins = []
         matched_entities = []
+        provisional_items = []
+        blocked_items = []
         for table in semantic.tables:
+            if table.decision_status in {DecisionStatus.warning_ack_required, DecisionStatus.publish_blocked}:
+                label = f"{table.table_name} ({table.decision_status.value})"
+                if table.decision_status == DecisionStatus.publish_blocked:
+                    blocked_items.append(label)
+                else:
+                    provisional_items.append(label)
             if table.table_name in matched_tables:
-                safe_joins.extend(table.valid_joins[:4])
+                if table.decision_status not in {DecisionStatus.warning_ack_required, DecisionStatus.publish_blocked}:
+                    safe_joins.extend(table.valid_joins[:4])
                 if table.likely_entity:
                     matched_entities.append(table.likely_entity)
 
         return LLMContextPackage(
             question=question,
             domain=semantic.domain,
+            review_mode=semantic.review_mode.value,
             matched_entities=matched_entities[:8],
             matched_tables=matched_tables,
             matched_columns=matched_columns,
             glossary_terms=glossary_terms,
             safe_joins=safe_joins[:10],
             query_patterns=query_patterns,
+            provisional_items=provisional_items[:12],
+            blocked_items=blocked_items[:12],
             notes_for_llm=[
                 "Prefer approved joins from the context package over inferred joins.",
                 "Avoid exposing sensitive columns unless explicitly approved.",
                 "Ask for clarification if the question references ambiguous status codes or entities.",
+                "Do not rely on publish-blocked or acknowledgement-required items as final truth.",
             ],
         )
 

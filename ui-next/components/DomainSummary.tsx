@@ -27,6 +27,8 @@ export default function DomainSummary({ state, groups }: Props) {
         <SummaryCard label="Selected" value={summary.selected_count} tone="success" />
         <SummaryCard label="Excluded" value={summary.excluded_count} />
         <SummaryCard label="Needs Review" value={summary.review_count} tone="warning" />
+        <SummaryCard label="Review Debt" value={summary.review_debt_count} tone="warning" />
+        <SummaryCard label="Publish Blockers" value={summary.publish_blocked_count + summary.warning_ack_required_count} tone="warning" />
       </div>
 
       <div className="card" style={{ padding: "1.25rem 1.5rem" }}>
@@ -104,6 +106,10 @@ function DomainCard({ domain, state }: { domain: DomainReviewGroup; state: Knowl
         <span className="pill pill-success">{domain.selected_count} selected</span>
         <span className="pill">{domain.excluded_count} excluded</span>
         <span className="pill pill-warning">{domain.review_count} review</span>
+        <span className="pill pill-warning">{domain.review_debt_count} review later</span>
+        {domain.publish_blocker_count > 0 ? (
+          <span className="pill pill-warning">{domain.publish_blocker_count} blocker</span>
+        ) : null}
       </div>
 
       {domain.inferred_business_meaning ? (
@@ -175,6 +181,7 @@ function DomainCard({ domain, state }: { domain: DomainReviewGroup; state: Knowl
                 <span className={`pill ${table.selected ? "pill-success" : ""}`}>
                   {table.selected ? "Selected" : "Excluded"}
                 </span>
+                <StatusBadge table={table} />
               </div>
             </div>
           );
@@ -182,6 +189,29 @@ function DomainCard({ domain, state }: { domain: DomainReviewGroup; state: Knowl
       </div>
     </div>
   );
+}
+
+function StatusBadge({ table }: { table: KnowledgeState["tables"][string] }) {
+  const status = table.decision_status;
+  if (status === "publish_blocked") {
+    return <span className="pill pill-warning">Publish Blocker</span>;
+  }
+  if (status === "warning_ack_required") {
+    return <span className="pill pill-warning">Ack Required</span>;
+  }
+  if (status === "user_confirmed") {
+    return <span className="pill pill-success">User Confirmed</span>;
+  }
+  if (status === "user_overridden") {
+    return <span className="pill">User Overrode</span>;
+  }
+  if (status === "auto_accepted") {
+    return <span className="pill pill-success">AI Decided</span>;
+  }
+  if (status === "deferred_review") {
+    return <span className="pill pill-warning">Needs Review Later</span>;
+  }
+  return null;
 }
 
 function fallbackGroups(state: KnowledgeState, groups: Record<string, string[]>): DomainReviewGroup[] {
@@ -213,6 +243,9 @@ function fallbackGroups(state: KnowledgeState, groups: Record<string, string[]>)
         score: Number(avgScore.toFixed(2)),
         rationale: ["Derived from table confidence scores"],
       },
+      review_debt_count: members.filter((table) => table.review_debt).length,
+      publish_blocker_count: members.filter((table) => table.publish_blocker).length,
+      warning_ack_required_count: members.filter((table) => table.needs_acknowledgement).length,
     };
   });
 }

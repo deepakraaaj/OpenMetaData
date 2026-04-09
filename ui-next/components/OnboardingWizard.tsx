@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { initializeEngine, getEngineState, getNextQuestion, submitAnswer, openMetadataClientApiBaseUrl } from "../lib/client-api";
+import {
+  initializeEngine,
+  getEngineState,
+  getNextQuestion,
+  setReviewMode,
+  submitAnswer,
+  openMetadataClientApiBaseUrl,
+} from "../lib/client-api";
 import { MOCK_KNOWLEDGE_STATE } from "../lib/mock-data";
-import type { KnowledgeState, GeneratedQuestion } from "../lib/types";
+import type { KnowledgeState, GeneratedQuestion, ReviewMode } from "../lib/types";
 import KnowledgePanel from "./KnowledgePanel";
 import Chatbot from "./Chatbot";
 import SemanticDiagram from "./SemanticDiagram";
@@ -23,6 +30,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
   const [question, setQuestion] = useState<GeneratedQuestion | null>(null);
   const [groups, setGroups] = useState<Record<string, string[]>>({});
   const [isPreparingWorkspace, setIsPreparingWorkspace] = useState(false);
+  const [changingReviewMode, setChangingReviewMode] = useState(false);
 
   const loadGroups = useCallback(async () => {
     try {
@@ -111,7 +119,30 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
       case "connect":
         return <ConnectScreen onNext={handleInitialize} sourceName={sourceName} mode={mode} error={error} busy={isPreparingWorkspace} />;
       case "overview":
-        return <OverviewScreen onNext={() => setScreen("workspace")} state={state} sourceName={sourceName} mode={mode} onStateUpdate={setState} groups={groups} />;
+        return (
+          <OverviewScreen
+            onContinue={() => setScreen("final")}
+            onReviewNow={() => setScreen("workspace")}
+            state={state}
+            sourceName={sourceName}
+            mode={mode}
+            onStateUpdate={setState}
+            groups={groups}
+            onReviewModeChange={async (reviewMode) => {
+              setChangingReviewMode(true);
+              try {
+                const updated = await setReviewMode(sourceName, reviewMode);
+                setState(updated);
+                void loadGroups();
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Failed to change review mode.");
+              } finally {
+                setChangingReviewMode(false);
+              }
+            }}
+            changingReviewMode={changingReviewMode}
+          />
+        );
       case "workspace":
         return (
           <div className="workspace">
@@ -139,9 +170,9 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
         <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem' }}>
           <NavItem active={screen === 'connect'} label="1. Connect" onClick={() => setScreen('connect')} />
           <NavItem active={screen === 'overview'} label="2. Overview" onClick={() => setScreen('overview')} />
-          <NavItem active={screen === 'workspace'} label="3. Workspace" onClick={() => setScreen('workspace')} />
+          <NavItem active={screen === 'workspace'} label="3. Review Queue" onClick={() => setScreen('workspace')} />
           <NavItem active={screen === 'enums'} label="4. Enums" onClick={() => setScreen('enums')} />
-          <NavItem active={screen === 'final'} label="5. Review" onClick={() => setScreen('final')} />
+          <NavItem active={screen === 'final'} label="5. Publish" onClick={() => setScreen('final')} />
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <span className={`pill ${mode === 'live' ? 'pill-success' : mode === 'mock' ? 'pill-danger' : 'pill-warning'}`}>
@@ -154,6 +185,7 @@ export function OnboardingWizard({ sourceName }: { sourceName: string }) {
                   : '○ Mock'}
           </span>
           <span className="pill">{sourceName}</span>
+          <span className="pill pill-success">{state.review_mode.replaceAll("_", " ")}</span>
         </div>
       </nav>
 
@@ -226,78 +258,80 @@ function ConnectScreen({ onNext, sourceName, mode, error, busy }: { onNext: () =
   );
 }
 
-function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups }: { onNext: () => void; state: KnowledgeState; mode: DataMode; sourceName: string; onStateUpdate: (s: KnowledgeState) => void, groups: Record<string, string[]> }) {
-  const [resolving, setResolving] = useState(false);
+function OverviewScreen({
+  onContinue,
+  onReviewNow,
+  state,
+  sourceName,
+  mode,
+  onStateUpdate,
+  groups,
+  onReviewModeChange,
+  changingReviewMode,
+}: {
+  onContinue: () => void;
+  onReviewNow: () => void;
+  state: KnowledgeState;
+  mode: DataMode;
+  sourceName: string;
+  onStateUpdate: (s: KnowledgeState) => void;
+  groups: Record<string, string[]>;
+  onReviewModeChange: (mode: ReviewMode) => Promise<void>;
+  changingReviewMode: boolean;
+}) {
   const [preparingReview, setPreparingReview] = useState(false);
   const [prepareError, setPrepareError] = useState("");
   const [activeTab, setActiveTab] = useState<'domains' | 'graph'>('domains');
-  const [resolveResult, setResolveResult] = useState<{ resolved: number; remaining: number } | null>(null);
 
   const tableCount = Object.keys(state.tables).length;
   const totalCols = Object.values(state.tables).reduce((s, t) => s + t.columns.length, 0);
-  const gapCount = state.unresolved_gaps.length;
-  const reviewCount = state.review_summary?.review_count || 0;
+  const groupedCount = state.domain_groups.length > 0 ? state.domain_groups.length : Object.keys(groups).length;
+  const reviewDebtCount = state.review_debt.length;
+  const publishBlockers = state.readiness.publish_blockers_count;
+  const guidedReviewCount = state.unresolved_gaps.length;
 
-  const handleAiResolve = async () => {
-    setResolving(true);
+  const handlePrepare = async () => {
+    if (mode !== "live") {
+      onContinue();
+      return;
+    }
+    setPrepareError("");
+    setPreparingReview(true);
     try {
-      const { aiResolveGaps, getEngineState } = await import("../lib/client-api");
-      const result = await aiResolveGaps(sourceName);
-      setResolveResult({ resolved: result.resolved_count, remaining: result.remaining_gaps });
-      // Reload state
-      const fresh = await getEngineState(sourceName);
-      onStateUpdate(fresh);
+      const refreshedState = await initializeEngine(sourceName);
+      onStateUpdate(refreshedState);
     } catch (err) {
-      console.error("AI resolve failed:", err);
+      setPrepareError(err instanceof Error ? err.message : "Failed to prepare the review workspace.");
+      setPreparingReview(false);
+      return;
     } finally {
-      setResolving(false);
+      setPreparingReview(false);
     }
-  };
-
-  const handleContinue = async () => {
-    if (mode === "live") {
-      setPrepareError("");
-      setPreparingReview(true);
-      try {
-        const refreshedState = await initializeEngine(sourceName);
-        onStateUpdate(refreshedState);
-      } catch (err) {
-        setPrepareError(err instanceof Error ? err.message : "Failed to prepare the review workspace.");
-        setPreparingReview(false);
-        return;
-      } finally {
-        setPreparingReview(false);
-      }
-    }
-    onNext();
+    onContinue();
   };
 
   return (
     <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1rem', flexWrap: 'wrap' }}>
         <div>
           <h2 style={{ marginBottom: '0.5rem' }}>
             {sourceName} — {tableCount} tables, {totalCols} columns
           </h2>
-          <p className="hint" style={{ margin: 0 }}>
-            {reviewCount > 0
-              ? `The system preselected the schema and only ${reviewCount} high-impact table decisions still need your confirmation.`
-              : gapCount > 0
-                ? `The system understood most of the schema but needs your input on ${gapCount} semantic items.`
-                : "Everything looks good. The schema is fully understood."}
+          <p className="hint" style={{ margin: 0, maxWidth: '60rem' }}>
+            Let AI decide what it safely can, continue onboarding immediately, and come back later only for the items that actually matter.
           </p>
         </div>
-        
+
         <div style={{ display: 'flex', background: 'var(--bg-surface)', padding: '0.25rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
-          <button 
-            className={`btn ${activeTab === 'domains' ? 'btn-primary' : 'btn-ghost'}`} 
+          <button
+            className={`btn ${activeTab === 'domains' ? 'btn-primary' : 'btn-ghost'}`}
             style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
             onClick={() => setActiveTab('domains')}
           >
             Business Domains
           </button>
-          <button 
-            className={`btn ${activeTab === 'graph' ? 'btn-primary' : 'btn-ghost'}`} 
+          <button
+            className={`btn ${activeTab === 'graph' ? 'btn-primary' : 'btn-ghost'}`}
             style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
             onClick={() => setActiveTab('graph')}
           >
@@ -306,57 +340,141 @@ function OverviewScreen({ onNext, state, sourceName, mode, onStateUpdate, groups
         </div>
       </div>
 
+      <div className="card" style={{ display: 'grid', gap: '1rem', padding: '1.25rem 1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          <div className="stack" style={{ gap: '0.4rem' }}>
+            <span className="eyebrow">Review Mode</span>
+            <p className="hint" style={{ margin: 0 }}>
+              Guided review is the default. You can switch modes now or later and the review debt and blockers will recompute.
+            </p>
+          </div>
+          <span className="pill pill-success">{state.review_mode.replaceAll("_", " ")}</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+          <ModeCard
+            active={state.review_mode === "full_ai"}
+            title="Let AI Decide And Continue"
+            description="AI auto-applies everything it safely can and leaves only high-risk publish checks behind."
+            onClick={() => onReviewModeChange("full_ai")}
+            disabled={changingReviewMode}
+          />
+          <ModeCard
+            active={state.review_mode === "guided"}
+            title="Review High-Impact Items"
+            description="AI resolves low-risk items and queues only medium-confidence or high-impact decisions."
+            onClick={() => onReviewModeChange("guided")}
+            disabled={changingReviewMode}
+          />
+          <ModeCard
+            active={state.review_mode === "deep_review"}
+            title="Deep Review"
+            description="Keep more decisions visible for manual inspection when the schema is especially sensitive."
+            onClick={() => onReviewModeChange("deep_review")}
+            disabled={changingReviewMode}
+          />
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+        <SummaryCard label="AI Selected" value={state.review_summary.selected_count} tone="success" />
+        <SummaryCard label="AI Excluded" value={state.review_summary.excluded_count} />
+        <SummaryCard label="Domains" value={groupedCount} />
+        <SummaryCard label="Review Later" value={reviewDebtCount} tone="warning" />
+        <SummaryCard label="Publish Blockers" value={publishBlockers} tone="warning" />
+      </div>
+
+      <div className="card" style={{ display: 'grid', gap: '0.6rem', padding: '1.15rem 1.3rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span className="pill pill-success">Continue Ready: {state.readiness.continue_ready ? "Yes" : "No"}</span>
+          <span className={`pill ${state.readiness.publish_ready ? 'pill-success' : 'pill-warning'}`}>
+            Publish Ready: {state.readiness.publish_ready ? "Yes" : "No"}
+          </span>
+          <span className="pill">{guidedReviewCount} active review item(s)</span>
+        </div>
+        {state.readiness.continue_notes.concat(state.readiness.publish_notes).slice(0, 3).map((note) => (
+          <p key={note} className="hint" style={{ margin: 0 }}>
+            {note}
+          </p>
+        ))}
+      </div>
+
       {activeTab === 'domains' ? (
         <DomainSummary state={state} groups={groups} />
       ) : (
         <SemanticDiagram state={state} />
       )}
 
-      {/* AI resolve bar */}
-      {gapCount > 0 && mode === 'live' && (
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', padding: '1rem 1.5rem' }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-              {resolveResult
-                ? `✦ AI resolved ${resolveResult.resolved} items — ${resolveResult.remaining} remaining`
-                : `✦ Let AI resolve the obvious ${gapCount} items`}
-            </div>
-            <div className="hint" style={{ fontSize: '0.75rem' }}>
-              {resolveResult
-                ? 'You can run it again or review the remaining items manually.'
-                : 'The LLM will answer business meanings, enum labels, and relationship confirmations.'}
-            </div>
-          </div>
-          <button
-            className="btn btn-outline"
-            onClick={handleAiResolve}
-            disabled={resolving}
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            {resolving ? 'Resolving...' : resolveResult ? 'Run Again' : 'Auto-Resolve'}
-          </button>
-        </div>
-      )}
-
-      <div className="button-row" style={{ marginTop: '1.5rem', justifyContent: 'flex-end' }}>
-        <button className="btn btn-primary" onClick={handleContinue} disabled={preparingReview}>
-          {preparingReview
-            ? 'Preparing review questions...'
-            : reviewCount > 0
-              ? `Review ${reviewCount} table decisions →`
-              : gapCount > 0
-                ? `Review ${gapCount} semantic items →`
-              : 'Continue →'}
+      <div className="button-row" style={{ marginTop: '1.5rem', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <button className="btn btn-outline" onClick={onReviewNow}>
+          {guidedReviewCount > 0 ? `Review ${guidedReviewCount} Item(s) Now` : 'Open Review Queue'}
+        </button>
+        <button className="btn btn-primary" onClick={handlePrepare} disabled={preparingReview || changingReviewMode}>
+          {preparingReview ? 'Preparing Review Workspace...' : 'Continue With AI Decisions →'}
         </button>
       </div>
       <p className="hint" style={{ marginTop: '-0.5rem', textAlign: 'right' }}>
-        Review questions and export artifacts are prepared when you continue from this screen.
+        Artifacts regenerate for the selected review mode when you continue from this screen.
       </p>
       {prepareError ? (
         <div style={{ padding: '0.75rem', background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)', borderRadius: '8px', fontSize: '0.8rem', color: '#fca5a5' }}>
           {prepareError}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ModeCard({
+  active,
+  title,
+  description,
+  onClick,
+  disabled,
+}: {
+  active: boolean;
+  title: string;
+  description: string;
+  onClick: () => void;
+  disabled: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className="card"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        textAlign: 'left',
+        padding: '1rem 1.1rem',
+        border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+        background: active ? 'rgba(var(--accent-rgb), 0.08)' : 'var(--bg-surface)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.7 : 1,
+      }}
+    >
+      <strong style={{ display: 'block', marginBottom: '0.35rem' }}>{title}</strong>
+      <span className="hint" style={{ fontSize: '0.8rem' }}>{description}</span>
+    </button>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "success" | "warning";
+}) {
+  const accent =
+    tone === "success" ? "var(--success)" : tone === "warning" ? "var(--warning)" : "var(--accent)";
+  return (
+    <div className="card" style={{ padding: "1.1rem 1.2rem" }}>
+      <div className="hint" style={{ fontSize: "0.8rem", marginBottom: "0.45rem" }}>
+        {label}
+      </div>
+      <div style={{ fontSize: "2rem", fontWeight: 700, color: accent }}>{value}</div>
     </div>
   );
 }
@@ -482,7 +600,7 @@ function ChatPanel({
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
         {canConfirm ? (
           <button className="btn btn-primary" onClick={handleConfirm}>
-            Confirm
+            Use AI Suggestion
           </button>
         ) : null}
         <button
@@ -540,15 +658,15 @@ function ChatPanel({
 
 function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state: KnowledgeState; sourceName: string; onStateUpdate: (s: KnowledgeState) => void; groups: Record<string, string[]> }) {
   const skippedTables = Object.values(state.tables).filter((table) => table.review_status === "skipped").length;
+  const publishBlockers = state.readiness.publish_blockers_count;
 
   return (
     <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <span className="eyebrow">Step 5 — Final Review</span>
-        <h1>AI-Preselected Table Scope</h1>
+        <span className="eyebrow">Step 5 — Publish Readiness</span>
+        <h1>AI-Decided Scope And Review Debt</h1>
         <p className="hint">
-          The system already grouped and preselected the schema. Confirm the uncertain decisions,
-          correct anything obvious, and avoid table-by-table discovery work.
+          Continue onboarding with AI-decided defaults now, then clear only the warnings and blockers before publish.
         </p>
       </div>
 
@@ -570,6 +688,16 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
               ? `${skippedTables} table(s) have already been removed from the manual review scope.`
               : 'No tables have been removed from scope yet.'}
           </p>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+            <span className={`pill ${state.readiness.continue_ready ? 'pill-success' : 'pill-warning'}`}>
+              Continue {state.readiness.continue_ready ? 'Ready' : 'Blocked'}
+            </span>
+            <span className={`pill ${state.readiness.publish_ready ? 'pill-success' : 'pill-warning'}`}>
+              Publish {state.readiness.publish_ready ? 'Ready' : 'Blocked'}
+            </span>
+            <span className="pill pill-warning">{state.review_debt.length} review later</span>
+            <span className="pill pill-warning">{publishBlockers} publish blocker(s)</span>
+          </div>
           <div className="stack" style={{ marginTop: '1rem' }}>
             {state.readiness.readiness_notes.length > 0 ? (
               state.readiness.readiness_notes.map((note: string, i: number) => (
@@ -626,9 +754,9 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
         <button 
           className="btn btn-outline" 
           style={{ padding: '1rem 4rem', fontSize: '1.1rem' }} 
-          disabled={!state.readiness.is_ready}
+          disabled={!state.readiness.publish_ready}
         >
-          {state.readiness.is_ready ? '🚀 Publish to TAG Domain' : 'Complete Audit to Publish'}
+          {state.readiness.publish_ready ? '🚀 Publish to TAG Domain' : 'Resolve Publish Blockers To Publish'}
         </button>
       </div>
     </div>
