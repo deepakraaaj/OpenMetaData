@@ -32,6 +32,82 @@ _GENERIC_MEANING_PREFIXES = (
     "Timestamp used for audit",
 )
 
+_BOOLEAN_LIKE_ENUM_VALUES = {
+    "0",
+    "1",
+    "y",
+    "n",
+    "yes",
+    "no",
+    "true",
+    "false",
+    "on",
+    "off",
+    "enabled",
+    "disabled",
+    "active",
+    "inactive",
+}
+
+_BUSINESS_ENUM_TOKENS = (
+    "status",
+    "state",
+    "phase",
+    "stage",
+    "type",
+    "category",
+    "mode",
+    "priority",
+    "severity",
+    "reason",
+    "result",
+)
+
+_TECHNICAL_ENUM_NOISE_TOKENS = (
+    "adc",
+    "battery",
+    "check_sum",
+    "checksum",
+    "current",
+    "digital_input",
+    "digital_output",
+    "distance",
+    "duration",
+    "fan_invoice",
+    "frame",
+    "fuel",
+    "gps",
+    "gsm",
+    "gprs",
+    "ignition",
+    "imei",
+    "imsi",
+    "input",
+    "invoice_number",
+    "kilometer",
+    "kilometre",
+    "latitude",
+    "longitude",
+    "meter",
+    "meters",
+    "mobile",
+    "number",
+    "odometer",
+    "output",
+    "packet",
+    "phone",
+    "plant_code",
+    "power",
+    "satellite",
+    "seconds",
+    "sequence",
+    "signal",
+    "speed",
+    "temperature",
+    "total",
+    "voltage",
+)
+
 
 class GapDetector:
     """Scans normalized metadata and current state to find high-value unresolved gaps."""
@@ -519,15 +595,36 @@ class GapDetector:
         if len(values) < 2 or len(values) > 8:
             return False
 
-        if all(re.fullmatch(r"[0-9]+", value) for value in values):
-            return True
+        boolean_prefixes = self.rules.gap_detection.boolean_prefixes
+        has_boolean_prefix = bool(boolean_prefixes) and name.startswith(boolean_prefixes)
+        if self._is_technical_enum_noise(name, values):
+            return False
+
+        all_numeric = all(re.fullmatch(r"[0-9]+", value) for value in values)
+        if all_numeric and not (self._has_enum_signal(name) or has_boolean_prefix):
+            return False
 
         if any(len(value) > 32 for value in values):
             return False
 
-        boolean_prefixes = self.rules.gap_detection.boolean_prefixes
-        has_boolean_prefix = bool(boolean_prefixes) and name.startswith(boolean_prefixes)
-        return any(token in name for token in self.rules.gap_detection.enum_name_tokens) or has_boolean_prefix
+        return self._has_enum_signal(name) or has_boolean_prefix
+
+    def _is_technical_enum_noise(self, column_name: str, values: list[str]) -> bool:
+        name = str(column_name or "").strip().lower()
+        if not name or not values:
+            return False
+        normalized_values = {str(value).strip().lower() for value in values if str(value).strip()}
+        if not normalized_values:
+            return False
+
+        all_numeric = all(re.fullmatch(r"[0-9]+", value) for value in normalized_values)
+        boolean_like = normalized_values <= _BOOLEAN_LIKE_ENUM_VALUES
+        if not all_numeric and not boolean_like:
+            return False
+
+        if name in _BUSINESS_ENUM_TOKENS:
+            return False
+        return any(token in name for token in _TECHNICAL_ENUM_NOISE_TOKENS)
 
     def _has_enum_signal(self, column_name: str) -> bool:
         name = str(column_name or "").strip().lower()
@@ -536,7 +633,7 @@ class GapDetector:
         enum_tokens = tuple(self.rules.gap_detection.enum_name_tokens or ())
         if any(token in name for token in enum_tokens):
             return True
-        return any(token in name for token in ("status", "state", "phase", "stage", "type", "category", "mode", "priority", "severity"))
+        return any(token in name for token in _BUSINESS_ENUM_TOKENS)
 
     def _enum_lookup_tables(
         self,

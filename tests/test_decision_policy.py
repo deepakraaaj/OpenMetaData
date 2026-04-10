@@ -2,6 +2,7 @@ from app.engine.decision_policy import AIDecisionPolicyPass
 from app.engine.readiness import ReadinessComputer
 from app.models.common import ConfidenceLabel, NamedConfidence
 from app.models.decision import ReviewMode
+from app.models.questionnaire import QuestionOption
 from app.models.semantic import SemanticColumn, SemanticTable
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
 
@@ -110,3 +111,26 @@ def test_high_risk_high_confidence_gap_stays_as_publish_blocker_until_acknowledg
     assert updated.tables["customer"].columns[0].displayable is False
     assert readiness.publish_ready is False
     assert readiness.publish_blockers_count == 1
+
+
+def test_recommended_gap_answer_prefers_best_option_value_over_best_guess_text() -> None:
+    gap = SemanticGap(
+        gap_id="enum-orders.status",
+        category=GapCategory.UNCONFIRMED_ENUM_MAPPING,
+        target_entity="orders",
+        target_property="status",
+        description="orders.status needs enum interpretation.",
+        best_guess="Workflow or lifecycle status.",
+        candidate_options=[
+            QuestionOption(
+                value="status_pattern",
+                label="Workflow or lifecycle status",
+                is_best_guess=True,
+            ),
+            QuestionOption(value="type_pattern", label="Type or category"),
+        ],
+    )
+
+    answer = AIDecisionPolicyPass()._recommended_gap_answer(gap)
+
+    assert answer == "status_pattern"

@@ -206,6 +206,64 @@ def test_gap_detector_uses_configured_enum_tokens() -> None:
     assert phase_gap.priority_score > 0
 
 
+def test_gap_detector_suppresses_telemetry_style_enum_noise() -> None:
+    normalized = NormalizedSource(
+        source_name="demo",
+        db_type="sqlite",
+        tables=[
+            NormalizedTable(
+                schema_name="main",
+                table_name="vts_transaction",
+                row_count=5000,
+                join_candidates=["vts_transaction.vehicle_id=vehicle.id"],
+                entity_hint="Vehicle trip transaction",
+                columns=[
+                    _column("check_sum", enum_values=["10", "20", "30"], sample_values=["10", "20", "30"]),
+                    _column("gps_fix", enum_values=["0", "1"], sample_values=["0", "1"]),
+                    _column(
+                        "gsm_signal_strength",
+                        enum_values=["1", "2", "3"],
+                        sample_values=["1", "2", "3"],
+                    ),
+                    _column("imei_no", enum_values=["1001", "1002"], sample_values=["1001", "1002"]),
+                    _column(
+                        "main_power_status",
+                        enum_values=["0", "1"],
+                        sample_values=["0", "1"],
+                        is_status_like=True,
+                    ),
+                    _column(
+                        "number_of_satellite",
+                        enum_values=["3", "4", "5"],
+                        sample_values=["3", "4", "5"],
+                    ),
+                    _column(
+                        "trip_status",
+                        enum_values=["OPEN", "CLOSED"],
+                        sample_values=["OPEN", "CLOSED"],
+                        is_status_like=True,
+                    ),
+                ],
+            )
+        ],
+    )
+    state = KnowledgeState(
+        source_name="demo",
+        tables={"vts_transaction": SemanticTable(table_name="vts_transaction")},
+    )
+
+    gaps = GapDetector().detect(normalized, state)
+    gap_ids = {gap.gap_id for gap in gaps}
+
+    assert "enum-vts_transaction.trip_status" in gap_ids
+    assert "enum-vts_transaction.check_sum" not in gap_ids
+    assert "enum-vts_transaction.gps_fix" not in gap_ids
+    assert "enum-vts_transaction.gsm_signal_strength" not in gap_ids
+    assert "enum-vts_transaction.imei_no" not in gap_ids
+    assert "enum-vts_transaction.main_power_status" not in gap_ids
+    assert "enum-vts_transaction.number_of_satellite" not in gap_ids
+
+
 def test_gap_detector_keeps_lookup_backed_status_id_as_enum_gap() -> None:
     normalized = NormalizedSource(
         source_name="demo",

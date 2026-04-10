@@ -551,11 +551,11 @@ class AIDecisionPolicyPass:
         return RiskLevel.medium
 
     def _recommended_gap_answer(self, gap: SemanticGap) -> Any:
-        if gap.best_guess not in (None, "", []):
-            return gap.best_guess
         for option in gap.candidate_options:
             if option.is_best_guess:
                 return option.value or option.label
+        if gap.best_guess not in (None, "", []):
+            return gap.best_guess
         if gap.candidate_options:
             option = gap.candidate_options[0]
             return option.value or option.label
