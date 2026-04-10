@@ -23,9 +23,11 @@ from app.introspection.env import list_database_url_presets, load_database_url_p
 from app.introspection.service import IntrospectionService
 from app.models.artifacts import LLMContextPackage
 from app.models.common import DatabaseType
+from app.models.simple_onboarding import SimpleOnboardingRequest
 from app.models.semantic import SemanticSourceModel
 from app.models.state import KnowledgeState
 from app.models.source import DiscoveredSource
+from app.onboard.simple_flow import SimpleOnboardingService
 from app.repositories.filesystem import WorkspaceRepository
 from app.retrieval.service import RetrievalContextBuilder
 from app.services.onboarding_jobs import InMemoryOnboardingJobStore, OnboardingJobService
@@ -240,6 +242,15 @@ def onboard_from_db_url(request: UrlOnboardingRequest) -> JSONResponse:
 
     job = get_onboarding_job_service().start_job(source, sync_openmetadata=False)
     return JSONResponse(job.model_dump(mode="json", exclude_none=True), status_code=202)
+
+
+@app.post("/api/onboarding/simple")
+def simple_onboarding(request: SimpleOnboardingRequest) -> JSONResponse:
+    try:
+        payload = SimpleOnboardingService(repository=repository).build(request)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JSONResponse(payload.model_dump(mode="json", exclude_none=True))
 
 
 @app.get("/api/onboarding/jobs/{job_id}")
