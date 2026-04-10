@@ -18,6 +18,11 @@ from app.models.review import TableRole
 from app.models.semantic import TableReviewStatus
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
 from app.models.source_attribution import DiscoverySource
+from app.utils.enum_candidates import (
+    has_business_enum_signal,
+    is_declared_enum_type,
+    is_enum_candidate,
+)
 from app.utils.text import snake_to_words, unique_non_empty
 
 
@@ -30,82 +35,6 @@ _GENERIC_MEANING_PREFIXES = (
     "Detailed records associated with ",
     "Historical event records for ",
     "Timestamp used for audit",
-)
-
-_BOOLEAN_LIKE_ENUM_VALUES = {
-    "0",
-    "1",
-    "y",
-    "n",
-    "yes",
-    "no",
-    "true",
-    "false",
-    "on",
-    "off",
-    "enabled",
-    "disabled",
-    "active",
-    "inactive",
-}
-
-_BUSINESS_ENUM_TOKENS = (
-    "status",
-    "state",
-    "phase",
-    "stage",
-    "type",
-    "category",
-    "mode",
-    "priority",
-    "severity",
-    "reason",
-    "result",
-)
-
-_TECHNICAL_ENUM_NOISE_TOKENS = (
-    "adc",
-    "battery",
-    "check_sum",
-    "checksum",
-    "current",
-    "digital_input",
-    "digital_output",
-    "distance",
-    "duration",
-    "fan_invoice",
-    "frame",
-    "fuel",
-    "gps",
-    "gsm",
-    "gprs",
-    "ignition",
-    "imei",
-    "imsi",
-    "input",
-    "invoice_number",
-    "kilometer",
-    "kilometre",
-    "latitude",
-    "longitude",
-    "meter",
-    "meters",
-    "mobile",
-    "number",
-    "odometer",
-    "output",
-    "packet",
-    "phone",
-    "plant_code",
-    "power",
-    "satellite",
-    "seconds",
-    "sequence",
-    "signal",
-    "speed",
-    "temperature",
-    "total",
-    "voltage",
 )
 
 
@@ -219,9 +148,16 @@ class GapDetector:
             table_impact = self._table_impact_score(table)
             table_relevance = self._table_business_relevance(table, existing)
             for col in table.columns:
-                if not self._is_meaningful_enum_column(col.column_name, col.enum_values, col.sample_values):
-                    continue
                 lookup_tables = self._enum_lookup_tables(table, col.column_name, table_map)
+                if not self._is_meaningful_enum_column(
+                    col.column_name,
+                    col.technical_type,
+                    col.enum_values,
+                    col.sample_values,
+                    lookup_tables=lookup_tables,
+                    is_foreign_key=col.is_foreign_key,
+                ):
+                    continue
                 if col.is_primary_key or col.is_identifier_like:
                     continue
                 if col.is_foreign_key and not lookup_tables and not self._has_enum_signal(col.column_name):
@@ -582,58 +518,33 @@ class GapDetector:
     def _is_meaningful_enum_column(
         self,
         column_name: str,
+        technical_type: str,
         enum_values: list[str],
         sample_values: list[str],
+        *,
+        lookup_tables: list[str] | None = None,
+        is_foreign_key: bool = False,
     ) -> bool:
         name = str(column_name or "").strip().lower()
-        if self._is_low_signal_column(name) and not self._has_enum_signal(name):
+        lookup_backed = bool(lookup_tables)
+        if self._is_low_signal_column(name) and not (
+            self._has_enum_signal(name) or lookup_backed or is_declared_enum_type(technical_type)
+        ):
             return False
-        if name == "id":
-            return False
-
-        values = self._meaningful_distinct_values(enum_values or sample_values)
-        if len(values) < 2 or len(values) > 8:
-            return False
-
-        boolean_prefixes = self.rules.gap_detection.boolean_prefixes
-        has_boolean_prefix = bool(boolean_prefixes) and name.startswith(boolean_prefixes)
-        if self._is_technical_enum_noise(name, values):
-            return False
-
-        all_numeric = all(re.fullmatch(r"[0-9]+", value) for value in values)
-        if all_numeric and not (self._has_enum_signal(name) or has_boolean_prefix):
-            return False
-
-        if any(len(value) > 32 for value in values):
-            return False
-
-        return self._has_enum_signal(name) or has_boolean_prefix
-
-    def _is_technical_enum_noise(self, column_name: str, values: list[str]) -> bool:
-        name = str(column_name or "").strip().lower()
-        if not name or not values:
-            return False
-        normalized_values = {str(value).strip().lower() for value in values if str(value).strip()}
-        if not normalized_values:
-            return False
-
-        all_numeric = all(re.fullmatch(r"[0-9]+", value) for value in normalized_values)
-        boolean_like = normalized_values <= _BOOLEAN_LIKE_ENUM_VALUES
-        if not all_numeric and not boolean_like:
-            return False
-
-        if name in _BUSINESS_ENUM_TOKENS:
-            return False
-        return any(token in name for token in _TECHNICAL_ENUM_NOISE_TOKENS)
+        return is_enum_candidate(
+            column_name=column_name,
+            technical_type=technical_type,
+            values=enum_values or sample_values,
+            extra_name_tokens=self.rules.gap_detection.enum_name_tokens,
+            is_foreign_key=is_foreign_key,
+            lookup_backed=lookup_backed,
+        )
 
     def _has_enum_signal(self, column_name: str) -> bool:
         name = str(column_name or "").strip().lower()
         if not name:
             return False
-        enum_tokens = tuple(self.rules.gap_detection.enum_name_tokens or ())
-        if any(token in name for token in enum_tokens):
-            return True
-        return any(token in name for token in _BUSINESS_ENUM_TOKENS)
+        return has_business_enum_signal(name, self.rules.gap_detection.enum_name_tokens)
 
     def _enum_lookup_tables(
         self,

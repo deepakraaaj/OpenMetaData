@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from app.models.technical import SourceTechnicalMetadata
+from app.utils.enum_candidates import is_enum_candidate
 from app.utils.serialization import write_json
 
 
@@ -115,7 +116,13 @@ class IntrospectionSerializer:
                     col_data["table"] = table_name
                     columns_data.append(col_data)
 
-                    if col.enum_values:
+                    if is_enum_candidate(
+                        column_name=col.name,
+                        technical_type=col.data_type,
+                        values=col.enum_values or col.sample_values,
+                        is_foreign_key=col.is_foreign_key,
+                        lookup_backed=bool(col.referenced_table),
+                    ):
                         enum_candidates_data.append(
                             {
                                 "schema": schema_name,

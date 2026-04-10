@@ -31,6 +31,7 @@ from app.onboard.simple_flow import SimpleOnboardingService
 from app.repositories.filesystem import WorkspaceRepository
 from app.retrieval.service import RetrievalContextBuilder
 from app.services.onboarding_jobs import InMemoryOnboardingJobStore, OnboardingJobService
+from app.utils.enum_candidates import is_enum_candidate
 from app.utils.serialization import read_json
 
 
@@ -161,7 +162,18 @@ def technical_source(request: Request, source_name: str) -> HTMLResponse:
             sample_table_count += 1 if table.sample_rows else 0
             timestamp_table_count += 1 if table.timestamp_columns else 0
             relationship_count += len(table.foreign_keys) + len(table.candidate_joins)
-            enum_candidate_count += sum(1 for column in table.columns if column.enum_values)
+            table_enum_candidate_count = sum(
+                1
+                for column in table.columns
+                if is_enum_candidate(
+                    column_name=column.name,
+                    technical_type=column.data_type,
+                    values=column.enum_values or column.sample_values,
+                    is_foreign_key=column.is_foreign_key,
+                    lookup_backed=bool(column.referenced_table),
+                )
+            )
+            enum_candidate_count += table_enum_candidate_count
             table_rows.append(
                 {
                     "schema_name": schema.schema_name,
@@ -170,7 +182,7 @@ def technical_source(request: Request, source_name: str) -> HTMLResponse:
                     "primary_key": ", ".join(table.primary_key) or "None",
                     "foreign_key_count": len(table.foreign_keys),
                     "candidate_join_count": len(table.candidate_joins),
-                    "enum_candidate_count": sum(1 for column in table.columns if column.enum_values),
+                    "enum_candidate_count": table_enum_candidate_count,
                     "sample_column_count": sum(1 for column in table.columns if column.sample_values),
                     "timestamp_columns": table.timestamp_columns,
                     "status_columns": table.status_columns,

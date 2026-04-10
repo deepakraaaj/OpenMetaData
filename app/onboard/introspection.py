@@ -26,6 +26,7 @@ from app.models.technical import (
 )
 from app.onboard.progress import ProgressCallback, emit_progress, technical_counts
 from app.services.database import create_db_engine
+from app.utils.enum_candidates import has_business_enum_signal, is_declared_enum_type
 from app.utils.text import tokenize
 
 
@@ -276,7 +277,7 @@ class DatabaseIntrospector:
                     enum_values=enum_values,
                     sample_values=sample_values,
                     is_timestamp_like=self._is_timestamp_like(name, data_type),
-                    is_status_like=self._is_status_like(name, sample_values),
+                    is_status_like=self._is_status_like(name, data_type, sample_values),
                     is_identifier_like=self._is_identifier_like(name),
                 )
             )
@@ -421,11 +422,12 @@ class DatabaseIntrospector:
         lowered = f"{name} {data_type}".lower()
         return any(token in lowered for token in ("timestamp", "datetime", "created", "updated", "deleted", "date"))
 
-    def _is_status_like(self, name: str, sample_values: list[str]) -> bool:
-        lowered = name.lower()
-        if any(token in lowered for token in ("status", "state", "type", "code")):
+    def _is_status_like(self, name: str, data_type: str, sample_values: list[str]) -> bool:
+        if is_declared_enum_type(data_type):
             return True
-        return self._is_low_cardinality(sample_values)
+        if has_business_enum_signal(name):
+            return True
+        return False
 
     def _is_identifier_like(self, name: str) -> bool:
         lowered = name.lower()

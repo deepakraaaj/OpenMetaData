@@ -33,6 +33,14 @@ def test_database_introspector_prefers_explicit_or_default_schema_scope() -> Non
     assert introspector._schema_names(_FakeInspector(), source) == ["custom_reporting"]
 
 
+def test_database_introspector_status_like_is_conservative() -> None:
+    introspector = DatabaseIntrospector()
+
+    assert introspector._is_status_like("status", "TEXT", ["OPEN", "DONE"]) is True
+    assert introspector._is_status_like("approval_bucket", "ENUM('new','done')", ["new", "done"]) is True
+    assert introspector._is_status_like("gps_fix", "INTEGER", ["0", "1"]) is False
+
+
 def test_introspection_service_and_serializer_generate_phase_one_artifacts(tmp_path: Path) -> None:
     db_path = tmp_path / "phase1.sqlite"
     engine = create_engine(f"sqlite:///{db_path}")
@@ -46,6 +54,7 @@ def test_introspection_service_and_serializer_generate_phase_one_artifacts(tmp_p
                     site_id INTEGER NOT NULL,
                     status TEXT NOT NULL,
                     priority TEXT,
+                    gps_fix INTEGER,
                     created_at TEXT,
                     FOREIGN KEY(site_id) REFERENCES sites(id)
                 )
@@ -57,10 +66,10 @@ def test_introspection_service_and_serializer_generate_phase_one_artifacts(tmp_p
         conn.execute(
             text(
                 """
-                INSERT INTO work_orders (site_id, status, priority, created_at)
+                INSERT INTO work_orders (site_id, status, priority, gps_fix, created_at)
                 VALUES
-                    (1, 'OPEN', 'HIGH', '2026-04-07T10:00:00'),
-                    (2, 'DONE', 'LOW', '2026-04-07T11:00:00')
+                    (1, 'OPEN', 'HIGH', 1, '2026-04-07T10:00:00'),
+                    (2, 'DONE', 'LOW', 0, '2026-04-07T11:00:00')
                 """
             )
         )
@@ -87,6 +96,7 @@ def test_introspection_service_and_serializer_generate_phase_one_artifacts(tmp_p
 
     assert {entry["table"] for entry in tables} == {"sites", "work_orders"}
     assert any(entry["table"] == "work_orders" and entry["column"] == "status" for entry in enum_candidates)
+    assert not any(entry["table"] == "work_orders" and entry["column"] == "gps_fix" for entry in enum_candidates)
     assert any(
         entry["source_table"] == "work_orders"
         and entry["target_table"] == "sites"

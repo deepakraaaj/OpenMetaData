@@ -14,6 +14,7 @@ from app.models.state import GapCategory, KnowledgeState, SemanticGap
 def _column(
     name: str,
     *,
+    technical_type: str = "TEXT",
     enum_values: list[str] | None = None,
     sample_values: list[str] | None = None,
     is_status_like: bool = False,
@@ -24,7 +25,7 @@ def _column(
         schema_name="main",
         table_name="api_key",
         column_name=name,
-        technical_type="TEXT",
+        technical_type=technical_type,
         enum_values=enum_values or [],
         sample_values=sample_values or [],
         is_status_like=is_status_like,
@@ -262,6 +263,39 @@ def test_gap_detector_suppresses_telemetry_style_enum_noise() -> None:
     assert "enum-vts_transaction.imei_no" not in gap_ids
     assert "enum-vts_transaction.main_power_status" not in gap_ids
     assert "enum-vts_transaction.number_of_satellite" not in gap_ids
+
+
+def test_gap_detector_keeps_declared_enum_type_without_name_signal() -> None:
+    normalized = NormalizedSource(
+        source_name="demo",
+        db_type="mysql",
+        tables=[
+            NormalizedTable(
+                schema_name="main",
+                table_name="dispatch",
+                row_count=5000,
+                join_candidates=["dispatch.owner_id=user.id"],
+                entity_hint="Dispatch task",
+                columns=[
+                    _column(
+                        "approval_bucket",
+                        technical_type="ENUM('new','approved','rejected')",
+                        enum_values=["new", "approved", "rejected"],
+                        sample_values=["new", "approved", "rejected"],
+                    ),
+                ],
+            )
+        ],
+    )
+    state = KnowledgeState(
+        source_name="demo",
+        tables={"dispatch": SemanticTable(table_name="dispatch")},
+    )
+
+    gaps = GapDetector().detect(normalized, state)
+    gap_ids = {gap.gap_id for gap in gaps}
+
+    assert "enum-dispatch.approval_bucket" in gap_ids
 
 
 def test_gap_detector_keeps_lookup_backed_status_id_as_enum_gap() -> None:
