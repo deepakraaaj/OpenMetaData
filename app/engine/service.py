@@ -482,6 +482,7 @@ class OnboardingEngine:
         semantic_model.glossary = list(state.glossary.values())
         semantic_model.canonical_entities = list(state.canonical_entities.values())
         semantic_model.query_patterns = list(state.query_patterns)
+        semantic_model.business_rules = list(state.business_rules)
 
         state_tables = state.tables
         semantic_tables = {table.table_name: table for table in semantic_model.tables}

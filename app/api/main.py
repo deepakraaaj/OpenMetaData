@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+from types import SimpleNamespace
 from typing import Any
 from pathlib import Path
 import zipfile
@@ -27,10 +28,13 @@ from app.models.simple_onboarding import SimpleOnboardingRequest
 from app.models.semantic import SemanticSourceModel
 from app.models.state import KnowledgeState
 from app.models.source import DiscoveredSource
+from app.models.validation import SqlValidationRequest
+from app.onboard.pipeline import OnboardingPipeline
 from app.onboard.simple_flow import SimpleOnboardingService
 from app.repositories.filesystem import WorkspaceRepository
 from app.retrieval.service import RetrievalContextBuilder
 from app.services.onboarding_jobs import InMemoryOnboardingJobStore, OnboardingJobService
+from app.services.sql_validation import SqlValidationService
 from app.utils.enum_candidates import is_enum_candidate
 from app.utils.serialization import read_json
 
@@ -435,21 +439,23 @@ def rebuild_semantic_bundle(source_name: str) -> JSONResponse:
 @app.post("/api/sources/{source_name}/semantic-bundle/publish")
 def publish_semantic_bundle(source_name: str, request: PublishBundleRequest) -> JSONResponse:
     try:
+        state = _prepare_review_workspace(source_name)
         bundle_dir = repository.semantic_bundle_dir(source_name)
         if not bundle_dir.exists():
             bundle_dir = _rebuild_semantic_bundle(source_name)
+        chatbot_manifest = repository.source_dir(source_name) / CHATBOT_PACKAGE_DIRNAME / "manifest.json"
+        if not chatbot_manifest.exists():
+            _rebuild_chatbot_package(source_name)
+        _assert_review_assets_exist(source_name)
         business_semantics = repository.load_semantic_bundle_file(source_name, "business_semantics.json")
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.") from exc
 
-    state_path = repository.source_dir(source_name) / "knowledge_state.json"
-    if state_path.exists():
-        state = KnowledgeState.model_validate(read_json(state_path))
-        if not state.readiness.publish_ready:
-            reasons = state.readiness.publish_notes or state.readiness.readiness_notes or [
-                "Publish blockers still need confirmation.",
-            ]
-            raise HTTPException(status_code=409, detail=" ".join(reasons))
+    if state is not None and not state.readiness.publish_ready:
+        reasons = state.readiness.publish_notes or state.readiness.readiness_notes or [
+            "Publish blockers still need confirmation.",
+        ]
+        raise HTTPException(status_code=409, detail=" ".join(reasons))
 
     domain_name = str(request.domain_name or business_semantics.get("domain_name") or source_name).strip()
     if not domain_name:
@@ -464,10 +470,40 @@ def publish_semantic_bundle(source_name: str, request: PublishBundleRequest) -> 
         {
             "source_name": source_name,
             "domain_name": domain_name,
+            "bundle_dir": str(bundle_dir),
             "published_to": str(target_dir),
+            "chatbot_package_ready": (repository.source_dir(source_name) / CHATBOT_PACKAGE_DIRNAME / "manifest.json").exists(),
             "status": "published",
         }
     )
+
+
+@app.post("/api/sources/{source_name}/sql-validation")
+def validate_business_question(source_name: str, request: SqlValidationRequest) -> JSONResponse:
+    source = _discovered_source_by_name(source_name)
+    if source is None:
+        raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.")
+
+    try:
+        semantic = repository.load_semantic_model(source_name)
+        technical = repository.load_technical_metadata(source_name)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"Source `{source_name}` has not been onboarded.") from exc
+
+    question = str(request.question or "").strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="question is required.")
+
+    try:
+        result = SqlValidationService().validate_question(
+            source=source,
+            semantic=semantic,
+            technical=technical,
+            question=question,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JSONResponse(result.model_dump(mode="json"))
 
 
 @app.get("/chatbot/{source_name}")
@@ -610,6 +646,39 @@ def _load_context_package(source_name: str, semantic: SemanticSourceModel) -> LL
         question=f"What does {source_name} contain and how should it be queried safely?",
     )
     return package
+
+
+def _prepare_review_workspace(source_name: str) -> KnowledgeState | None:
+    pipeline_settings = settings
+    if not hasattr(pipeline_settings, "output_dir"):
+        pipeline_settings = SimpleNamespace(
+            output_dir=repository.output_dir,
+            openmetadata_enable_sync=getattr(settings, "openmetadata_enable_sync", False),
+        )
+    pipeline = OnboardingPipeline(pipeline_settings, repository)
+    try:
+        return pipeline.prepare_review_workspace(source_name)
+    except FileNotFoundError:
+        state_path = repository.source_dir(source_name) / "knowledge_state.json"
+        if state_path.exists():
+            return KnowledgeState.model_validate(read_json(state_path))
+        return None
+
+
+def _assert_review_assets_exist(source_name: str) -> None:
+    source_dir = repository.source_dir(source_name)
+    required_paths = [
+        repository.semantic_bundle_dir(source_name) / "schema_context.json",
+        repository.semantic_bundle_dir(source_name) / "business_semantics.json",
+        source_dir / CHATBOT_PACKAGE_DIRNAME / "manifest.json",
+        source_dir / "questionnaire.json",
+    ]
+    missing = [str(path.name) for path in required_paths if not path.exists()]
+    if missing:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Expected generated assets are missing after workspace preparation: {', '.join(missing)}.",
+        )
 
 
 def _stream_directory_zip(

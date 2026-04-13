@@ -20,6 +20,7 @@ from app.onboard.introspection import DatabaseIntrospector
 from app.repositories.filesystem import WorkspaceRepository
 from app.services.database import redacted_url
 from app.utils.serialization import write_json
+from app.utils.text import tokenize
 
 
 def _dedupe_keep_order(values: list[str]) -> list[str]:
@@ -43,10 +44,7 @@ def _humanize(identifier: str) -> str:
 def _tokens(*values: str) -> set[str]:
     tokens: set[str] = set()
     for value in values:
-        for part in re.split(r"[^a-zA-Z0-9]+", str(value or "").lower()):
-            cleaned = part.strip()
-            if cleaned:
-                tokens.add(cleaned)
+        tokens.update(tokenize(str(value or "")))
     return tokens
 
 
@@ -120,7 +118,7 @@ class SimpleOnboardingService:
         "version",
     }
     _DATE_TERMS = {"date", "datetime", "time", "timestamp", "scheduled", "due", "created", "updated", "occurred"}
-    _STATUS_TERMS = {"state", "status", "priority", "severity", "stage", "phase"}
+    _STATUS_TERMS = {"state", "status", "priority", "severity", "stage", "phase", "condition", "outcome"}
     _CATEGORY_RULES = (
         (
             "Core Operations",
@@ -540,6 +538,8 @@ class SimpleOnboardingService:
         threshold = 32 if selection_mode == "review" else 48
         if category == "Reference Data" and profile.incoming_tables:
             threshold -= 6
+        if category == "Reference Data" and self._has_semantic_columns(profile):
+            threshold -= 6
         if self._is_bridge(profile) and selection_mode == "ai":
             threshold += 6
         return score >= threshold
@@ -661,7 +661,8 @@ class SimpleOnboardingService:
         if self._is_noise(profile) or self._is_bridge(profile):
             return False
         column_names = {name.lower() for name in profile.columns}
-        key_columns = {"name", "label", "code", "title", "type", "category", "status"}
+        key_columns = {"name", "label", "code", "title", "type", "category", "status", "condition", "outcome"}
+        # Increased cardinality support for lookup tables as well
         if len(profile.columns) <= 5 and column_names & key_columns:
             return True
         return len(profile.columns) <= 4 and profile.incoming_tables and not profile.foreign_keys

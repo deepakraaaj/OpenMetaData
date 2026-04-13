@@ -7,12 +7,13 @@ import {
   getNextQuestion,
   setReviewMode,
   submitAnswer,
+  publishSemanticBundle,
+  validateBusinessQuestion,
   openMetadataClientApiBaseUrl,
 } from "../lib/client-api";
 import { MOCK_KNOWLEDGE_STATE } from "../lib/mock-data";
-import type { KnowledgeState, GeneratedQuestion, ReviewMode } from "../lib/types";
+import type { KnowledgeState, GeneratedQuestion, ReviewMode, SqlValidationResponse } from "../lib/types";
 import KnowledgePanel from "./KnowledgePanel";
-import Chatbot from "./Chatbot";
 import SemanticDiagram from "./SemanticDiagram";
 import DomainSummary from "./DomainSummary";
 import EnumReviewGrid from "./EnumReviewGrid";
@@ -216,11 +217,11 @@ function NavItem({ active, label, onClick }: { active: boolean; label: string; o
 function ConnectScreen({ onNext, sourceName, mode, error, busy }: { onNext: () => void; sourceName: string; mode: DataMode; error: string; busy: boolean }) {
   const message =
     mode === "live"
-      ? "A cached review workspace is already available."
+      ? "A cached review workspace and generated artifacts are already available."
       : mode === "loading"
         ? "Checking whether a cached review workspace already exists."
         : mode === "setup"
-          ? "Semantic metadata is ready. Click to prepare the review workspace and deferred review artifacts."
+          ? "Semantic metadata is ready. Click to refresh the review workspace and regenerate the publish artifacts."
           : "The engine API could not be reached. You can retry once connectivity is restored.";
 
   const buttonLabel =
@@ -234,7 +235,7 @@ function ConnectScreen({ onNext, sourceName, mode, error, busy }: { onNext: () =
     <div className="hero">
       <span className="eyebrow">Semantic Onboarding</span>
       <h1>Prepare the review workspace for {sourceName}.</h1>
-      <p>This step loads the cached semantic model, initializes the review state, and prepares the deferred review outputs only when you ask for them.</p>
+      <p>This step loads the cached semantic model, refreshes the review state, and regenerates the publishable artifacts from the current answers.</p>
 
       <div className="card" style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'left' }}>
         <div className="stack" style={{ gap: '1rem' }}>
@@ -503,7 +504,7 @@ function ChatPanel({
   }, [question?.gap_id]);
 
   if (mode !== "live") {
-    return <Chatbot state={state} />;
+    return <WorkspaceUnavailablePanel mode={mode} />;
   }
 
   if (!question) {
@@ -659,6 +660,25 @@ function ChatPanel({
 function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state: KnowledgeState; sourceName: string; onStateUpdate: (s: KnowledgeState) => void; groups: Record<string, string[]> }) {
   const skippedTables = Object.values(state.tables).filter((table) => table.review_status === "skipped").length;
   const publishBlockers = state.readiness.publish_blockers_count;
+  const [domainName, setDomainName] = useState(sourceName);
+  const [publishing, setPublishing] = useState(false);
+  const [publishMessage, setPublishMessage] = useState("");
+  const [publishError, setPublishError] = useState("");
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    setPublishError("");
+    setPublishMessage("");
+    try {
+      const response = await publishSemanticBundle(sourceName, domainName.trim() || undefined);
+      setPublishMessage(`Published to ${response.published_to}`);
+      setDomainName(response.domain_name || domainName);
+    } catch (err) {
+      setPublishError(err instanceof Error ? err.message : "Publish failed.");
+    } finally {
+      setPublishing(false);
+    }
+  };
 
   return (
     <div className="stack" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
@@ -750,15 +770,211 @@ function FinalReviewScreen({ state, sourceName, onStateUpdate, groups }: { state
 
       <ArtifactExplorer sourceName={sourceName} />
 
-      <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'center' }}>
-        <button 
-          className="btn btn-outline" 
-          style={{ padding: '1rem 4rem', fontSize: '1.1rem' }} 
-          disabled={!state.readiness.publish_ready}
-        >
-          {state.readiness.publish_ready ? '🚀 Publish to TAG Domain' : 'Resolve Publish Blockers To Publish'}
+      <ValidationWorkbench state={state} sourceName={sourceName} />
+
+      <div className="card" style={{ marginTop: '2rem' }}>
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <div>
+            <h3>Publish</h3>
+            <p className="hint">
+              Publish now copies the real generated semantic bundle into the TAG domain folder only after the workspace artifacts are regenerated successfully.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={domainName}
+              onChange={(event) => setDomainName(event.target.value)}
+              placeholder="Target domain name"
+              style={{ minWidth: '280px', flex: '1 1 280px' }}
+            />
+            <button
+              className="btn btn-primary"
+              style={{ padding: '1rem 2rem', fontSize: '1rem' }}
+              disabled={!state.readiness.publish_ready || publishing}
+              onClick={handlePublish}
+            >
+              {publishing
+                ? 'Publishing...'
+                : state.readiness.publish_ready
+                  ? 'Publish to TAG Domain'
+                  : 'Resolve Publish Blockers To Publish'}
+            </button>
+          </div>
+          {publishMessage ? (
+            <div style={{ padding: '0.85rem 1rem', borderRadius: '10px', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.35)' }}>
+              <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Publish complete</strong>
+              <span className="hint" style={{ color: 'var(--text-main)' }}>{publishMessage}</span>
+            </div>
+          ) : null}
+          {publishError ? (
+            <div style={{ padding: '0.85rem 1rem', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)' }}>
+              <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Publish failed</strong>
+              <span className="hint" style={{ color: '#fca5a5' }}>{publishError}</span>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorkspaceUnavailablePanel({ mode }: { mode: DataMode }) {
+  const message =
+    mode === "setup"
+      ? "Initialize the live review workspace first. The simulated assistant path has been removed."
+      : mode === "mock"
+        ? "The workspace is unavailable because the live backend could not be reached."
+        : "The workspace is still loading.";
+
+  return (
+    <div className="card" style={{ display: 'grid', gap: '0.9rem', flex: 1, alignContent: 'center' }}>
+      <h3>Live Review Workspace Required</h3>
+      <p className="hint">{message}</p>
+      <p className="hint">Review answers, publish, and SQL validation now run only against the real backend workspace.</p>
+    </div>
+  );
+}
+
+function ValidationWorkbench({ state, sourceName }: { state: KnowledgeState; sourceName: string }) {
+  const suggestedQuestions = Array.from(
+    new Set(
+      Object.values(state.tables)
+        .flatMap((table) => table.common_business_questions)
+        .filter(Boolean)
+    )
+  ).slice(0, 5);
+  const [question, setQuestion] = useState(suggestedQuestions[0] || "");
+  const [running, setRunning] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<SqlValidationResponse | null>(null);
+
+  const handleRun = async () => {
+    if (!question.trim()) return;
+    setRunning(true);
+    setError("");
+    try {
+      const response = await validateBusinessQuestion(sourceName, question.trim());
+      setResult(response);
+    } catch (err) {
+      setResult(null);
+      setError(err instanceof Error ? err.message : "Validation failed.");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <div className="card" style={{ marginTop: '2rem', display: 'grid', gap: '1rem' }}>
+      <div>
+        <h3>SQL Validation Workbench</h3>
+        <p className="hint">
+          Test real business questions against the current semantic bundle. The generated SQL stays visible and execution is limited to a guarded read-only path.
+        </p>
+      </div>
+
+      {suggestedQuestions.length > 0 ? (
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          {suggestedQuestions.map((item) => (
+            <button
+              key={item}
+              className="btn btn-outline"
+              style={{ fontSize: '0.8rem' }}
+              onClick={() => setQuestion(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          value={question}
+          onChange={(event) => setQuestion(event.target.value)}
+          placeholder="Ask a business question"
+          style={{ flex: '1 1 420px' }}
+        />
+        <button className="btn btn-primary" onClick={handleRun} disabled={running || !question.trim()}>
+          {running ? 'Running...' : 'Run Validation'}
         </button>
       </div>
+
+      {error ? (
+        <div style={{ padding: '0.85rem 1rem', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)' }}>
+          <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Validation error</strong>
+          <span className="hint" style={{ color: '#fca5a5' }}>{error}</span>
+        </div>
+      ) : null}
+
+      {result ? (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <span className={`pill ${result.execution_status === 'success' ? 'pill-success' : 'pill-warning'}`}>
+              {result.execution_status}
+            </span>
+            {result.matched_table ? <span className="pill">Table: {result.matched_table}</span> : null}
+            <span className="pill">Intent: {result.intent.replaceAll("_", " ")}</span>
+            <span className="pill">{result.row_count} row(s)</span>
+          </div>
+
+          <div>
+            <strong style={{ display: 'block', marginBottom: '0.5rem' }}>Generated SQL</strong>
+            <pre style={{ margin: 0, padding: '1rem', background: 'var(--bg-surface-alt)', borderRadius: '10px', overflowX: 'auto' }}>
+              <code>{result.sql}</code>
+            </pre>
+          </div>
+
+          {result.warnings.length > 0 ? (
+            <div>
+              <strong style={{ display: 'block', marginBottom: '0.5rem' }}>Notes</strong>
+              <div className="stack" style={{ gap: '0.35rem' }}>
+                {result.warnings.map((warning) => (
+                  <p key={warning} className="hint" style={{ margin: 0 }}>{warning}</p>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {result.error ? (
+            <div style={{ padding: '0.85rem 1rem', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)' }}>
+              <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Execution error</strong>
+              <span className="hint" style={{ color: '#fca5a5' }}>{result.error}</span>
+            </div>
+          ) : result.rows.length > 0 ? (
+            <div>
+              <strong style={{ display: 'block', marginBottom: '0.5rem' }}>Preview</strong>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      {result.columns.map((column) => (
+                        <th key={column} style={{ textAlign: 'left', padding: '0.6rem', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                          {column}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.rows.map((row, index) => (
+                      <tr key={`${index}-${JSON.stringify(row)}`}>
+                        {result.columns.map((column) => (
+                          <td key={`${index}-${column}`} style={{ padding: '0.6rem', borderBottom: '1px solid var(--border)' }}>
+                            {String(row[column] ?? "")}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <p className="hint" style={{ margin: 0 }}>The query executed successfully but returned no rows.</p>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

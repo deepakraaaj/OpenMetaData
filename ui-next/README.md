@@ -9,7 +9,7 @@ This app is a richer review surface for OpenMetaData semantic onboarding.
 3. The UI opens a schema-grounded question wizard.
 4. Your answers update the semantic bundle JSON files.
 5. You can download a zip containing all generated JSON outputs for that source.
-6. You can publish the reviewed semantic bundle into TAG and trigger TAG reindex.
+6. You can publish the reviewed semantic bundle into TAG and validate reviewable SQL against the source database.
 
 ## Run
 
@@ -45,4 +45,4 @@ Optional dev config:
 
 The wizard asks schema-grounded business questions, saves answers back into the semantic bundle,
 publishes the reviewed bundle into `TAG-Implementation/app/domains/<domain>/semantic_bundle/`,
-and can trigger TAG's `/semantic/reindex` endpoint immediately after publish.
+and exposes a manual SQL validation workbench for testing real business questions before rollout.

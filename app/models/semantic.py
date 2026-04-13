@@ -148,5 +148,6 @@ class SemanticSourceModel(BaseModel):
     glossary: list[GlossaryTerm] = Field(default_factory=list)
     canonical_entities: list[CanonicalEntity] = Field(default_factory=list)
     query_patterns: list[QueryPattern] = Field(default_factory=list)
+    business_rules: list[BusinessRule] = Field(default_factory=list)
     decision_history: list[DecisionRecord] = Field(default_factory=list)
     review_debt: list[ReviewDebtItem] = Field(default_factory=list)

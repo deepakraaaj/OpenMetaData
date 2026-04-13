@@ -70,6 +70,11 @@ class IntrospectionSerializer:
                                 "nullable": column.nullable,
                                 "sample_values": column.sample_values,
                                 "enum_values": column.enum_values,
+                                "null_ratio": column.null_ratio,
+                                "distinct_count": column.distinct_count,
+                                "top_values": [item.model_dump(mode="json") for item in column.top_values],
+                                "min_value": column.min_value,
+                                "max_value": column.max_value,
                                 "is_identifier_like": column.is_identifier_like,
                                 "is_status_like": column.is_status_like,
                                 "is_timestamp_like": column.is_timestamp_like,
@@ -107,6 +112,9 @@ class IntrospectionSerializer:
                             "target_columns": [join.right_column],
                             "confidence": join.confidence,
                             "reasons": join.reasons,
+                            "validated_by_data": join.validated_by_data,
+                            "overlap_ratio": join.overlap_ratio,
+                            "overlap_sample_size": join.overlap_sample_size,
                         }
                     )
 

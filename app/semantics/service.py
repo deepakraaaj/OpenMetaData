@@ -139,7 +139,7 @@ class SemanticGuessService:
             column_name=column.column_name,
             technical_type=column.technical_type,
             business_meaning=meaning,
-            example_values=(column.enum_values or column.sample_values)[:5],
+            example_values=(column.enum_values or column.top_values or column.sample_values)[:5],
             synonyms=synonyms,
             filterable=filterable,
             displayable=displayable,
@@ -354,6 +354,7 @@ class SemanticGuessService:
         name = column.column_name.lower()
         reasons: list[str] = []
         score = 0.45
+        low_cardinality = column.distinct_count is not None and column.distinct_count <= 12
         status_signal = column.is_status_like or any(token in name for token in column_rules.status_tokens)
         classification_signal = any(token in name for token in column_rules.classification_tokens)
         if column.is_primary_key:
@@ -379,14 +380,18 @@ class SemanticGuessService:
                 self._confidence(score, reasons),
             )
         if status_signal:
+            if low_cardinality:
+                reasons.append(f"low cardinality ({column.distinct_count} distinct values)")
             return (
                 "Lifecycle or workflow status for the record.",
-                self._confidence(0.9, ["status/state naming"]),
+                self._confidence(0.93 if low_cardinality else 0.9, reasons or ["status/state naming"]),
             )
         if classification_signal:
+            if low_cardinality:
+                reasons.append(f"low cardinality ({column.distinct_count} distinct values)")
             return (
                 "Classification or category for the record.",
-                self._confidence(0.8, ["type/category naming"]),
+                self._confidence(0.85 if low_cardinality else 0.8, reasons or ["type/category naming"]),
             )
         if any(token in name for token in column_rules.timestamp_tokens) or column.is_timestamp_like:
             return (
@@ -397,6 +402,12 @@ class SemanticGuessService:
             score = 0.8
             reasons.append("name field")
             return ("Human-readable name or label.", self._confidence(score, reasons))
+        if low_cardinality and (column.top_values or column.enum_values):
+            reasons.append(f"low cardinality ({column.distinct_count} distinct values)")
+            return (
+                "Controlled vocabulary or small business classification used for filtering and grouping.",
+                self._confidence(0.76, reasons),
+            )
         if column.sample_values and len(column.sample_values) <= 5:
             reasons.append("sample values available")
             score += 0.15
@@ -479,12 +490,39 @@ class SemanticGuessService:
         patterns: list[QueryPattern] = []
         for table in tables[:12]:
             singular = snake_to_words(table.table_name.rstrip("s"))
+            status_column = next(
+                (
+                    column.column_name
+                    for column in table.columns
+                    if "status" in column.column_name.lower()
+                    or column.business_meaning == "Lifecycle or workflow status for the record."
+                ),
+                None,
+            )
+            timestamp_column = next(
+                (
+                    column.column_name
+                    for column in table.columns
+                    if column.business_meaning and "timestamp" in column.business_meaning.lower()
+                ),
+                None,
+            )
+            if timestamp_column is None:
+                timestamp_column = next(
+                    (
+                        column.column_name
+                        for column in table.columns
+                        if any(token in column.column_name.lower() for token in ("created", "updated", "date", "time"))
+                    ),
+                    None,
+                )
             patterns.append(
                 QueryPattern(
                     intent=f"{singular}_summary",
                     question_examples=[
                         f"Show me a summary of {singular} records",
                         f"How many {singular} records are there?",
+                        f"What are the most recent {singular} records?",
                     ],
                     preferred_tables=[table.table_name],
                     required_joins=table.valid_joins[:3],
@@ -495,6 +533,36 @@ class SemanticGuessService:
                     rendering_guidance="Default to counts, recent records, and status breakdowns before raw detail dumps.",
                 )
             )
+            if status_column:
+                patterns.append(
+                    QueryPattern(
+                        intent=f"{singular}_status_breakdown",
+                        question_examples=[f"What is the status breakdown for {singular} records?"],
+                        preferred_tables=[table.table_name],
+                        required_joins=table.valid_joins[:3],
+                        safe_filters=table.common_filters[:4],
+                        optional_sql_template=(
+                            f"SELECT {status_column}, COUNT(*) AS total_records "
+                            f"FROM {table.table_name} GROUP BY {status_column} ORDER BY total_records DESC"
+                        ),
+                        rendering_guidance="Use this pattern to validate enum meaning and workflow coverage.",
+                    )
+                )
+            if timestamp_column:
+                patterns.append(
+                    QueryPattern(
+                        intent=f"{singular}_recent_records",
+                        question_examples=[f"Show the most recent {singular} records"],
+                        preferred_tables=[table.table_name],
+                        required_joins=table.valid_joins[:3],
+                        safe_filters=table.common_filters[:4],
+                        optional_sql_template=(
+                            f"SELECT * FROM {table.table_name} "
+                            f"ORDER BY {timestamp_column} DESC LIMIT 20"
+                        ),
+                        rendering_guidance="Use recent records to sanity-check freshness and grain.",
+                    )
+                )
         return patterns
 
     def _confidence(self, score: float, reasons: list[str]) -> NamedConfidence:

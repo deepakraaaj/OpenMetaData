@@ -173,3 +173,83 @@ def test_simple_onboarding_applies_bulk_rules_and_manual_overrides() -> None:
     assert "person" not in response.selected_tables
     assert "audit_log" not in response.selected_tables
     assert response.artifact.categories["Reference Data"] == ["task_asset_mapping", "task_status"]
+
+
+def test_simple_onboarding_selects_status_reference_tables_in_ai_mode() -> None:
+    service = SimpleOnboardingService()
+
+    metadata = SourceTechnicalMetadata(
+        source_name="facility_source",
+        db_type=DatabaseType.mysql,
+        database_name="facility",
+        connectivity_ok=True,
+        schemas=[
+            SchemaProfile(
+                schema_name="facility",
+                tables=[
+                    TableProfile(
+                        schema_name="facility",
+                        table_name="facility_status",
+                        columns=[
+                            ColumnProfile(name="id", data_type="INTEGER"),
+                            ColumnProfile(name="status", data_type="TEXT"),
+                            ColumnProfile(name="description", data_type="TEXT"),
+                        ],
+                        primary_key=["id"],
+                    )
+                ],
+            )
+        ],
+    )
+
+    response = service.build_from_metadata(
+        metadata=metadata,
+        request=SimpleOnboardingRequest(
+            db_url="mysql://demo",
+            selection_mode="ai",
+        ),
+        source_name="facility_source",
+        database_target="mysql://db.example.com:3306/facility",
+    )
+
+    assert "facility_status" in response.selected_tables
+
+
+def test_simple_onboarding_handles_camelcase_reference_tables() -> None:
+    service = SimpleOnboardingService()
+
+    metadata = SourceTechnicalMetadata(
+        source_name="facility_source",
+        db_type=DatabaseType.mysql,
+        database_name="facility",
+        connectivity_ok=True,
+        schemas=[
+            SchemaProfile(
+                schema_name="facility",
+                tables=[
+                    TableProfile(
+                        schema_name="facility",
+                        table_name="FacilityStatus",
+                        columns=[
+                            ColumnProfile(name="id", data_type="INTEGER"),
+                            ColumnProfile(name="status", data_type="TEXT"),
+                            ColumnProfile(name="description", data_type="TEXT"),
+                        ],
+                        primary_key=["id"],
+                    )
+                ],
+            )
+        ],
+    )
+
+    response = service.build_from_metadata(
+        metadata=metadata,
+        request=SimpleOnboardingRequest(
+            db_url="mysql://demo",
+            selection_mode="review",
+        ),
+        source_name="facility_source",
+        database_target="mysql://db.example.com:3306/facility",
+    )
+
+    assert "FacilityStatus" in response.selected_tables

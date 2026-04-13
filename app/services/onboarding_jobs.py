@@ -165,6 +165,38 @@ class InMemoryOnboardingJobStore:
                 sync_openmetadata=sync_openmetadata,
                 progress=lambda update: self.apply_update(job_id, update),
             )
+            self.apply_update(
+                job_id,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.GENERATING_REVIEW_QUESTIONS,
+                    step_state=OnboardingStepState.RUNNING,
+                    level=OnboardingLogLevel.INFO,
+                    message="Generating review questions, semantic bundle, and chatbot package.",
+                ),
+            )
+            pipeline.prepare_review_workspace(source.name)
+            if not pipeline._review_assets_exist(source.name):
+                raise OnboardingPipelineError(
+                    "Onboarding finished introspection, but required review artifacts were not generated."
+                )
+            self.apply_update(
+                job_id,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.GENERATING_REVIEW_QUESTIONS,
+                    step_state=OnboardingStepState.COMPLETED,
+                    level=OnboardingLogLevel.SUCCESS,
+                    message="Review workspace, semantic bundle, and package files are ready.",
+                ),
+            )
+            self.apply_update(
+                job_id,
+                OnboardingProgressUpdate(
+                    stage=OnboardingStage.READY_FOR_REVIEW,
+                    step_state=OnboardingStepState.COMPLETED,
+                    level=OnboardingLogLevel.SUCCESS,
+                    message="Onboarding completed with real review artifacts available for publish and validation.",
+                ),
+            )
             repository.upsert_discovered_source(source)
             self.mark_completed(
                 job_id,

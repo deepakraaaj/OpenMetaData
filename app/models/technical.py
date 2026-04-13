@@ -7,6 +7,11 @@ from pydantic import BaseModel, Field
 from app.models.common import DatabaseType
 
 
+class TopValueProfile(BaseModel):
+    value: str
+    count: int
+
+
 class ColumnProfile(BaseModel):
     name: str
     data_type: str
@@ -19,6 +24,11 @@ class ColumnProfile(BaseModel):
     referenced_column: str | None = None
     enum_values: list[str] = Field(default_factory=list)
     sample_values: list[str] = Field(default_factory=list)
+    null_ratio: float | None = None
+    distinct_count: int | None = None
+    top_values: list[TopValueProfile] = Field(default_factory=list)
+    min_value: str | None = None
+    max_value: str | None = None
     is_timestamp_like: bool = False
     is_status_like: bool = False
     is_identifier_like: bool = False
@@ -45,6 +55,9 @@ class CandidateJoin(BaseModel):
     right_column: str
     confidence: float
     reasons: list[str] = Field(default_factory=list)
+    validated_by_data: bool = False
+    overlap_ratio: float | None = None
+    overlap_sample_size: int | None = None
 
 
 class TableProfile(BaseModel):
@@ -76,4 +89,3 @@ class SourceTechnicalMetadata(BaseModel):
     connectivity_ok: bool = False
     connectivity_notes: list[str] = Field(default_factory=list)
     source_summary: dict[str, Any] = Field(default_factory=dict)
-

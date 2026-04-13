@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from app.utils.serialization import read_json
 from sqlalchemy import create_engine, text
 
 from app.api import main as api_main
@@ -40,7 +41,7 @@ def test_api_lists_env_presets_and_runs_phase_one_introspection_from_env(tmp_pat
     db_path = env_dir / "demo.sqlite"
     _create_demo_db(db_path)
     env_file = env_dir / "demo.env"
-    env_file.write_text("DEMO_DATABASE_URL=sqlite:///demo.sqlite\n", encoding="utf-8")
+    env_file.write_text(f"DEMO_DATABASE_URL=sqlite:///{db_path}\n", encoding="utf-8")
 
     monkeypatch.setattr(api_main, "repository", repository)
     client = TestClient(api_main.app)
@@ -71,6 +72,12 @@ def test_api_lists_env_presets_and_runs_phase_one_introspection_from_env(tmp_pat
     assert (source_dir / "tables.json").exists()
     assert (source_dir / "columns.json").exists()
     assert (source_dir / "profiling.json").exists()
+    profiling = read_json(source_dir / "profiling.json")
+    tickets = next(entry for entry in profiling if entry["table"] == "tickets")
+    status_column = next(column for column in tickets["columns"] if column["column"] == "status")
+    assert status_column["null_ratio"] == 0.0
+    assert status_column["distinct_count"] == 1
+    assert status_column["top_values"]
 
 
 def test_api_runs_phase_one_introspection_from_raw_url(tmp_path: Path, monkeypatch) -> None:
@@ -100,3 +107,7 @@ def test_api_runs_phase_one_introspection_from_raw_url(tmp_path: Path, monkeypat
 
     source_dir = repository.source_dir("direct_phase1")
     assert (source_dir / "relationships.json").exists()
+    profiling = read_json(source_dir / "profiling.json")
+    tickets = next(entry for entry in profiling if entry["table"] == "tickets")
+    created_at = next(column for column in tickets["columns"] if column["column"] == "created_at")
+    assert created_at["null_ratio"] == 0.0

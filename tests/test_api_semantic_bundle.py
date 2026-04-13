@@ -17,12 +17,20 @@ from app.models.common import DatabaseType
 from app.models.questionnaire import QuestionnaireBundle
 from app.models.semantic import QueryPattern, SemanticSourceModel, SemanticTable
 from app.models.state import KnowledgeState, ReadinessState
+from app.models.source import DiscoveredSource, SourceConnection
 from app.models.technical import ColumnProfile, SchemaProfile, SourceTechnicalMetadata, TableProfile
 from app.repositories.filesystem import WorkspaceRepository
 from app.services.onboarding_jobs import InMemoryOnboardingJobStore
 
 
 def _seed_source(repository: WorkspaceRepository, source_name: str) -> None:
+    repository.upsert_discovered_source(
+        DiscoveredSource(
+            name=source_name,
+            connection=SourceConnection(type=DatabaseType.mysql, database="warehouse"),
+            description="seeded source",
+        )
+    )
     repository.save_technical_metadata(
         SourceTechnicalMetadata(
             source_name=source_name,
@@ -114,6 +122,9 @@ def test_semantic_bundle_api_rebuild_and_publish(tmp_path: Path, monkeypatch) ->
         SimpleNamespace(
             admin_origins=["http://localhost:3000"],
             tag_domains_dir=tag_domains_dir,
+            config_dir=config_dir,
+            output_dir=output_dir,
+            openmetadata_enable_sync=False,
         ),
     )
 
@@ -133,6 +144,7 @@ def test_semantic_bundle_api_rebuild_and_publish(tmp_path: Path, monkeypatch) ->
         json={"domain_name": "warehouse_ops"},
     )
     assert publish.status_code == 200
+    assert publish.json()["chatbot_package_ready"] is True
     assert (tag_domains_dir / "warehouse_ops" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
 
 
@@ -166,6 +178,9 @@ def test_publish_is_blocked_when_state_is_not_publish_ready(tmp_path: Path, monk
         SimpleNamespace(
             admin_origins=["http://localhost:3000"],
             tag_domains_dir=tag_domains_dir,
+            config_dir=config_dir,
+            output_dir=output_dir,
+            openmetadata_enable_sync=False,
         ),
     )
 
@@ -233,8 +248,8 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
     assert completed["counts"]["table_count"] == 1
     assert (output_dir / "warehouse_direct" / "knowledge_state.json").exists()
     assert (output_dir / "warehouse_direct" / "domain_groups.json").exists()
-    assert not (output_dir / "warehouse_direct" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
-    assert not (output_dir / "warehouse_direct" / "chatbot_package" / "manifest.json").exists()
+    assert (output_dir / "warehouse_direct" / SEMANTIC_BUNDLE_DIRNAME / "schema_context.json").exists()
+    assert (output_dir / "warehouse_direct" / "chatbot_package" / "manifest.json").exists()
 
     prepare = client.post("/api/engine/warehouse_direct/initialize")
     assert prepare.status_code == 200
@@ -282,6 +297,86 @@ def test_url_onboarding_endpoint_processes_db_url_and_returns_zip(tmp_path: Path
         assert "technical_metadata.json" in names
         assert "tables.json" in names
         assert "relationships.json" in names
+
+
+def test_sql_validation_endpoint_runs_reviewable_sql(tmp_path: Path, monkeypatch) -> None:
+    config_dir = tmp_path / "config"
+    output_dir = tmp_path / "output"
+    tag_domains_dir = tmp_path / "tag-domains"
+    repository = WorkspaceRepository(config_dir, output_dir)
+
+    db_path = tmp_path / "validation.sqlite"
+    engine = create_engine(f"sqlite:///{db_path}")
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE task_transaction (
+                    id INTEGER PRIMARY KEY,
+                    company_id INTEGER,
+                    status TEXT,
+                    created_at TEXT
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                INSERT INTO task_transaction (company_id, status, created_at)
+                VALUES
+                    (1, 'open', '2026-04-10T10:00:00'),
+                    (1, 'done', '2026-04-10T11:00:00'),
+                    (2, 'done', '2026-04-10T12:00:00')
+                """
+            )
+        )
+
+    monkeypatch.setattr(api_main, "repository", repository)
+    monkeypatch.setattr(engine_routes, "repository", repository)
+    monkeypatch.setattr(engine_routes, "engine", OnboardingEngine(output_dir))
+    monkeypatch.setattr(
+        api_main,
+        "settings",
+        SimpleNamespace(
+            admin_origins=["http://localhost:3000"],
+            tag_domains_dir=tag_domains_dir,
+            config_dir=config_dir,
+            output_dir=output_dir,
+            openmetadata_enable_sync=False,
+        ),
+    )
+    monkeypatch.setattr(
+        "app.onboard.pipeline.group_tables_by_relationships",
+        lambda state, **_kwargs: {"Operations": sorted(state.tables.keys())},
+    )
+
+    client = TestClient(api_main.app)
+    onboard = client.post(
+        "/api/onboarding/url",
+        json={
+            "db_url": f"sqlite:///{db_path}",
+            "source_name": "validation_source",
+            "domain_name": "warehouse_ops",
+        },
+    )
+    assert onboard.status_code == 202
+    payload = onboard.json()
+    _wait_for_job(client, payload["job_id"], expected_status="completed")
+
+    initialize = client.post("/api/engine/validation_source/initialize")
+    assert initialize.status_code == 200
+
+    validation = client.post(
+        "/api/sources/validation_source/sql-validation",
+        json={"question": "What is the status breakdown for task transaction records?"},
+    )
+    assert validation.status_code == 200
+    body = validation.json()
+    assert body["execution_status"] == "success"
+    assert body["matched_table"] == "task_transaction"
+    assert "GROUP BY task_transaction.status" in body["sql"]
+    assert body["rows"]
 
 
 def test_url_onboarding_rejects_empty_schema(tmp_path: Path, monkeypatch) -> None:

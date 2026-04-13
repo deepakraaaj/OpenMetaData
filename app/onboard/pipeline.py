@@ -167,10 +167,9 @@ class OnboardingPipeline:
         emit_progress(
             progress,
             OnboardingProgressUpdate(
-                stage=OnboardingStage.READY_FOR_REVIEW,
-                step_state=OnboardingStepState.COMPLETED,
-                level=OnboardingLogLevel.SUCCESS,
-                message="Semantic model is ready. Review questions and export artifacts will be prepared when you open the workspace.",
+                stage=OnboardingStage.GENERATING_REVIEW_QUESTIONS,
+                step_state=OnboardingStepState.RUNNING,
+                message="Semantic model is ready. Final review workspace assets are being generated.",
                 counts=semantic_progress,
             ),
         )

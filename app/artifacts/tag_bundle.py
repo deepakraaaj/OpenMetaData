@@ -178,6 +178,16 @@ class TagBundleExporter:
                 [str(item or "").strip().lower() for item in semantic.key_entities if str(item or "").strip()]
             )[:10],
             "business_terms": business_terms,
+            "business_rules": [
+                {
+                    "rule_name": rule.rule_name,
+                    "description": rule.description,
+                    "enforcement_level": rule.enforcement_level,
+                    "related_tables": list(rule.related_tables),
+                    "related_columns": list(rule.related_columns),
+                }
+                for rule in semantic.business_rules
+            ],
             "example_queries": example_queries[:10],
             "categorized_examples": categorized_examples,
             "review_debt": [

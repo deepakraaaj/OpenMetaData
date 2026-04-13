@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 import re
 
+from app.utils.text import tokenize
+
 
 BUSINESS_ENUM_TOKENS = (
     "status",
@@ -17,6 +19,8 @@ BUSINESS_ENUM_TOKENS = (
     "reason",
     "result",
     "class",
+    "condition",
+    "outcome",
 )
 
 BOOLEAN_LIKE_ENUM_VALUES = {
@@ -107,12 +111,17 @@ def is_declared_enum_type(data_type: str) -> bool:
 
 
 def has_business_enum_signal(column_name: str, extra_tokens: Sequence[str] | None = None) -> bool:
-    name = str(column_name or "").strip().lower()
-    if not name:
+    text = str(column_name or "").strip()
+    if not text:
         return False
-    if any(token in name for token in BUSINESS_ENUM_TOKENS):
+
+    name = text.lower()
+    tokens = tokenize(text)
+    if any(token in BUSINESS_ENUM_TOKENS for token in tokens):
         return True
-    return any(token in name for token in tuple(extra_tokens or ()))
+    if name.endswith("_id"):
+        return True
+    return any(token in tokens for token in tuple(extra_tokens or ()))
 
 
 def is_technical_enum_noise(column_name: str, values: Sequence[str]) -> bool:
@@ -144,21 +153,23 @@ def is_enum_candidate(
     cleaned_values = meaningful_distinct_values(values)
     if not name or name == "id":
         return False
-    if len(cleaned_values) < 2 or len(cleaned_values) > 8:
+    if len(cleaned_values) < 2 or len(cleaned_values) > 12:
         return False
     if any(len(value) > 32 for value in cleaned_values):
         return False
 
     declared_enum = is_declared_enum_type(technical_type)
     business_signal = has_business_enum_signal(name, extra_name_tokens)
-    if is_technical_enum_noise(name, cleaned_values) and not (declared_enum or lookup_backed):
+    orphan_id_signal = name.endswith("_id") and not is_foreign_key
+
+    if is_technical_enum_noise(name, cleaned_values) and not (declared_enum or lookup_backed or orphan_id_signal):
         return False
 
     if is_foreign_key and not (declared_enum or lookup_backed or business_signal):
         return False
 
     all_numeric = all(re.fullmatch(r"[0-9]+", value) for value in cleaned_values)
-    if all_numeric and not (declared_enum or lookup_backed or business_signal):
+    if all_numeric and not (declared_enum or lookup_backed or business_signal or orphan_id_signal):
         return False
 
-    return declared_enum or lookup_backed or business_signal
+    return declared_enum or lookup_backed or business_signal or orphan_id_signal

@@ -71,6 +71,7 @@ class StateManager:
             review_mode=semantic.review_mode,
             tables=tables,
             canonical_entities=entities,
+            business_rules=list(semantic.business_rules),
             glossary=glossary,
             query_patterns=semantic.query_patterns,
             decision_history=list(semantic.decision_history),

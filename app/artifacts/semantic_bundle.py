@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 
 from app.models.questionnaire import QuestionnaireBundle, QuestionnaireQuestion
-from app.models.semantic import GlossaryTerm, QueryPattern, SemanticSourceModel
+from app.models.semantic import BusinessRule, GlossaryTerm, QueryPattern, SemanticSourceModel
 from app.models.technical import ColumnProfile, SourceTechnicalMetadata, TableProfile
 from app.utils.files import ensure_dir
 from app.utils.serialization import write_json
@@ -216,6 +216,11 @@ class SemanticBundleExporter:
                             ),
                             "data_type": technical_columns.get(column_name).data_type if technical_columns.get(column_name) else "",
                             "nullable": technical_columns.get(column_name).nullable if technical_columns.get(column_name) else True,
+                            "null_ratio": technical_columns.get(column_name).null_ratio if technical_columns.get(column_name) else None,
+                            "distinct_count": technical_columns.get(column_name).distinct_count if technical_columns.get(column_name) else None,
+                            "top_values": [item.model_dump(mode="json") for item in technical_columns.get(column_name).top_values] if technical_columns.get(column_name) else [],
+                            "min_value": technical_columns.get(column_name).min_value if technical_columns.get(column_name) else None,
+                            "max_value": technical_columns.get(column_name).max_value if technical_columns.get(column_name) else None,
                         }
                         for column_name in _dedupe_keep_order(
                             list(semantic_table.important_columns)
@@ -296,6 +301,7 @@ class SemanticBundleExporter:
             "sensitive_areas": list(semantic.sensitive_areas),
             "glossary": glossary,
             "canonical_entities": entities,
+            "business_rules": [self._business_rule_payload(rule) for rule in semantic.business_rules],
             "review_debt": [
                 {
                     "decision_id": item.decision_id,
@@ -365,6 +371,9 @@ class SemanticBundleExporter:
                         ),
                         "confidence": candidate.confidence,
                         "reasons": list(candidate.reasons),
+                        "validated_by_data": candidate.validated_by_data,
+                        "overlap_ratio": candidate.overlap_ratio,
+                        "overlap_sample_size": candidate.overlap_sample_size,
                     }
                 )
 
@@ -468,6 +477,16 @@ class SemanticBundleExporter:
             "safe_filters": list(pattern.safe_filters),
             "optional_sql_template": pattern.optional_sql_template,
             "rendering_guidance": pattern.rendering_guidance,
+        }
+
+    def _business_rule_payload(self, rule: BusinessRule) -> dict:
+        return {
+            "rule_name": rule.rule_name,
+            "description": rule.description,
+            "enforcement_level": rule.enforcement_level,
+            "related_tables": list(rule.related_tables),
+            "related_columns": list(rule.related_columns),
+            "attribution": rule.attribution.model_dump(mode="json"),
         }
 
     def _question_payload(self, question: QuestionnaireQuestion) -> dict:

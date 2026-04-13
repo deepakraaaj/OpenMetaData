@@ -11,6 +11,11 @@ class NormalizedColumn(BaseModel):
     tokens: list[str] = Field(default_factory=list)
     sample_values: list[str] = Field(default_factory=list)
     enum_values: list[str] = Field(default_factory=list)
+    null_ratio: float | None = None
+    distinct_count: int | None = None
+    top_values: list[str] = Field(default_factory=list)
+    min_value: str | None = None
+    max_value: str | None = None
     is_primary_key: bool = False
     is_foreign_key: bool = False
     is_identifier_like: bool = False
@@ -40,4 +45,3 @@ class NormalizedSource(BaseModel):
     domain_hints: list[str] = Field(default_factory=list)
     tables: list[NormalizedTable] = Field(default_factory=list)
     summary: dict[str, int] = Field(default_factory=dict)
-

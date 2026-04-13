@@ -107,6 +107,7 @@ ONBOARDING_STAGE_LABELS: dict[OnboardingStage, str] = {
     OnboardingStage.READING_SCHEMA: "Reading schema",
     OnboardingStage.EXTRACTING_RELATIONSHIPS: "Extracting relationships",
     OnboardingStage.BUILDING_SEMANTIC_MODEL: "Building semantic model",
+    OnboardingStage.GENERATING_REVIEW_QUESTIONS: "Generating review workspace",
     OnboardingStage.READY_FOR_REVIEW: "Open review workspace",
 }
 

@@ -5,7 +5,9 @@ import type {
   ChatbotPackageResponse,
   KnowledgeState,
   OnboardingJobSnapshot,
+  PublishBundleResponse,
   ReviewMode,
+  SqlValidationResponse,
 } from "./types";
 
 function normalizeBaseUrl(value: string | undefined, fallback = ""): string {
@@ -75,6 +77,26 @@ export async function getOnboardingJob(jobId: string): Promise<OnboardingJobSnap
 
 export async function loadChatbotPackage(sourceName: string): Promise<ChatbotPackageResponse> {
   return fetchJson<ChatbotPackageResponse>(`/api/sources/${sourceName}/chatbot-package`);
+}
+
+export async function publishSemanticBundle(
+  sourceName: string,
+  domainName?: string,
+): Promise<PublishBundleResponse> {
+  return fetchJson<PublishBundleResponse>(`/api/sources/${sourceName}/semantic-bundle/publish`, {
+    method: "POST",
+    body: JSON.stringify({ domain_name: domainName }),
+  });
+}
+
+export async function validateBusinessQuestion(
+  sourceName: string,
+  question: string,
+): Promise<SqlValidationResponse> {
+  return fetchJson<SqlValidationResponse>(`/api/sources/${sourceName}/sql-validation`, {
+    method: "POST",
+    body: JSON.stringify({ question }),
+  });
 }
 
 // Phase 4 Engine API

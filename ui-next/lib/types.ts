@@ -121,6 +121,15 @@ export type EnumMapping = {
   attribution: SourceAttribution;
 };
 
+export type BusinessRule = {
+  rule_name: string;
+  description: string;
+  enforcement_level: string;
+  related_tables: string[];
+  related_columns: string[];
+  attribution: SourceAttribution;
+};
+
 export type GapCategory =
   | "missing_primary_key"
   | "ambiguous_relationship"
@@ -290,7 +299,7 @@ export type KnowledgeState = {
   tables: Record<string, SemanticTable>;
   canonical_entities: Record<string, unknown>;
   enums: Record<string, EnumMapping[]>;
-  business_rules: unknown[];
+  business_rules: BusinessRule[];
   glossary: Record<string, unknown>;
   query_patterns: unknown[];
   unresolved_gaps: SemanticGap[];
@@ -408,6 +417,30 @@ export type ChatbotPackageResponse = {
   manifest: ChatbotPackageManifest;
   overview_url: string;
   download_url: string;
+};
+
+export type PublishBundleResponse = {
+  source_name: string;
+  domain_name: string;
+  bundle_dir: string;
+  published_to: string;
+  chatbot_package_ready: boolean;
+  status: string;
+};
+
+export type SqlValidationResponse = {
+  source_name: string;
+  question: string;
+  intent: string;
+  matched_table?: string;
+  matched_join?: string;
+  sql: string;
+  execution_status: string;
+  columns: string[];
+  rows: Array<Record<string, unknown>>;
+  row_count: number;
+  warnings: string[];
+  error?: string;
 };
 
 export type QuestionsResponse = {

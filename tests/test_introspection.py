@@ -108,6 +108,27 @@ def test_introspection_service_and_serializer_generate_phase_one_artifacts(tmp_p
         and any(column["column"] == "created_at" and column["is_timestamp_like"] for column in entry["columns"])
         for entry in profiling
     )
+    assert any(
+        entry["table"] == "work_orders"
+        and any(
+            column["column"] == "status"
+            and column["null_ratio"] == 0.0
+            and column["distinct_count"] == 2
+            and column["top_values"]
+            for column in entry["columns"]
+        )
+        for entry in profiling
+    )
+    assert any(
+        entry["table"] == "work_orders"
+        and any(
+            column["column"] == "gps_fix"
+            and column["min_value"] == "0"
+            and column["max_value"] == "1"
+            for column in entry["columns"]
+        )
+        for entry in profiling
+    )
     assert any(entry["table"] == "work_orders" and entry["name"] == "status" for entry in columns)
     assert (output_dir / "technical_metadata_bundle.json").exists()
 

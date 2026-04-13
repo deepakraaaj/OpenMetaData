@@ -6,7 +6,7 @@ import re
 
 from app.models.common import ConfidenceLabel, NamedConfidence, SensitivityLabel
 from app.models.decision import DecisionActor
-from app.models.semantic import EnumMapping, GlossaryTerm
+from app.models.semantic import BusinessRule, EnumMapping, GlossaryTerm
 from app.models.source_attribution import DiscoverySource, SourceAttribution
 from app.models.state import GapCategory, KnowledgeState, SemanticGap
 
@@ -104,8 +104,42 @@ class AnswerInterpreter:
         else:
             # Table-level meaning
             table.business_meaning = final_answer
+            extracted_grain = self._extract_grain_rule(final_answer)
+            if extracted_grain:
+                table.grain = extracted_grain
             table.attribution = _attribution_for(actor, reviewer)
             table.confidence = _confidence_for(actor, gap)
+            self._upsert_business_rule(
+                state,
+                rule_name=f"table_meaning:{table.table_name}",
+                description=final_answer,
+                enforcement_level="guidance",
+                related_tables=[table.table_name],
+                actor=actor,
+                reviewer=reviewer,
+            )
+            if table.grain:
+                self._upsert_business_rule(
+                    state,
+                    rule_name=f"table_grain:{table.table_name}",
+                    description=table.grain,
+                    enforcement_level="guidance",
+                    related_tables=[table.table_name],
+                    actor=actor,
+                    reviewer=reviewer,
+                )
+            return
+
+        self._upsert_business_rule(
+            state,
+            rule_name=f"column_meaning:{table.table_name}.{gap.target_property}",
+            description=final_answer,
+            enforcement_level="guidance",
+            related_tables=[table.table_name],
+            related_columns=[f"{table.table_name}.{gap.target_property}"],
+            actor=actor,
+            reviewer=reviewer,
+        )
 
     def _apply_enum_mapping(
         self,
@@ -149,6 +183,17 @@ class AnswerInterpreter:
                     )
             if mappings:
                 state.enums[col_key] = mappings
+                for mapping in mappings:
+                    self._upsert_business_rule(
+                        state,
+                        rule_name=f"enum:{col_key}:{mapping.database_value}",
+                        description=f"`{gap.target_property}={mapping.database_value}` means `{mapping.business_label}`.",
+                        enforcement_level="guidance",
+                        related_tables=[gap.target_entity] if gap.target_entity else [],
+                        related_columns=[col_key],
+                        actor=actor,
+                        reviewer=reviewer,
+                    )
             return
 
         # Parse answer like "0=Pending, 1=Active, 2=Closed"
@@ -173,6 +218,17 @@ class AnswerInterpreter:
                 )
         if mappings:
             state.enums[col_key] = mappings
+            for mapping in mappings:
+                self._upsert_business_rule(
+                    state,
+                    rule_name=f"enum:{col_key}:{mapping.database_value}",
+                    description=f"`{gap.target_property}={mapping.database_value}` means `{mapping.business_label}`.",
+                    enforcement_level="guidance",
+                    related_tables=[gap.target_entity] if gap.target_entity else [],
+                    related_columns=[col_key],
+                    actor=actor,
+                    reviewer=reviewer,
+                )
 
     def _apply_enum_pattern_meaning(
         self,
@@ -206,6 +262,16 @@ class AnswerInterpreter:
             col.business_meaning = meaning
             col.attribution = _attribution_for(actor, reviewer)
             col.confidence = _confidence_for(actor, gap)
+            self._upsert_business_rule(
+                state,
+                rule_name=f"enum_pattern:{table.table_name}.{gap.target_property}",
+                description=meaning,
+                enforcement_level="guidance",
+                related_tables=[table.table_name],
+                related_columns=[f"{table.table_name}.{gap.target_property}"],
+                actor=actor,
+                reviewer=reviewer,
+            )
             break
 
     def _labels_are_meaningful(self, observed_values: list[str], labels: list[str]) -> bool:
@@ -244,6 +310,16 @@ class AnswerInterpreter:
             table.important_columns.insert(0, pk_col)
         table.attribution = _attribution_for(actor, reviewer)
         table.confidence = _confidence_for(actor, gap)
+        self._upsert_business_rule(
+            state,
+            rule_name=f"primary_key:{table.table_name}",
+            description=f"`{pk_col}` is the primary business key used to identify one {table.table_name.rstrip('s')}.",
+            enforcement_level="required",
+            related_tables=[table.table_name],
+            related_columns=[f"{table.table_name}.{pk_col}"],
+            actor=actor,
+            reviewer=reviewer,
+        )
 
     def _apply_relationship(
         self,
@@ -275,6 +351,18 @@ class AnswerInterpreter:
             if selected_join:
                 table.valid_joins.append(selected_join)
                 table.attribution = _attribution_for(actor, reviewer)
+                self._upsert_business_rule(
+                    state,
+                    rule_name=f"approved_join:{table.table_name}.{gap.target_property}",
+                    description=f"Approved join `{selected_join}`.",
+                    enforcement_level="required",
+                    related_tables=[table.table_name, selected_join.split("=")[1].split(".")[0].strip()],
+                    related_columns=[
+                        f"{table.table_name}.{gap.target_property}"
+                    ],
+                    actor=actor,
+                    reviewer=reviewer,
+                )
                 return
 
         is_valid = choice_key in {"yes", "true", "yes, this is valid", "1"}
@@ -282,6 +370,20 @@ class AnswerInterpreter:
             table.valid_joins.append(gap.target_property)
         elif gap.target_property and gap.target_property in table.valid_joins:
             table.valid_joins.remove(gap.target_property)
+        if gap.target_property:
+            if is_valid:
+                self._upsert_business_rule(
+                    state,
+                    rule_name=f"approved_join:{table.table_name}.{gap.target_property}",
+                    description=f"Approved join `{gap.target_property}`.",
+                    enforcement_level="required",
+                    related_tables=self._tables_from_join(gap.target_property),
+                    related_columns=[f"{table.table_name}.{gap.target_property}"],
+                    actor=actor,
+                    reviewer=reviewer,
+                )
+            else:
+                self._remove_business_rule(state, f"approved_join:{table.table_name}.{gap.target_property}")
         table.attribution = _attribution_for(actor, reviewer)
 
     def _apply_sensitivity(
@@ -313,6 +415,20 @@ class AnswerInterpreter:
                 col.displayable = not is_sensitive
                 col.attribution = _attribution_for(actor, reviewer)
                 col.confidence = _confidence_for(actor, gap)
+                rule_name = f"sensitive:{table.table_name}.{gap.target_property}"
+                if is_sensitive:
+                    self._upsert_business_rule(
+                        state,
+                        rule_name=rule_name,
+                        description=f"`{table.table_name}.{gap.target_property}` is sensitive and must stay masked.",
+                        enforcement_level="required",
+                        related_tables=[table.table_name],
+                        related_columns=[f"{table.table_name}.{gap.target_property}"],
+                        actor=actor,
+                        reviewer=reviewer,
+                    )
+                else:
+                    self._remove_business_rule(state, rule_name)
                 break
 
     def _apply_glossary(
@@ -334,6 +450,73 @@ class AnswerInterpreter:
             related_tables=[entity],
             attribution=_attribution_for(actor, reviewer),
         )
+        self._upsert_business_rule(
+            state,
+            rule_name=f"glossary:{entity}",
+            description=f"`{entity}` is referred to as `{final_answer}` in business usage.",
+            enforcement_level="guidance",
+            related_tables=[entity],
+            actor=actor,
+            reviewer=reviewer,
+        )
+
+    def _extract_grain_rule(self, answer: str) -> str | None:
+        cleaned = str(answer or "").strip()
+        lowered = cleaned.lower()
+        if lowered.startswith("one row per") or lowered.startswith("1 row per") or lowered.startswith("each row"):
+            return cleaned
+        match = re.search(r"(one row per[^.]+)", cleaned, flags=re.IGNORECASE)
+        if match:
+            return match.group(1).strip().rstrip(".")
+        return None
+
+    def _tables_from_join(self, join_value: str) -> list[str]:
+        tables: list[str] = []
+        for side in str(join_value or "").split("="):
+            table_name = side.split(".")[0].strip()
+            if table_name and table_name not in tables:
+                tables.append(table_name)
+        return tables
+
+    def _remove_business_rule(self, state: KnowledgeState, rule_name: str) -> None:
+        state.business_rules = [rule for rule in state.business_rules if rule.rule_name != rule_name]
+
+    def _upsert_business_rule(
+        self,
+        state: KnowledgeState,
+        *,
+        rule_name: str,
+        description: str,
+        enforcement_level: str,
+        related_tables: list[str] | None = None,
+        related_columns: list[str] | None = None,
+        actor: DecisionActor,
+        reviewer: str | None,
+    ) -> None:
+        cleaned_description = str(description or "").strip()
+        if not cleaned_description:
+            return
+
+        new_rule = BusinessRule(
+            rule_name=rule_name,
+            description=cleaned_description,
+            enforcement_level=enforcement_level,
+            related_tables=[value for value in (related_tables or []) if str(value or "").strip()],
+            related_columns=[value for value in (related_columns or []) if str(value or "").strip()],
+            attribution=_attribution_for(actor, reviewer),
+        )
+
+        replaced = False
+        updated_rules: list[BusinessRule] = []
+        for existing in state.business_rules:
+            if existing.rule_name == rule_name:
+                updated_rules.append(new_rule)
+                replaced = True
+            else:
+                updated_rules.append(existing)
+        if not replaced:
+            updated_rules.append(new_rule)
+        state.business_rules = updated_rules
 
     def _apply_generic(
         self,

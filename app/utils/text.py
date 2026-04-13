@@ -4,11 +4,19 @@ import re
 from collections.abc import Iterable
 
 
-TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
-
-
 def tokenize(value: str) -> list[str]:
-    return [match.group(0).lower() for match in TOKEN_RE.finditer(value)]
+    text = str(value or "")
+    tokens: list[str] = []
+    for segment in re.split(r"[^A-Za-z0-9]+", text):
+        if not segment:
+            continue
+        split_segment = re.sub(r"(.)([A-Z][a-z]+)", r"\1 \2", segment)
+        split_segment = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", split_segment)
+        for token in split_segment.split():
+            cleaned = token.strip().lower()
+            if cleaned:
+                tokens.append(cleaned)
+    return tokens
 
 
 def snake_to_words(value: str) -> str:
