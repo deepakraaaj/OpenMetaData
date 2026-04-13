@@ -1,0 +1,493 @@
+- term: platform ops
+  meaning: Operational domain inferred from schema structure for platform ops.
+  synonyms: []
+  related_tables: []
+  related_columns: []
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: alert cfg
+  meaning: Directory of operational contact details and support channels.
+  synonyms:
+  - Alert Cfg
+  related_tables:
+  - alert_cfg
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - report_type
+  - email_subject
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: api key
+  meaning: Primary records for api key.
+  synonyms:
+  - Api Key
+  related_tables:
+  - api_key
+  related_columns:
+  - id
+  - date_created
+  - is_active
+  - user_id
+  - api_key
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: app setting
+  meaning: Primary records for app setting.
+  synonyms:
+  - App Setting
+  related_tables:
+  - app_setting
+  related_columns:
+  - id
+  - date_created
+  - is_active
+  - application_name
+  - version_name
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: asset category
+  meaning: Primary records for asset category.
+  synonyms:
+  - Asset Category
+  related_tables:
+  - asset_category
+  related_columns:
+  - id
+  - type
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: asset device mapping
+  meaning: Relationship mapping records for asset device.
+  synonyms:
+  - Asset Device Mapping
+  related_tables:
+  - asset_device_mapping
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - created_by
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: asset type master
+  meaning: Primary records for asset type master.
+  synonyms:
+  - Asset Type Master
+  related_tables:
+  - asset_type_master
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - name
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: asset use case cfg
+  meaning: Primary records for asset use case cfg.
+  synonyms:
+  - Asset Use Case Cfg
+  related_tables:
+  - asset_use_case_cfg
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - name
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: asset use case device cfg
+  meaning: Primary records for asset use case device cfg.
+  synonyms:
+  - Asset Use Case Device Cfg
+  related_tables:
+  - asset_use_case_device_cfg
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - product_category_id
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: asset use case mapping
+  meaning: Relationship mapping records for asset use case.
+  synonyms:
+  - Asset Use Case Mapping
+  related_tables:
+  - asset_use_case_mapping
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - company_id
+  - type
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: call log
+  meaning: Historical event records for call.
+  synonyms:
+  - Call Log
+  related_tables:
+  - call_log
+  related_columns:
+  - id
+  - date_created
+  - vehicle_id
+  - trip_id
+  - location_id
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: call log problem identified
+  meaning: Primary records for call log problem identified.
+  synonyms:
+  - Call Log Problem Identified
+  related_tables:
+  - call_log_problem_identified
+  related_columns:
+  - call_log_id
+  - problem_identified_id
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: call log problem master
+  meaning: Primary records for call log problem master.
+  synonyms:
+  - Call Log Problem Master
+  related_tables:
+  - call_log_problem_master
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - is_generic
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: call log problem reported
+  meaning: Primary records for call log problem reported.
+  synonyms:
+  - Call Log Problem Reported
+  related_tables:
+  - call_log_problem_reported
+  related_columns:
+  - call_log_id
+  - problem_reported_id
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: call log solution master
+  meaning: Primary records for call log solution master.
+  synonyms:
+  - Call Log Solution Master
+  related_tables:
+  - call_log_solution_master
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - name
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: call log solution provided
+  meaning: Primary records for call log solution provided.
+  synonyms:
+  - Call Log Solution Provided
+  related_tables:
+  - call_log_solution_provided
+  related_columns:
+  - call_log_id
+  - solution_provided_id
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: company
+  meaning: Support and contact details maintained for regional or state entities,
+    offices, and companies.
+  synonyms:
+  - Company
+  related_tables:
+  - company
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - address
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: contact information
+  meaning: Support and contact details maintained for companies, regional or state
+    entities, and offices.
+  synonyms:
+  - Contact Information
+  related_tables:
+  - contact_information
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - application_code
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: country
+  meaning: Primary records for country.
+  synonyms:
+  - Country
+  related_tables:
+  - country
+  related_columns:
+  - id
+  - name
+  - description
+  - country_short_code
+  - currency_name
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: country state
+  meaning: Primary records for country state.
+  synonyms:
+  - Country State
+  related_tables:
+  - country_state
+  related_columns:
+  - id
+  - name
+  - short_code
+  - country_id
+  - state_code
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: device cfg history
+  meaning: Historical event records for device cfg.
+  synonyms:
+  - Device Cfg History
+  related_tables:
+  - device_cfg_history
+  related_columns:
+  - id
+  - date_created
+  - date_updated
+  - is_active
+  - type
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- term: Vehicle Inspection Response
+  meaning: User-defined business term for vehicle_inspection_response.
+  synonyms: []
+  related_tables:
+  - vehicle_inspection_response
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:50.536720+00:00'
+    rationale: null
+    tooling_notes: Applied via ai_auto.
+- term: Dms Transaction
+  meaning: User-defined business term for dms_transaction.
+  synonyms: []
+  related_tables:
+  - dms_transaction
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:50.536606+00:00'
+    rationale: null
+    tooling_notes: Applied via ai_auto.
+- term: Vts Transaction
+  meaning: User-defined business term for vts_transaction.
+  synonyms: []
+  related_tables:
+  - vts_transaction
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:50.536680+00:00'
+    rationale: null
+    tooling_notes: Applied via ai_auto.
+- term: Device Command Master
+  meaning: User-defined business term for device_command_master.
+  synonyms: []
+  related_tables:
+  - device_command_master
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.458908+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Event Alert Master
+  meaning: User-defined business term for event_alert_master.
+  synonyms: []
+  related_tables:
+  - event_alert_master
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.458990+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Product
+  meaning: User-defined business term for product.
+  synonyms: []
+  related_tables:
+  - product
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.459068+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Supported Product Cfg
+  meaning: User-defined business term for supported_product_cfg.
+  synonyms: []
+  related_tables:
+  - supported_product_cfg
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.459146+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Vehicle
+  meaning: User-defined business term for vehicle.
+  synonyms: []
+  related_tables:
+  - vehicle
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.459228+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Vehicle Communication
+  meaning: User-defined business term for vehicle_communication.
+  synonyms: []
+  related_tables:
+  - vehicle_communication
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.459307+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Vehicle Communication Issue
+  meaning: User-defined business term for vehicle_communication_issue.
+  synonyms: []
+  related_tables:
+  - vehicle_communication_issue
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.459385+00:00'
+    rationale: null
+    tooling_notes: Applied via rule_default.
+- term: Trip
+  meaning: User-defined business term for trip.
+  synonyms: []
+  related_tables:
+  - trip
+  related_columns: []
+  attribution:
+    source: inferred_by_system
+    user: null
+    timestamp: '2026-04-09T15:34:22.459468+00:00'
+    rationale: null
+    tooling_notes: Applied via ai_auto.

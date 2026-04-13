@@ -1,0 +1,3785 @@
+{
+  "version": 1,
+  "source_name": "vts",
+  "domain_name": "platform_ops",
+  "review_mode": "guided",
+  "generated_at": "2026-04-09T15:34:56+00:00",
+  "scope": "vts appears to support platform ops workflows.",
+  "selection_summary": {
+    "analyzed_table_count": 81,
+    "selected_count": 36,
+    "excluded_count": 45,
+    "review_count": 49,
+    "auto_accepted_count": 5,
+    "user_confirmed_count": 0,
+    "user_overridden_count": 0,
+    "deferred_review_count": 57,
+    "publish_blocked_count": 8,
+    "warning_ack_required_count": 11,
+    "review_debt_count": 76,
+    "detected_domains": [
+      "Vehicle Management",
+      "Configuration / Internal",
+      "Random Password Generator Operations",
+      "Sim Info Operations"
+    ]
+  },
+  "domain_groups": [
+    {
+      "domain": "Vehicle Management",
+      "table_count": 76,
+      "selected_count": 34,
+      "excluded_count": 42,
+      "review_count": 47,
+      "confidence": 0.86,
+      "tables": [
+        "alert_cfg",
+        "api_key",
+        "asset_category",
+        "asset_device_mapping",
+        "asset_type_master",
+        "asset_use_case_cfg",
+        "asset_use_case_device_cfg",
+        "asset_use_case_mapping",
+        "call_log",
+        "call_log_problem_identified",
+        "call_log_problem_master",
+        "call_log_problem_reported",
+        "call_log_solution_master",
+        "call_log_solution_provided",
+        "company",
+        "contact_information",
+        "country",
+        "country_state",
+        "device_cfg_history",
+        "device_command_master",
+        "device_history",
+        "device_removal_location_detail",
+        "dms_exception",
+        "dms_exception_mapping",
+        "dms_transaction",
+        "email_log",
+        "entity_alert_flag_history",
+        "entity_update_history",
+        "event_alert_log",
+        "event_alert_master",
+        "event_log_position_detail",
+        "inspection_question_master",
+        "inspection_type_master",
+        "inspection_type_question_mapping",
+        "location",
+        "location_additional_fence",
+        "location_boundary",
+        "location_company_mapping",
+        "product",
+        "product_change_approval",
+        "regional_office",
+        "removal_category_master",
+        "removal_category_product_type_mapping",
+        "role_master",
+        "route",
+        "sms_log",
+        "sms_provider_master",
+        "sms_template_master",
+        "state_office",
+        "supported_product_cfg",
+        "tickets_support",
+        "tickets_support_status",
+        "transporter_details",
+        "trip",
+        "trip_log",
+        "trip_status_master",
+        "trip_vts_mapping",
+        "user",
+        "user_location_mapping",
+        "user_role",
+        "vehicle",
+        "vehicle_billing_company_history",
+        "vehicle_billing_company_product_mapping",
+        "vehicle_communication",
+        "vehicle_communication_issue",
+        "vehicle_communication_issue_state_history",
+        "vehicle_company_mapping",
+        "vehicle_inspection_image",
+        "vehicle_inspection_question_response",
+        "vehicle_inspection_response",
+        "vehicle_inspection_response_image",
+        "vehicle_locking_system_images",
+        "vehicle_trip_communication",
+        "vts_exception",
+        "vts_exception_mapping",
+        "vts_transaction"
+      ],
+      "anchor_tables": [
+        "dms_transaction",
+        "vts_transaction",
+        "vts_exception"
+      ],
+      "inferred_business_meaning": "Business area centered on dms_transaction, vts_transaction, vts_exception.",
+      "requires_review": true,
+      "review_reason": "This cluster mixes several table roles. Confirm the business grouping before using it downstream.",
+      "evidence": [
+        "anchors: dms_transaction, vts_transaction, vts_exception",
+        "internal connectivity=1.00",
+        "role mix: core_entity=25, lookup_master=15, mapping_bridge=8",
+        "member count=76"
+      ]
+    },
+    {
+      "domain": "Random Password Generator Operations",
+      "table_count": 1,
+      "selected_count": 1,
+      "excluded_count": 0,
+      "review_count": 1,
+      "confidence": 0.68,
+      "tables": [
+        "random_password_generator"
+      ],
+      "anchor_tables": [
+        "random_password_generator"
+      ],
+      "inferred_business_meaning": "Business area centered on random_password_generator.",
+      "requires_review": true,
+      "review_reason": "Cluster label confidence is moderate. Confirm the domain grouping before relying on it.",
+      "evidence": [
+        "anchors: random_password_generator",
+        "internal connectivity=0.00",
+        "role mix: core_entity=1",
+        "member count=1"
+      ]
+    },
+    {
+      "domain": "Sim Info Operations",
+      "table_count": 1,
+      "selected_count": 1,
+      "excluded_count": 0,
+      "review_count": 1,
+      "confidence": 0.68,
+      "tables": [
+        "sim_info"
+      ],
+      "anchor_tables": [
+        "sim_info"
+      ],
+      "inferred_business_meaning": "Business area centered on sim_info.",
+      "requires_review": true,
+      "review_reason": "Cluster label confidence is moderate. Confirm the domain grouping before relying on it.",
+      "evidence": [
+        "anchors: sim_info",
+        "internal connectivity=0.00",
+        "role mix: core_entity=1",
+        "member count=1"
+      ]
+    },
+    {
+      "domain": "Configuration / Internal",
+      "table_count": 1,
+      "selected_count": 0,
+      "excluded_count": 1,
+      "review_count": 0,
+      "confidence": 0.78,
+      "tables": [
+        "unhandled_log"
+      ],
+      "anchor_tables": [
+        "unhandled_log"
+      ],
+      "inferred_business_meaning": "Configuration, logs, audit trails, or internal support tables.",
+      "requires_review": true,
+      "review_reason": "Most tables in this cluster look technical or internal. Confirm the exclusion scope.",
+      "evidence": [
+        "anchors: unhandled_log",
+        "internal connectivity=0.00",
+        "role mix: log_event=1",
+        "member count=1"
+      ]
+    }
+  ],
+  "key_entities": [
+    "Alert Cfg",
+    "Api Key",
+    "App Setting",
+    "Asset Category",
+    "Asset Device Mapping",
+    "Asset Type Master",
+    "Asset Use Case Cfg",
+    "Asset Use Case Device Cfg"
+  ],
+  "approved_use_cases": [
+    "business question answering",
+    "metadata onboarding",
+    "safe NL2SQL grounding"
+  ],
+  "sensitive_areas": [
+    "alert_cfg",
+    "call_log",
+    "company",
+    "contact_information",
+    "email_log",
+    "event_alert_log",
+    "event_log_position_detail",
+    "location",
+    "product",
+    "random_password_generator",
+    "regional_office",
+    "sim_info",
+    "sms_log",
+    "state_office",
+    "tickets_support",
+    "trip",
+    "trip_log",
+    "user",
+    "vehicle_communication_issue",
+    "vehicle_trip_communication",
+    "vts_transaction"
+  ],
+  "glossary": [
+    {
+      "term": "platform ops",
+      "meaning": "Operational domain inferred from schema structure for platform ops.",
+      "synonyms": [],
+      "related_tables": [],
+      "related_columns": []
+    },
+    {
+      "term": "alert cfg",
+      "meaning": "Directory of operational contact details and support channels.",
+      "synonyms": [
+        "Alert Cfg"
+      ],
+      "related_tables": [
+        "alert_cfg"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "report_type",
+        "email_subject"
+      ]
+    },
+    {
+      "term": "api key",
+      "meaning": "Primary records for api key.",
+      "synonyms": [
+        "Api Key"
+      ],
+      "related_tables": [
+        "api_key"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "is_active",
+        "user_id",
+        "api_key"
+      ]
+    },
+    {
+      "term": "app setting",
+      "meaning": "Primary records for app setting.",
+      "synonyms": [
+        "App Setting"
+      ],
+      "related_tables": [
+        "app_setting"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "is_active",
+        "application_name",
+        "version_name"
+      ]
+    },
+    {
+      "term": "asset category",
+      "meaning": "Primary records for asset category.",
+      "synonyms": [
+        "Asset Category"
+      ],
+      "related_tables": [
+        "asset_category"
+      ],
+      "related_columns": [
+        "id",
+        "type"
+      ]
+    },
+    {
+      "term": "asset device mapping",
+      "meaning": "Relationship mapping records for asset device.",
+      "synonyms": [
+        "Asset Device Mapping"
+      ],
+      "related_tables": [
+        "asset_device_mapping"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "created_by"
+      ]
+    },
+    {
+      "term": "asset type master",
+      "meaning": "Primary records for asset type master.",
+      "synonyms": [
+        "Asset Type Master"
+      ],
+      "related_tables": [
+        "asset_type_master"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "name"
+      ]
+    },
+    {
+      "term": "asset use case cfg",
+      "meaning": "Primary records for asset use case cfg.",
+      "synonyms": [
+        "Asset Use Case Cfg"
+      ],
+      "related_tables": [
+        "asset_use_case_cfg"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "name"
+      ]
+    },
+    {
+      "term": "asset use case device cfg",
+      "meaning": "Primary records for asset use case device cfg.",
+      "synonyms": [
+        "Asset Use Case Device Cfg"
+      ],
+      "related_tables": [
+        "asset_use_case_device_cfg"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "product_category_id"
+      ]
+    },
+    {
+      "term": "asset use case mapping",
+      "meaning": "Relationship mapping records for asset use case.",
+      "synonyms": [
+        "Asset Use Case Mapping"
+      ],
+      "related_tables": [
+        "asset_use_case_mapping"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "company_id",
+        "type"
+      ]
+    },
+    {
+      "term": "call log",
+      "meaning": "Historical event records for call.",
+      "synonyms": [
+        "Call Log"
+      ],
+      "related_tables": [
+        "call_log"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "vehicle_id",
+        "trip_id",
+        "location_id"
+      ]
+    },
+    {
+      "term": "call log problem identified",
+      "meaning": "Primary records for call log problem identified.",
+      "synonyms": [
+        "Call Log Problem Identified"
+      ],
+      "related_tables": [
+        "call_log_problem_identified"
+      ],
+      "related_columns": [
+        "call_log_id",
+        "problem_identified_id"
+      ]
+    },
+    {
+      "term": "call log problem master",
+      "meaning": "Primary records for call log problem master.",
+      "synonyms": [
+        "Call Log Problem Master"
+      ],
+      "related_tables": [
+        "call_log_problem_master"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "is_generic"
+      ]
+    },
+    {
+      "term": "call log problem reported",
+      "meaning": "Primary records for call log problem reported.",
+      "synonyms": [
+        "Call Log Problem Reported"
+      ],
+      "related_tables": [
+        "call_log_problem_reported"
+      ],
+      "related_columns": [
+        "call_log_id",
+        "problem_reported_id"
+      ]
+    },
+    {
+      "term": "call log solution master",
+      "meaning": "Primary records for call log solution master.",
+      "synonyms": [
+        "Call Log Solution Master"
+      ],
+      "related_tables": [
+        "call_log_solution_master"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "name"
+      ]
+    },
+    {
+      "term": "call log solution provided",
+      "meaning": "Primary records for call log solution provided.",
+      "synonyms": [
+        "Call Log Solution Provided"
+      ],
+      "related_tables": [
+        "call_log_solution_provided"
+      ],
+      "related_columns": [
+        "call_log_id",
+        "solution_provided_id"
+      ]
+    },
+    {
+      "term": "company",
+      "meaning": "Support and contact details maintained for regional or state entities, offices, and companies.",
+      "synonyms": [
+        "Company"
+      ],
+      "related_tables": [
+        "company"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "address"
+      ]
+    },
+    {
+      "term": "contact information",
+      "meaning": "Support and contact details maintained for companies, regional or state entities, and offices.",
+      "synonyms": [
+        "Contact Information"
+      ],
+      "related_tables": [
+        "contact_information"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "application_code"
+      ]
+    },
+    {
+      "term": "country",
+      "meaning": "Primary records for country.",
+      "synonyms": [
+        "Country"
+      ],
+      "related_tables": [
+        "country"
+      ],
+      "related_columns": [
+        "id",
+        "name",
+        "description",
+        "country_short_code",
+        "currency_name"
+      ]
+    },
+    {
+      "term": "country state",
+      "meaning": "Primary records for country state.",
+      "synonyms": [
+        "Country State"
+      ],
+      "related_tables": [
+        "country_state"
+      ],
+      "related_columns": [
+        "id",
+        "name",
+        "short_code",
+        "country_id",
+        "state_code"
+      ]
+    },
+    {
+      "term": "device cfg history",
+      "meaning": "Historical event records for device cfg.",
+      "synonyms": [
+        "Device Cfg History"
+      ],
+      "related_tables": [
+        "device_cfg_history"
+      ],
+      "related_columns": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active",
+        "type"
+      ]
+    },
+    {
+      "term": "Vehicle Inspection Response",
+      "meaning": "User-defined business term for vehicle_inspection_response.",
+      "synonyms": [],
+      "related_tables": [
+        "vehicle_inspection_response"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Dms Transaction",
+      "meaning": "User-defined business term for dms_transaction.",
+      "synonyms": [],
+      "related_tables": [
+        "dms_transaction"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Vts Transaction",
+      "meaning": "User-defined business term for vts_transaction.",
+      "synonyms": [],
+      "related_tables": [
+        "vts_transaction"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Device Command Master",
+      "meaning": "User-defined business term for device_command_master.",
+      "synonyms": [],
+      "related_tables": [
+        "device_command_master"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Event Alert Master",
+      "meaning": "User-defined business term for event_alert_master.",
+      "synonyms": [],
+      "related_tables": [
+        "event_alert_master"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Product",
+      "meaning": "User-defined business term for product.",
+      "synonyms": [],
+      "related_tables": [
+        "product"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Supported Product Cfg",
+      "meaning": "User-defined business term for supported_product_cfg.",
+      "synonyms": [],
+      "related_tables": [
+        "supported_product_cfg"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Vehicle",
+      "meaning": "User-defined business term for vehicle.",
+      "synonyms": [],
+      "related_tables": [
+        "vehicle"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Vehicle Communication",
+      "meaning": "User-defined business term for vehicle_communication.",
+      "synonyms": [],
+      "related_tables": [
+        "vehicle_communication"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Vehicle Communication Issue",
+      "meaning": "User-defined business term for vehicle_communication_issue.",
+      "synonyms": [],
+      "related_tables": [
+        "vehicle_communication_issue"
+      ],
+      "related_columns": []
+    },
+    {
+      "term": "Trip",
+      "meaning": "User-defined business term for trip.",
+      "synonyms": [],
+      "related_tables": [
+        "trip"
+      ],
+      "related_columns": []
+    }
+  ],
+  "canonical_entities": [
+    {
+      "entity_name": "Alert Cfg",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "alert_cfg"
+      ],
+      "mapped_columns": [
+        "alert_cfg.id",
+        "alert_cfg.date_created",
+        "alert_cfg.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Api Key",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "api_key"
+      ],
+      "mapped_columns": [
+        "api_key.id",
+        "api_key.date_created",
+        "api_key.is_active"
+      ]
+    },
+    {
+      "entity_name": "App Setting",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "app_setting"
+      ],
+      "mapped_columns": [
+        "app_setting.id",
+        "app_setting.date_created",
+        "app_setting.is_active"
+      ]
+    },
+    {
+      "entity_name": "Asset Category",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "asset_category"
+      ],
+      "mapped_columns": [
+        "asset_category.id",
+        "asset_category.type"
+      ]
+    },
+    {
+      "entity_name": "Asset Device Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "asset_device_mapping"
+      ],
+      "mapped_columns": [
+        "asset_device_mapping.id",
+        "asset_device_mapping.date_created",
+        "asset_device_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Asset Type Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "asset_type_master"
+      ],
+      "mapped_columns": [
+        "asset_type_master.id",
+        "asset_type_master.date_created",
+        "asset_type_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Asset Use Case Cfg",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "asset_use_case_cfg"
+      ],
+      "mapped_columns": [
+        "asset_use_case_cfg.id",
+        "asset_use_case_cfg.date_created",
+        "asset_use_case_cfg.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Asset Use Case Device Cfg",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "asset_use_case_device_cfg"
+      ],
+      "mapped_columns": [
+        "asset_use_case_device_cfg.id",
+        "asset_use_case_device_cfg.date_created",
+        "asset_use_case_device_cfg.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Asset Use Case Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "asset_use_case_mapping"
+      ],
+      "mapped_columns": [
+        "asset_use_case_mapping.id",
+        "asset_use_case_mapping.date_created",
+        "asset_use_case_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Call Log",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "call_log"
+      ],
+      "mapped_columns": [
+        "call_log.id",
+        "call_log.date_created",
+        "call_log.vehicle_id"
+      ]
+    },
+    {
+      "entity_name": "Call Log Problem Identified",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "call_log_problem_identified"
+      ],
+      "mapped_columns": [
+        "call_log_problem_identified.call_log_id",
+        "call_log_problem_identified.problem_identified_id"
+      ]
+    },
+    {
+      "entity_name": "Call Log Problem Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "call_log_problem_master"
+      ],
+      "mapped_columns": [
+        "call_log_problem_master.id",
+        "call_log_problem_master.date_created",
+        "call_log_problem_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Call Log Problem Reported",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "call_log_problem_reported"
+      ],
+      "mapped_columns": [
+        "call_log_problem_reported.call_log_id",
+        "call_log_problem_reported.problem_reported_id"
+      ]
+    },
+    {
+      "entity_name": "Call Log Solution Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "call_log_solution_master"
+      ],
+      "mapped_columns": [
+        "call_log_solution_master.id",
+        "call_log_solution_master.date_created",
+        "call_log_solution_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Call Log Solution Provided",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "call_log_solution_provided"
+      ],
+      "mapped_columns": [
+        "call_log_solution_provided.call_log_id",
+        "call_log_solution_provided.solution_provided_id"
+      ]
+    },
+    {
+      "entity_name": "Company",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "company"
+      ],
+      "mapped_columns": [
+        "company.id",
+        "company.date_created",
+        "company.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Contact Information",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "contact_information"
+      ],
+      "mapped_columns": [
+        "contact_information.id",
+        "contact_information.date_created",
+        "contact_information.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Country",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "country"
+      ],
+      "mapped_columns": [
+        "country.id",
+        "country.name",
+        "country.description"
+      ]
+    },
+    {
+      "entity_name": "Country State",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "country_state"
+      ],
+      "mapped_columns": [
+        "country_state.id",
+        "country_state.name",
+        "country_state.short_code"
+      ]
+    },
+    {
+      "entity_name": "Device Cfg History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "device_cfg_history"
+      ],
+      "mapped_columns": [
+        "device_cfg_history.id",
+        "device_cfg_history.date_created",
+        "device_cfg_history.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Device Command Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "device_command_master"
+      ],
+      "mapped_columns": [
+        "device_command_master.id",
+        "device_command_master.date_created",
+        "device_command_master.name"
+      ]
+    },
+    {
+      "entity_name": "Device History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "device_history"
+      ],
+      "mapped_columns": [
+        "device_history.id",
+        "device_history.date_created",
+        "device_history.vehicle_id"
+      ]
+    },
+    {
+      "entity_name": "Device Removal Location Detail",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "device_removal_location_detail"
+      ],
+      "mapped_columns": [
+        "device_removal_location_detail.id",
+        "device_removal_location_detail.device_history_id",
+        "device_removal_location_detail.support_id"
+      ]
+    },
+    {
+      "entity_name": "Dms Exception",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "dms_exception"
+      ],
+      "mapped_columns": [
+        "dms_exception.id",
+        "dms_exception.date_created",
+        "dms_exception.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Dms Exception Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "dms_exception_mapping"
+      ],
+      "mapped_columns": [
+        "dms_exception_mapping.id",
+        "dms_exception_mapping.date_created",
+        "dms_exception_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Dms Transaction",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "dms_transaction"
+      ],
+      "mapped_columns": [
+        "dms_transaction.id",
+        "dms_transaction.date_created",
+        "dms_transaction.company_id"
+      ]
+    },
+    {
+      "entity_name": "Email Log",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "email_log"
+      ],
+      "mapped_columns": [
+        "email_log.id",
+        "email_log.date_created",
+        "email_log.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Entity Alert Flag History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "entity_alert_flag_history"
+      ],
+      "mapped_columns": [
+        "entity_alert_flag_history.id",
+        "entity_alert_flag_history.date_created",
+        "entity_alert_flag_history.entity_id"
+      ]
+    },
+    {
+      "entity_name": "Entity Update History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "entity_update_history"
+      ],
+      "mapped_columns": [
+        "entity_update_history.id",
+        "entity_update_history.date_created",
+        "entity_update_history.entity_type"
+      ]
+    },
+    {
+      "entity_name": "Event Alert Log",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "event_alert_log"
+      ],
+      "mapped_columns": [
+        "event_alert_log.id",
+        "event_alert_log.date_created",
+        "event_alert_log.vehicle_id"
+      ]
+    },
+    {
+      "entity_name": "Event Alert Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "event_alert_master"
+      ],
+      "mapped_columns": [
+        "event_alert_master.id",
+        "event_alert_master.date_created",
+        "event_alert_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Event Log Position Detail",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "event_log_position_detail"
+      ],
+      "mapped_columns": [
+        "event_log_position_detail.id",
+        "event_log_position_detail.event_alert_log_id",
+        "event_log_position_detail.latitude"
+      ]
+    },
+    {
+      "entity_name": "Flyway Schema History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "flyway_schema_history"
+      ],
+      "mapped_columns": [
+        "flyway_schema_history.installed_rank",
+        "flyway_schema_history.version",
+        "flyway_schema_history.description"
+      ]
+    },
+    {
+      "entity_name": "Inspection Question Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "inspection_question_master"
+      ],
+      "mapped_columns": [
+        "inspection_question_master.id",
+        "inspection_question_master.date_created",
+        "inspection_question_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Inspection Type Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "inspection_type_master"
+      ],
+      "mapped_columns": [
+        "inspection_type_master.id",
+        "inspection_type_master.date_created",
+        "inspection_type_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Inspection Type Question Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "inspection_type_question_mapping"
+      ],
+      "mapped_columns": [
+        "inspection_type_question_mapping.id",
+        "inspection_type_question_mapping.inspection_type_id",
+        "inspection_type_question_mapping.inspection_question_id"
+      ]
+    },
+    {
+      "entity_name": "Location",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "location"
+      ],
+      "mapped_columns": [
+        "location.id",
+        "location.date_created",
+        "location.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Location Additional Fence",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "location_additional_fence"
+      ],
+      "mapped_columns": [
+        "location_additional_fence.id",
+        "location_additional_fence.date_created",
+        "location_additional_fence.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Location Boundary",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "location_boundary"
+      ],
+      "mapped_columns": [
+        "location_boundary.id",
+        "location_boundary.date_created",
+        "location_boundary.location_id"
+      ]
+    },
+    {
+      "entity_name": "Location Company Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "location_company_mapping"
+      ],
+      "mapped_columns": [
+        "location_company_mapping.id",
+        "location_company_mapping.date_created",
+        "location_company_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Product",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "product"
+      ],
+      "mapped_columns": [
+        "product.id",
+        "product.date_created",
+        "product.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Product Change Approval",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "product_change_approval"
+      ],
+      "mapped_columns": [
+        "product_change_approval.id",
+        "product_change_approval.vehicle_id",
+        "product_change_approval.product_id"
+      ]
+    },
+    {
+      "entity_name": "Random Password Generator",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "random_password_generator"
+      ],
+      "mapped_columns": [
+        "random_password_generator.id",
+        "random_password_generator.date_created",
+        "random_password_generator.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Regional Office",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "regional_office"
+      ],
+      "mapped_columns": [
+        "regional_office.id",
+        "regional_office.name",
+        "regional_office.short_code"
+      ]
+    },
+    {
+      "entity_name": "Removal Category Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "removal_category_master"
+      ],
+      "mapped_columns": [
+        "removal_category_master.id",
+        "removal_category_master.reason",
+        "removal_category_master.description"
+      ]
+    },
+    {
+      "entity_name": "Removal Category Product Type Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "removal_category_product_type_mapping"
+      ],
+      "mapped_columns": [
+        "removal_category_product_type_mapping.id",
+        "removal_category_product_type_mapping.removal_category_master_id",
+        "removal_category_product_type_mapping.product_type"
+      ]
+    },
+    {
+      "entity_name": "Role Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "role_master"
+      ],
+      "mapped_columns": [
+        "role_master.id",
+        "role_master.date_created",
+        "role_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Route",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "route"
+      ],
+      "mapped_columns": [
+        "route.id",
+        "route.date_created",
+        "route.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Sim Info",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "sim_info"
+      ],
+      "mapped_columns": [
+        "sim_info.mobile_number",
+        "sim_info.date_created",
+        "sim_info.network_operator"
+      ]
+    },
+    {
+      "entity_name": "Sms Log",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "sms_log"
+      ],
+      "mapped_columns": [
+        "sms_log.id",
+        "sms_log.message_content",
+        "sms_log.mobile_number"
+      ]
+    },
+    {
+      "entity_name": "Sms Provider Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "sms_provider_master"
+      ],
+      "mapped_columns": [
+        "sms_provider_master.id",
+        "sms_provider_master.provider_type",
+        "sms_provider_master.base_url"
+      ]
+    },
+    {
+      "entity_name": "Sms Template Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "sms_template_master"
+      ],
+      "mapped_columns": [
+        "sms_template_master.id",
+        "sms_template_master.date_created",
+        "sms_template_master.date_updated"
+      ]
+    },
+    {
+      "entity_name": "State Office",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "state_office"
+      ],
+      "mapped_columns": [
+        "state_office.id",
+        "state_office.name",
+        "state_office.short_code"
+      ]
+    },
+    {
+      "entity_name": "Supported Product Cfg",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "supported_product_cfg"
+      ],
+      "mapped_columns": [
+        "supported_product_cfg.id",
+        "supported_product_cfg.name",
+        "supported_product_cfg.quantity"
+      ]
+    },
+    {
+      "entity_name": "Tickets Support",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "tickets_support"
+      ],
+      "mapped_columns": [
+        "tickets_support.id",
+        "tickets_support.date_created",
+        "tickets_support.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Tickets Support Statu",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "tickets_support_status"
+      ],
+      "mapped_columns": [
+        "tickets_support_status.id",
+        "tickets_support_status.date_created",
+        "tickets_support_status.tickets_support_id"
+      ]
+    },
+    {
+      "entity_name": "Transporter Detail",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "transporter_details"
+      ],
+      "mapped_columns": [
+        "transporter_details.id",
+        "transporter_details.date_created",
+        "transporter_details.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Trip",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "trip"
+      ],
+      "mapped_columns": [
+        "trip.id",
+        "trip.date_created",
+        "trip.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Trip Log",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "trip_log"
+      ],
+      "mapped_columns": [
+        "trip_log.id",
+        "trip_log.date_created",
+        "trip_log.trip_id"
+      ]
+    },
+    {
+      "entity_name": "Trip Status Master",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "trip_status_master"
+      ],
+      "mapped_columns": [
+        "trip_status_master.id",
+        "trip_status_master.type",
+        "trip_status_master.display_type"
+      ]
+    },
+    {
+      "entity_name": "Trip Vts Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "trip_vts_mapping"
+      ],
+      "mapped_columns": [
+        "trip_vts_mapping.id",
+        "trip_vts_mapping.date_created",
+        "trip_vts_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Unhandled Log",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "unhandled_log"
+      ],
+      "mapped_columns": [
+        "unhandled_log.id",
+        "unhandled_log.date_created",
+        "unhandled_log.date_updated"
+      ]
+    },
+    {
+      "entity_name": "User",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "user"
+      ],
+      "mapped_columns": [
+        "user.id",
+        "user.date_created",
+        "user.date_updated"
+      ]
+    },
+    {
+      "entity_name": "User Location Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "user_location_mapping"
+      ],
+      "mapped_columns": [
+        "user_location_mapping.id",
+        "user_location_mapping.user_id",
+        "user_location_mapping.location_id"
+      ]
+    },
+    {
+      "entity_name": "User Role",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "user_role"
+      ],
+      "mapped_columns": [
+        "user_role.id",
+        "user_role.user_id",
+        "user_role.role_master_id"
+      ]
+    },
+    {
+      "entity_name": "Vehicle",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle"
+      ],
+      "mapped_columns": [
+        "vehicle.id",
+        "vehicle.date_created",
+        "vehicle.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Billing Company History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_billing_company_history"
+      ],
+      "mapped_columns": [
+        "vehicle_billing_company_history.id",
+        "vehicle_billing_company_history.date_created",
+        "vehicle_billing_company_history.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Billing Company Product Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_billing_company_product_mapping"
+      ],
+      "mapped_columns": [
+        "vehicle_billing_company_product_mapping.id",
+        "vehicle_billing_company_product_mapping.date_created",
+        "vehicle_billing_company_product_mapping.vehicle_billing_company_history_id"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Communication",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_communication"
+      ],
+      "mapped_columns": [
+        "vehicle_communication.id",
+        "vehicle_communication.vehicle_id",
+        "vehicle_communication.gsm_last_updated_time"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Communication Issue",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_communication_issue"
+      ],
+      "mapped_columns": [
+        "vehicle_communication_issue.id",
+        "vehicle_communication_issue.date_created",
+        "vehicle_communication_issue.vehicle_id"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Communication Issue State History",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_communication_issue_state_history"
+      ],
+      "mapped_columns": [
+        "vehicle_communication_issue_state_history.id",
+        "vehicle_communication_issue_state_history.date_created",
+        "vehicle_communication_issue_state_history.vehicle_communication_issue_id"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Company Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_company_mapping"
+      ],
+      "mapped_columns": [
+        "vehicle_company_mapping.id",
+        "vehicle_company_mapping.date_created",
+        "vehicle_company_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Inspection Image",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_inspection_image"
+      ],
+      "mapped_columns": [
+        "vehicle_inspection_image.id",
+        "vehicle_inspection_image.date_created",
+        "vehicle_inspection_image.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Inspection Question Response",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_inspection_question_response"
+      ],
+      "mapped_columns": [
+        "vehicle_inspection_question_response.id",
+        "vehicle_inspection_question_response.vehicle_inspection_response_id",
+        "vehicle_inspection_question_response.inspection_question_id"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Inspection Response",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_inspection_response"
+      ],
+      "mapped_columns": [
+        "vehicle_inspection_response.id",
+        "vehicle_inspection_response.date_created",
+        "vehicle_inspection_response.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Inspection Response Image",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_inspection_response_image"
+      ],
+      "mapped_columns": [
+        "vehicle_inspection_response_image.id",
+        "vehicle_inspection_response_image.vehicle_inspection_response_id",
+        "vehicle_inspection_response_image.url"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Locking System Image",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_locking_system_images"
+      ],
+      "mapped_columns": [
+        "vehicle_locking_system_images.id",
+        "vehicle_locking_system_images.date_created",
+        "vehicle_locking_system_images.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vehicle Trip Communication",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vehicle_trip_communication"
+      ],
+      "mapped_columns": [
+        "vehicle_trip_communication.id",
+        "vehicle_trip_communication.date_created",
+        "vehicle_trip_communication.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vts Exception",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vts_exception"
+      ],
+      "mapped_columns": [
+        "vts_exception.id",
+        "vts_exception.date_created",
+        "vts_exception.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vts Exception Mapping",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vts_exception_mapping"
+      ],
+      "mapped_columns": [
+        "vts_exception_mapping.id",
+        "vts_exception_mapping.date_created",
+        "vts_exception_mapping.date_updated"
+      ]
+    },
+    {
+      "entity_name": "Vts Transaction",
+      "description": "Canonical entity spanning 1 related table(s).",
+      "mapped_source_tables": [
+        "vts_transaction"
+      ],
+      "mapped_columns": [
+        "vts_transaction.id",
+        "vts_transaction.vehicle_id",
+        "vts_transaction.dynamic_trip_id"
+      ]
+    }
+  ],
+  "review_debt": [
+    {
+      "decision_id": "decision_6fa2183b377c4e9594cd0b5b35086ce1",
+      "item_key": "gap:sensitivity-alert_cfg.email_cc",
+      "title": "How should `alert_cfg.email_cc` be handled in user-facing outputs?",
+      "table_name": "alert_cfg",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_dcbd0af8a363466ab5769aed8e2ec4a8",
+      "item_key": "gap:sensitivity-alert_cfg.email_subject",
+      "title": "How should `alert_cfg.email_subject` be handled in user-facing outputs?",
+      "table_name": "alert_cfg",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_ccf0722579984cc3ae3f15855d89775d",
+      "item_key": "gap:sensitivity-alert_cfg.email_to",
+      "title": "How should `alert_cfg.email_to` be handled in user-facing outputs?",
+      "table_name": "alert_cfg",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_8145d45ecefe4bcf9b38211f9257b034",
+      "item_key": "gap:sensitivity-alert_cfg.mobile_number",
+      "title": "How should `alert_cfg.mobile_number` be handled in user-facing outputs?",
+      "table_name": "alert_cfg",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_b7a54455d7ef4f868843a4c9ebd35d80",
+      "item_key": "table_selection:asset_use_case_mapping",
+      "title": "Selection scope for asset_use_case_mapping",
+      "table_name": "asset_use_case_mapping",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_93aff7b8742c4926af760de2e2753c62",
+      "item_key": "gap:sensitivity-company.address",
+      "title": "How should `company.address` be handled in user-facing outputs?",
+      "table_name": "company",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_c5c324354d2a4d469f7b00f8b1fae9b2",
+      "item_key": "gap:sensitivity-company.is_use_location_master_mobile_number",
+      "title": "How should `company.is_use_location_master_mobile_number` be handled in user-facing outputs?",
+      "table_name": "company",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_e9bc2a4edbc74714a197ee6dcb32fe07",
+      "item_key": "table_selection:company",
+      "title": "Selection scope for company",
+      "table_name": "company",
+      "decision_status": "warning_ack_required",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": true
+    },
+    {
+      "decision_id": "decision_c758d99c15b74ee6824c4bb34fe21723",
+      "item_key": "gap:rel-company-parent_company_id",
+      "title": "Which entity does `company.parent_company_id` most likely reference?",
+      "table_name": "company",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_d92886e373c74e31b89f47d84422f662",
+      "item_key": "gap:sensitivity-contact_information.customer_support_mobile_number",
+      "title": "How should `contact_information.customer_support_mobile_number` be handled in user-facing outputs?",
+      "table_name": "contact_information",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_112a2c1d7ff9428ca107541728dcda08",
+      "item_key": "gap:sensitivity-contact_information.electronics_tech_support_mobile_number",
+      "title": "How should `contact_information.electronics_tech_support_mobile_number` be handled in user-facing outputs?",
+      "table_name": "contact_information",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_b98a193d3862403a96d6079895629efe",
+      "item_key": "gap:sensitivity-contact_information.it_tech_support_mobile_number",
+      "title": "How should `contact_information.it_tech_support_mobile_number` be handled in user-facing outputs?",
+      "table_name": "contact_information",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_e0d21bc1be5348dcb72cdf643b09d70d",
+      "item_key": "gap:sensitivity-contact_information.operations_support_mobile_number",
+      "title": "How should `contact_information.operations_support_mobile_number` be handled in user-facing outputs?",
+      "table_name": "contact_information",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_78cf878cb29b4da9bb840dcd611a0e19",
+      "item_key": "table_selection:contact_information",
+      "title": "Selection scope for contact_information",
+      "table_name": "contact_information",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_fa0e451d0bbe42d991868146e9f8711e",
+      "item_key": "table_selection:dms_exception",
+      "title": "Selection scope for dms_exception",
+      "table_name": "dms_exception",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_78fa2990c38f478fa1b34431a0d6add3",
+      "item_key": "table_selection:dms_transaction",
+      "title": "Selection scope for dms_transaction",
+      "table_name": "dms_transaction",
+      "decision_status": "warning_ack_required",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": true
+    },
+    {
+      "decision_id": "decision_88a3657451d4429ba701bed8bded65a5",
+      "item_key": "gap:sensitivity-event_alert_log.email_log_id",
+      "title": "How should `event_alert_log.email_log_id` be handled in user-facing outputs?",
+      "table_name": "event_alert_log",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_86f66c15497146f3945a8333752da88d",
+      "item_key": "gap:sensitivity-event_alert_log.emergency_mobile_number",
+      "title": "How should `event_alert_log.emergency_mobile_number` be handled in user-facing outputs?",
+      "table_name": "event_alert_log",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_200e61ec21e14e0e9bd361874837cb00",
+      "item_key": "gap:sensitivity-event_alert_log.sms_otp_requested_mobile_number",
+      "title": "How should `event_alert_log.sms_otp_requested_mobile_number` be handled in user-facing outputs?",
+      "table_name": "event_alert_log",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_2fdd13fba5074636ae1acd72843c72b3",
+      "item_key": "gap:sensitivity-event_log_position_detail.mobile_time",
+      "title": "How should `event_log_position_detail.mobile_time` be handled in user-facing outputs?",
+      "table_name": "event_log_position_detail",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_d2f2986b0c0346e084b4e49e878c30e0",
+      "item_key": "gap:sensitivity-location.address",
+      "title": "How should `location.address` be handled in user-facing outputs?",
+      "table_name": "location",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_9ade6478fd7140aaaf4a0b405070e9f2",
+      "item_key": "gap:sensitivity-location.is_alert_via_email",
+      "title": "How should `location.is_alert_via_email` be handled in user-facing outputs?",
+      "table_name": "location",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_f4137e4bb28d4fcb850e61d8d67bbe1c",
+      "item_key": "gap:sensitivity-location.notify_email_id",
+      "title": "How should `location.notify_email_id` be handled in user-facing outputs?",
+      "table_name": "location",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_8c37cc69575a41b48cd3ab682ebee445",
+      "item_key": "gap:sensitivity-location.notify_mobile_number",
+      "title": "How should `location.notify_mobile_number` be handled in user-facing outputs?",
+      "table_name": "location",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_f0031e9194d34fcd8fe920238b685ecf",
+      "item_key": "table_selection:location",
+      "title": "Selection scope for location",
+      "table_name": "location",
+      "decision_status": "warning_ack_required",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": true
+    },
+    {
+      "decision_id": "decision_3e9213cbd10c41d79f23e53317daea62",
+      "item_key": "table_selection:location_company_mapping",
+      "title": "Selection scope for location_company_mapping",
+      "table_name": "location_company_mapping",
+      "decision_status": "warning_ack_required",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": true
+    },
+    {
+      "decision_id": "decision_e886981b89354beaa941a6d5f54a4c7c",
+      "item_key": "gap:sensitivity-product.mac_address",
+      "title": "How should `product.mac_address` be handled in user-facing outputs?",
+      "table_name": "product",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_1bdb38a7a6684f82a7f586254fd2b0eb",
+      "item_key": "gap:sensitivity-product.mobile_number",
+      "title": "How should `product.mobile_number` be handled in user-facing outputs?",
+      "table_name": "product",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_8e9baddf41d0453f955a0ed8af8dce99",
+      "item_key": "table_selection:route",
+      "title": "Selection scope for route",
+      "table_name": "route",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_e899cc626cee4cd18b85e254bf8daba6",
+      "item_key": "table_selection:sms_provider_master",
+      "title": "Selection scope for sms_provider_master",
+      "table_name": "sms_provider_master",
+      "decision_status": "warning_ack_required",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": true
+    },
+    {
+      "decision_id": "decision_aa954d9ea15f4f8b89d2b5503eabbec2",
+      "item_key": "gap:sensitivity-tickets_support.customer_mobile_number",
+      "title": "How should `tickets_support.customer_mobile_number` be handled in user-facing outputs?",
+      "table_name": "tickets_support",
+      "decision_status": "publish_blocked",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": false
+    },
+    {
+      "decision_id": "decision_9d0fd03cf380437e81efe48800024f8b",
+      "item_key": "table_selection:tickets_support",
+      "title": "Selection scope for tickets_support",
+      "table_name": "tickets_support",
+      "decision_status": "warning_ack_required",
+      "decision_actor": "rule_default",
+      "risk_level": "high",
+      "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+      "publish_blocker": true,
+      "needs_acknowledgement": true
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `product` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `product` or override it.",
+      "table": "product",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.79,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.93,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "asset_device_mapping",
+          "asset_type_master",
+          "call_log_problem_master",
+          "call_log_solution_master",
+          "device_cfg_history",
+          "device_removal_location_detail",
+          "dms_transaction",
+          "product_change_approval"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `location` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `location` or override it.",
+      "table": "location",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.83,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.72,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.81,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "call_log",
+          "email_log",
+          "location_additional_fence",
+          "location_boundary",
+          "location_company_mapping",
+          "route",
+          "tickets_support",
+          "trip"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `trip` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `trip` or override it.",
+      "table": "trip",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.83,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.89,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "call_log",
+          "company",
+          "country_state",
+          "dms_exception",
+          "event_alert_log",
+          "location",
+          "location_company_mapping",
+          "route"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `contact_information` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `contact_information` or override it.",
+      "table": "contact_information",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.77,
+      "evidence": [
+        "Included by default because it appears business-relevant.",
+        "Included by default because it appears business-relevant.. Inferred role: core entity. Signals: default entity candidate; contains descriptive identity columns; high relationship centrality.. domain=Vehicle Management. anchors=dms_transaction, vts_transaction. related to company, country, country_state",
+        "The table looks important, but the role or scope still needs confirmation.",
+        "related tables: company, country, country_state, location_company_mapping"
+      ],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.62,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.77,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "company",
+          "country",
+          "country_state",
+          "location_company_mapping",
+          "regional_office",
+          "state_office",
+          "vehicle_billing_company_history",
+          "vehicle_billing_company_product_mapping"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `company` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `company` or override it.",
+      "table": "company",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.83,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.89,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "alert_cfg",
+          "asset_device_mapping",
+          "asset_use_case_mapping",
+          "call_log",
+          "contact_information",
+          "country",
+          "country_state",
+          "device_cfg_history"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vts_transaction` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vts_transaction` or override it.",
+      "table": "vts_transaction",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.89,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.94,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.97,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "ai_auto",
+        "risk_level": "medium",
+        "policy_reason": "Medium risk with high confidence: auto-applied with review debt.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "call_log",
+          "event_alert_log",
+          "product",
+          "trip",
+          "trip_log",
+          "trip_status_master",
+          "trip_vts_mapping",
+          "vehicle"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `user` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `user` or override it.",
+      "table": "user",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.79,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.76,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.89,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "api_key",
+          "company",
+          "device_history",
+          "email_log",
+          "product_change_approval",
+          "user_location_mapping",
+          "user_role"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vts_exception` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vts_exception` or override it.",
+      "table": "vts_exception",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.72,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.84,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 2.04,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "call_log",
+          "company",
+          "event_alert_log",
+          "product",
+          "trip",
+          "vehicle",
+          "vehicle_communication",
+          "vts_exception_mapping"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `tickets_support` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `tickets_support` or override it.",
+      "table": "tickets_support",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.81,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.91,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "company",
+          "device_removal_location_detail",
+          "location",
+          "product_change_approval",
+          "tickets_support_status",
+          "trip",
+          "trip_status_master",
+          "vehicle"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `product_change_approval` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `product_change_approval` or override it.",
+      "table": "product_change_approval",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.72,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 2.0,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "asset_category",
+          "asset_device_mapping",
+          "device_removal_location_detail",
+          "dms_transaction",
+          "product",
+          "removal_category_master",
+          "removal_category_product_type_mapping",
+          "supported_product_cfg"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_communication` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_communication` or override it.",
+      "table": "vehicle_communication",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.72,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 2.0,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "dms_transaction",
+          "entity_update_history",
+          "event_alert_log",
+          "event_alert_master",
+          "event_log_position_detail",
+          "trip_vts_mapping",
+          "vehicle",
+          "vehicle_billing_company_product_mapping"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_inspection_image` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_inspection_image` or override it.",
+      "table": "vehicle_inspection_image",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.7,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.7,
+      "ambiguity_score": null,
+      "business_relevance": 0.88,
+      "priority_score": 1.88,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "vehicle",
+          "vehicle_communication_issue_state_history",
+          "vehicle_inspection_response",
+          "vehicle_locking_system_images"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_billing_company_product_mapping` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_billing_company_product_mapping` or override it.",
+      "table": "vehicle_billing_company_product_mapping",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.76,
+      "evidence": [
+        "Included by default because it appears business-relevant.",
+        "Included by default because it appears business-relevant.. Inferred role: transaction. Signals: transaction/workflow naming pattern; timeline columns suggest events or workflow steps; status columns suggest lifecycle tracking.. domain=Vehicle Management. anchors=dms_transaction, vts_transaction. related to asset_device_mapping, asset_use_case_mapping, company",
+        "The table looks important, but the role or scope still needs confirmation.",
+        "related tables: asset_device_mapping, asset_use_case_mapping, company, contact_information"
+      ],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.96,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "asset_device_mapping",
+          "asset_use_case_mapping",
+          "company",
+          "contact_information",
+          "device_cfg_history",
+          "device_history",
+          "device_removal_location_detail",
+          "dms_transaction"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `dms_exception` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `dms_exception` or override it.",
+      "table": "dms_exception",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.72,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.68,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.88,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "company",
+          "dms_exception_mapping",
+          "trip",
+          "vehicle"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `device_removal_location_detail` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `device_removal_location_detail` or override it.",
+      "table": "device_removal_location_detail",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.76,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.74,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.9,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "device_history",
+          "product",
+          "product_change_approval",
+          "removal_category_product_type_mapping",
+          "supported_product_cfg",
+          "tickets_support",
+          "tickets_support_status",
+          "vehicle"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_communication_issue` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_communication_issue` or override it.",
+      "table": "vehicle_communication_issue",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.78,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.94,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "company",
+          "location_company_mapping",
+          "trip_vts_mapping",
+          "vehicle",
+          "vehicle_billing_company_history",
+          "vehicle_billing_company_product_mapping",
+          "vehicle_communication_issue_state_history",
+          "vehicle_company_mapping"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_inspection_response` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_inspection_response` or override it.",
+      "table": "vehicle_inspection_response",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.78,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.94,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "company",
+          "entity_update_history",
+          "inspection_type_master",
+          "location_company_mapping",
+          "vehicle",
+          "vehicle_billing_company_history",
+          "vehicle_billing_company_product_mapping",
+          "vehicle_communication_issue_state_history"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `asset_use_case_mapping` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `asset_use_case_mapping` or override it.",
+      "table": "asset_use_case_mapping",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.75,
+      "evidence": [
+        "Tentatively included because the table might matter, but the role is unclear.",
+        "Tentatively included because the table might matter, but the role is unclear.. Inferred role: unknown. Signals: weak or conflicting structural signals; relationship degree=9; inbound refs=1.. domain=Vehicle Management. anchors=dms_transaction, vts_transaction. related to asset_device_mapping, asset_use_case_cfg, company",
+        "Low confidence classification. A human should confirm the table role before it drives review questions or retrieval.",
+        "related tables: asset_device_mapping, asset_use_case_cfg, company, entity_alert_flag_history"
+      ],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.6,
+      "ambiguity_score": null,
+      "business_relevance": 0.71,
+      "priority_score": 1.56,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "asset_device_mapping",
+          "asset_use_case_cfg",
+          "company",
+          "entity_alert_flag_history",
+          "entity_update_history",
+          "location_company_mapping",
+          "vehicle_billing_company_history",
+          "vehicle_billing_company_product_mapping"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `dms_transaction` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `dms_transaction` or override it.",
+      "table": "dms_transaction",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.88,
+      "evidence": [
+        "Included because it looks like a core business table with strong supporting signals.",
+        "Included because it looks like a core business table with strong supporting signals.. Inferred role: transaction. Signals: transaction/workflow naming pattern; high row volume; timeline columns suggest events or workflow steps.. domain=Vehicle Management. anchors=dms_transaction, vts_transaction. related to call_log, company, dms_exception_mapping",
+        "This cluster mixes several table roles. Confirm the business grouping before using it downstream.",
+        "related tables: call_log, company, dms_exception_mapping, event_alert_log"
+      ],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.94,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.98,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "call_log",
+          "company",
+          "dms_exception_mapping",
+          "event_alert_log",
+          "location_company_mapping",
+          "product",
+          "product_change_approval",
+          "removal_category_product_type_mapping"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle` or override it.",
+      "table": "vehicle",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "excluded",
+      "confidence": 0.79,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": false,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": true,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.8,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.93,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "excluded",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "publish_blocked",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk without high confidence: continue onboarding, but keep blocked for publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "alert_cfg",
+          "asset_device_mapping",
+          "asset_use_case_cfg",
+          "asset_use_case_device_cfg",
+          "call_log",
+          "company",
+          "device_cfg_history",
+          "device_command_master"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_inspection_question_response` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_inspection_question_response` or override it.",
+      "table": "vehicle_inspection_question_response",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.66,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.56,
+      "ambiguity_score": null,
+      "business_relevance": 0.78,
+      "priority_score": 1.68,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "inspection_question_master",
+          "vehicle_communication_issue_state_history",
+          "vehicle_inspection_response"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `trip_log` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `trip_log` or override it.",
+      "table": "trip_log",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.8,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.78,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.9,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "call_log",
+          "call_log_problem_identified",
+          "call_log_problem_master",
+          "call_log_problem_reported",
+          "call_log_solution_master",
+          "call_log_solution_provided",
+          "email_log",
+          "event_alert_log"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_trip_communication` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_trip_communication` or override it.",
+      "table": "vehicle_trip_communication",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.79,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.74,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.87,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "deferred_review",
+        "decision_actor": "rule_default",
+        "risk_level": "medium",
+        "policy_reason": "Confidence is not high enough for silent automation in the current mode.",
+        "review_debt": true,
+        "publish_blocker": false,
+        "needs_acknowledgement": false,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "entity_update_history",
+          "trip",
+          "vehicle",
+          "vehicle_communication_issue_state_history",
+          "vts_transaction"
+        ]
+      }
+    },
+    {
+      "type": "table_scope_review",
+      "question_type": "table_scope_review",
+      "question": "Should `vehicle_billing_company_history` stay in the semantic bundle scope?",
+      "decision_prompt": "Use the AI suggestion for `vehicle_billing_company_history` or override it.",
+      "table": "vehicle_billing_company_history",
+      "column": null,
+      "left_table": null,
+      "right_table": null,
+      "best_guess": "selected",
+      "confidence": 0.8,
+      "evidence": [],
+      "candidate_options": [
+        {
+          "value": "selected",
+          "label": "Keep in Scope",
+          "description": "Publish this table into the semantic bundle.",
+          "is_best_guess": true,
+          "is_fallback": false
+        },
+        {
+          "value": "excluded",
+          "label": "Exclude for Now",
+          "description": "Keep it out of the bundle until a human confirms it.",
+          "is_best_guess": false,
+          "is_fallback": false
+        }
+      ],
+      "actions": [
+        {
+          "value": "confirm",
+          "label": "Use AI Suggestion"
+        },
+        {
+          "value": "change",
+          "label": "Override"
+        },
+        {
+          "value": "skip",
+          "label": "Review Later"
+        }
+      ],
+      "impact_score": 0.76,
+      "ambiguity_score": null,
+      "business_relevance": 0.92,
+      "priority_score": 1.88,
+      "allow_free_text": false,
+      "free_text_placeholder": null,
+      "suggested_answer": "selected",
+      "suggested_join": null,
+      "answer": null,
+      "metadata": {
+        "review_mode": "guided",
+        "decision_status": "warning_ack_required",
+        "decision_actor": "rule_default",
+        "risk_level": "high",
+        "policy_reason": "High risk with high confidence: prefill recommendation and require acknowledgement before publish.",
+        "review_debt": true,
+        "publish_blocker": true,
+        "needs_acknowledgement": true,
+        "domain": "Vehicle Management",
+        "related_tables": [
+          "asset_device_mapping",
+          "asset_use_case_mapping",
+          "company",
+          "contact_information",
+          "device_history",
+          "dms_transaction",
+          "trip",
+          "trip_vts_mapping"
+        ]
+      }
+    }
+  ]
+}

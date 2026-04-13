@@ -1,0 +1,44 @@
+{
+  "source_name": "vts",
+  "db_type": "mysql",
+  "domain": "platform_ops",
+  "description": "vts appears to support platform ops workflows.",
+  "key_entities": [
+    "Alert Cfg",
+    "Api Key",
+    "App Setting",
+    "Asset Category",
+    "Asset Device Mapping",
+    "Asset Type Master",
+    "Asset Use Case Cfg",
+    "Asset Use Case Device Cfg"
+  ],
+  "sensitive_areas": [
+    "alert_cfg",
+    "call_log",
+    "company",
+    "contact_information",
+    "email_log",
+    "event_alert_log",
+    "event_log_position_detail",
+    "location",
+    "product",
+    "random_password_generator",
+    "regional_office",
+    "sim_info",
+    "sms_log",
+    "state_office",
+    "tickets_support",
+    "trip",
+    "trip_log",
+    "user",
+    "vehicle_communication_issue",
+    "vehicle_trip_communication",
+    "vts_transaction"
+  ],
+  "approved_use_cases": [
+    "business question answering",
+    "metadata onboarding",
+    "safe NL2SQL grounding"
+  ]
+}

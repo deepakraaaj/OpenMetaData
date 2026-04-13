@@ -1,0 +1,7594 @@
+[
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_alert_configuration_company",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_template_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms, template",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_command_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_question_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "role_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "alert_cfg",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_provider_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "api_key",
+    "source_columns": [
+      "user_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: user",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "api_key",
+    "source_columns": [
+      "user_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user_location_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: user",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "api_key",
+    "source_columns": [
+      "user_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user_role",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: user",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_asset_device_mapping_asset_use_case_mapping_id",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "asset_use_case_mapping_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_use_case_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_asset_device_mapping_product_id",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_category",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product_change_approval",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_product_type_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category, product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_device_mapping",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_asset_use_case_cfg_asset_type",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_cfg",
+    "source_columns": [
+      "asset_type"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_asset_use_case_device_cfg_asset_use_case",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_device_cfg",
+    "source_columns": [
+      "asset_use_case_cfg_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_use_case_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_asset_use_case_device_cfg_supported_product",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_device_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "product_category_id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_asset_use_case_mapping_asset_use_case",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "asset_use_case_cfg_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_use_case_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "entity_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_alert_flag_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: entity",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "asset_use_case_mapping",
+    "source_columns": [
+      "entity_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: entity",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_call_log_location",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_call_log_trip",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_call_log_vehicle",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: transaction, vts",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "dms_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: transaction",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_vts_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "call_record_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_identified",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: call",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "call_record_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: call",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "call_record_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_reported",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: call",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "call_record_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: call",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "call_record_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_provided",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: call",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "call_log",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_call_log_problem_identified",
+    "source_schema": "VTS",
+    "source_table": "call_log_problem_identified",
+    "source_columns": [
+      "call_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_problem_identified_id",
+    "source_schema": "VTS",
+    "source_table": "call_log_problem_identified",
+    "source_columns": [
+      "problem_identified_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_call_log_problem_reported",
+    "source_schema": "VTS",
+    "source_table": "call_log_problem_reported",
+    "source_columns": [
+      "call_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_problem_reported_id",
+    "source_schema": "VTS",
+    "source_table": "call_log_problem_reported",
+    "source_columns": [
+      "problem_reported_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_call_log_solution_provided",
+    "source_schema": "VTS",
+    "source_table": "call_log_solution_provided",
+    "source_columns": [
+      "call_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_solution_provided_id",
+    "source_schema": "VTS",
+    "source_table": "call_log_solution_provided",
+    "source_columns": [
+      "solution_provided_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country_state",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: country, state",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "state_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: office, state",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "regional_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "regional_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: office, regional",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: country",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "state_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country_state",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "regional_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: office",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "regional_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "state_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: office",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "parent_company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.6,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key",
+      "self-like identifier"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "company",
+    "source_columns": [
+      "parent_company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.6,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key",
+      "self-like identifier"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country_state",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: country, state",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "state_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: office, state",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: country",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "state_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "country_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country_state",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "contact_information",
+    "source_columns": [
+      "state_office_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "regional_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: office",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "country_state",
+    "source_columns": [
+      "country_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: country",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_device_configuration_command",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "device_command_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_command_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_device_configuration_vehicle",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log, sms",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_identified",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_reported",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_provided",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_cfg_history",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_log_position_detail",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_template_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms, template",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_question_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "role_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_provider_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_command_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_status_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_device_history_created_by",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "created_by"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_device_history_vehicle",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "device_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_device_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "device_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_use_case_device_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "device_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_cfg_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "device_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_command_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "device_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_removal_location_detail",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_device_removal_location_detail_device_history_id",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "device_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "product_change_approval_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product_change_approval",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: approval, change, product",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "support_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "tickets_support",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: support",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "support_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "tickets_support_status",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: support",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "product_change_approval_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "product_change_approval_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_product_type_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "product_change_approval_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "device_removal_location_detail",
+    "source_columns": [
+      "product_change_approval_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dms_exception_company",
+    "source_schema": "VTS",
+    "source_table": "dms_exception",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dms_exception_trip",
+    "source_schema": "VTS",
+    "source_table": "dms_exception",
+    "source_columns": [
+      "trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dms_exception_vehicle",
+    "source_schema": "VTS",
+    "source_table": "dms_exception",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dms_exception_mapping_dms_exception",
+    "source_schema": "VTS",
+    "source_table": "dms_exception_mapping",
+    "source_columns": [
+      "dms_exception_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "dms_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dms_exception_mapping_end_dms",
+    "source_schema": "VTS",
+    "source_table": "dms_exception_mapping",
+    "source_columns": [
+      "end_dms_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "dms_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dms_exception_mapping_start_dms",
+    "source_schema": "VTS",
+    "source_table": "dms_exception_mapping",
+    "source_columns": [
+      "start_dms_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "dms_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_dm_transaction_vehicle",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product_change_approval",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_product_type_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "dms_transaction",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "entity_alert_flag_history",
+    "source_columns": [
+      "entity_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: entity",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "entity_update_history",
+    "source_columns": [
+      "entity_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_alert_flag_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: entity",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_event_log_event",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "event_alert_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_event_log_trip",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_event_log_vehicle",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: transaction, vts",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log, sms",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "email_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: email, log",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "trip_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log, trip",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vts_exception_mapping_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: exception, mapping, vts",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "dms_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: transaction",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_vts_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_identified",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_template_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms, template",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_command_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_question_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "role_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_provider_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_alert_master",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_status_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: alert, event, log",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "alert_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: alert",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_identified",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_reported",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_provided",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_alert_flag_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: alert",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: alert, event",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "event_log_position_detail",
+    "source_columns": [
+      "event_alert_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_inspection_type_question_mapping_inspection_type_id",
+    "source_schema": "VTS",
+    "source_table": "inspection_type_question_mapping",
+    "source_columns": [
+      "inspection_type_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_inspection_type_question_mapping_question_id",
+    "source_schema": "VTS",
+    "source_table": "inspection_type_question_mapping",
+    "source_columns": [
+      "inspection_question_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_question_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "location",
+    "source_columns": [
+      "notify_email_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: email",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_location_additional_fence_location",
+    "source_schema": "VTS",
+    "source_table": "location_additional_fence",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_location_boundary_location",
+    "source_schema": "VTS",
+    "source_table": "location_boundary",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_location_company_mapping_company",
+    "source_schema": "VTS",
+    "source_table": "location_company_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_location_company_mapping_location",
+    "source_schema": "VTS",
+    "source_table": "location_company_mapping",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_route_location_company_mapping",
+    "source_schema": "VTS",
+    "source_table": "location_company_mapping",
+    "source_columns": [
+      "route_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "route",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_cfg_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: cfg, device, history",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_vts_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_interval_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_vts_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_interval_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_interval_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_vts_interval_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_master_sms_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_master_sms_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product",
+    "source_columns": [
+      "last_master_sms_config_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_product_change_approval_created_by",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "created_by"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_product_change_approval_vehicle_id",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_product_type_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_category",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_product_type_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category, product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "support_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "tickets_support",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: support",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "product_change_approval",
+    "source_columns": [
+      "support_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "tickets_support_status",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: support",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_removal_category_device_type_mapping_removal_category_id",
+    "source_schema": "VTS",
+    "source_table": "removal_category_product_type_mapping",
+    "source_columns": [
+      "removal_category_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_route_company",
+    "source_schema": "VTS",
+    "source_table": "route",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_route_destination_location",
+    "source_schema": "VTS",
+    "source_table": "route",
+    "source_columns": [
+      "destination_location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_route_source_location",
+    "source_schema": "VTS",
+    "source_table": "route",
+    "source_columns": [
+      "source_location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_template_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms, template",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_command_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_question_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "role_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_provider_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master, sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "sms_log",
+    "source_columns": [
+      "sms_template_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_status_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: master",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "supported_product_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_category",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "supported_product_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "supported_product_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product_change_approval",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "supported_product_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "supported_product_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "removal_category_product_type_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: category, product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "supported_product_cfg",
+    "source_columns": [
+      "product_category_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_ro_support_company_id",
+    "source_schema": "VTS",
+    "source_table": "tickets_support",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_ro_support_location_id",
+    "source_schema": "VTS",
+    "source_table": "tickets_support",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_ro_support_rule_id",
+    "source_schema": "VTS",
+    "source_table": "tickets_support",
+    "source_columns": [
+      "rule_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_ro_support_vehicle_id",
+    "source_schema": "VTS",
+    "source_table": "tickets_support",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "tickets_support",
+    "source_columns": [
+      "recent_ro_support_status_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "tickets_support_status",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: status, support",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "tickets_support",
+    "source_columns": [
+      "recent_ro_support_status_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_status_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: status",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_ro_support_status_ro_support_id",
+    "source_schema": "VTS",
+    "source_table": "tickets_support_status",
+    "source_columns": [
+      "tickets_support_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "tickets_support",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_route_trip",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "route_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "route",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_rule_location",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_rule_vehicle",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "recent_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "country_state",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "recent_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "state_office",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "recent_state_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: state",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "billing_company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "billing_company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "billing_company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: billing, company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip",
+    "source_columns": [
+      "billing_company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: billing, company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "Fk_rule_state_product_id_idx",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_rule_state_trip",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_rule_state_trip_status_master_id",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "trip_status_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_status_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "trip_log_vts_transaction_id",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log, sms",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "email_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: email, log",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_identified",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_problem_reported",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "call_log_solution_provided",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_log_position_detail",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: log",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_log",
+    "source_columns": [
+      "sms_log_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "sms_provider_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: sms",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_mapping_trip",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "dynamic_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_mapping_vts_destination",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "destination_exits_vts_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_mapping_vts_enroute",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "enroute_vts_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_mapping_vts_reached_ro",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "reached_ro_vts_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_mapping_vts_reached_terminal",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "reached_terminal_vts_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "trip_vts_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_user_company",
+    "source_schema": "VTS",
+    "source_table": "user",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "user",
+    "source_columns": [
+      "email_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "email_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: email",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_user_location_mapping_location_id",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "location_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_user_location_mapping_user_id",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "user_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "user_location_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_user_role_role",
+    "source_schema": "VTS",
+    "source_table": "user_role",
+    "source_columns": [
+      "role_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "role_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_user_role_user",
+    "source_schema": "VTS",
+    "source_table": "user_role",
+    "source_columns": [
+      "user_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "user",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_company",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_transporter_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "transporter_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "transporter_details",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_cfg_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: cfg, device, history",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "alert_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: cfg",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_device_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_use_case_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: cfg",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "asset_use_case_device_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: cfg, device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_command_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device, history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_removal_location_detail",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: device",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_alert_flag_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "supported_product_cfg",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: cfg",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle",
+    "source_columns": [
+      "device_cfg_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_billing_company_history_company",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_history",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_billing_company_history_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_history",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: billing, company, history, vehicle",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "product_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "product",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: product",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_cfg_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "device_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_alert_flag_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_billing_company_product_mapping",
+    "source_columns": [
+      "vehicle_billing_company_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: history, vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_communication_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: transaction, vts",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "gps_last_update_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: update",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "recent_trackable_event_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: event",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "recent_trackable_event_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_alert_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: event",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "recent_trackable_event_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "event_log_position_detail",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: event",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "dms_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: transaction",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_vts_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication",
+    "source_columns": [
+      "vts_transaction_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vts",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_communication_issue_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "vehicle_communication_issue_recent_state_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "recent_state_history_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue_state_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication_issue",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: communication, issue, vehicle",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_communication",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: communication, vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_image",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_question_response",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_response",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_response_image",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_locking_system_images",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_communication_issue_state_history",
+    "source_columns": [
+      "vehicle_communication_issue_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_trip_communication",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: communication, vehicle",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_company_mapping_company_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_company_mapping",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_company_mapping_vehicle_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_company_mapping",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_inspection_image_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_image",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_inspection_image_vehicle_inspection_response",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_image",
+    "source_columns": [
+      "vehicle_inspection_response_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_response",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_insp_question_resp_inspection_question_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_question_response",
+    "source_columns": [
+      "inspection_question_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_question_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_insp_question_resp_vehicle_insp_resp_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_question_response",
+    "source_columns": [
+      "vehicle_inspection_response_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_response",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_inspection_inspection_type_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "inspection_type_master_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "inspection_type_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_inspection_vehicle_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.95,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "singular foreign-key naming",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "gps_last_update_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: update",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "location_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_billing_company_product_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_company_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: company",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_insp_resp_image_vehicle_insp_resp_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_inspection_response_image",
+    "source_columns": [
+      "vehicle_inspection_response_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_response",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_locking_system_images_vehicle_inspection_image",
+    "source_schema": "VTS",
+    "source_table": "vehicle_locking_system_images",
+    "source_columns": [
+      "vehicle_inspection_image_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_inspection_image",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_trip_communication_trip_id",
+    "source_schema": "VTS",
+    "source_table": "vehicle_trip_communication",
+    "source_columns": [
+      "trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vehicle_trip_communication_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vehicle_trip_communication",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vehicle_trip_communication",
+    "source_columns": [
+      "gps_last_update_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "entity_update_history",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: update",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_exception_company",
+    "source_schema": "VTS",
+    "source_table": "vts_exception",
+    "source_columns": [
+      "company_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "company",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_exception_trip",
+    "source_schema": "VTS",
+    "source_table": "vts_exception",
+    "source_columns": [
+      "trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_exception_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vts_exception",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_exception_mapping_end_vts",
+    "source_schema": "VTS",
+    "source_table": "vts_exception_mapping",
+    "source_columns": [
+      "end_vts_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_exception_mapping_start_vts",
+    "source_schema": "VTS",
+    "source_table": "vts_exception_mapping",
+    "source_columns": [
+      "start_vts_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_transaction",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_exception_mapping_vts_exception",
+    "source_schema": "VTS",
+    "source_table": "vts_exception_mapping",
+    "source_columns": [
+      "vts_exception_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vts_exception",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_trip",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "dynamic_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "foreign_key",
+    "name": "FK_vts_transaction_vehicle",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "vehicle_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 1.0,
+    "reasons": [
+      "declared foreign key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "terminal_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: trip",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "terminal_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_log",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: trip",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "terminal_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_status_master",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: trip",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "terminal_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "trip_vts_mapping",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: trip",
+      "target uses conventional primary key"
+    ]
+  },
+  {
+    "relationship_type": "candidate_join",
+    "source_schema": "VTS",
+    "source_table": "vts_transaction",
+    "source_columns": [
+      "terminal_trip_id"
+    ],
+    "target_schema": "VTS",
+    "target_table": "vehicle_trip_communication",
+    "target_columns": [
+      "id"
+    ],
+    "confidence": 0.75,
+    "reasons": [
+      "identifier suffix",
+      "name overlap: trip",
+      "target uses conventional primary key"
+    ]
+  }
+]

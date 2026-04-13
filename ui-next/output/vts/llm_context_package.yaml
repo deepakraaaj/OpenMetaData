@@ -1,0 +1,57 @@
+question: What does vts contain and how should it be queried safely?
+domain: platform_ops
+review_mode: guided
+matched_entities:
+- Trip Vts Mapping
+- Vts Exception
+- Vts Exception Mapping
+- Vts Transaction
+matched_tables:
+- trip_vts_mapping
+- vts_exception
+- vts_exception_mapping
+- vts_transaction
+matched_columns:
+- call_log.vts_transaction_id
+- call_log.distance_to_be_covered
+- company.last_vts_time_updated
+- contact_information.it_tech_support_mobile_number
+- event_alert_log.vts_transaction_id
+- event_alert_log.vts_exception_mapping_id
+- location.is_vts_enabled
+- product.is_vts_enabled
+- product.vts_interval_minutes
+- product.last_vts_config_id
+- product.last_vts_interval_config_id
+- trip_log.vts_transaction_id
+glossary_terms:
+- Vts Transaction
+safe_joins:
+- vts_transaction.terminal_trip_id=trip.id
+query_patterns: []
+provisional_items:
+- company (warning_ack_required)
+- dms_transaction (warning_ack_required)
+- location (warning_ack_required)
+- location_company_mapping (warning_ack_required)
+- sms_provider_master (warning_ack_required)
+- tickets_support (warning_ack_required)
+- trip (warning_ack_required)
+- trip_log (warning_ack_required)
+- trip_vts_mapping (warning_ack_required)
+- vehicle_billing_company_history (warning_ack_required)
+- vehicle_company_mapping (warning_ack_required)
+blocked_items:
+- asset_use_case_mapping (publish_blocked)
+- contact_information (publish_blocked)
+- dms_exception (publish_blocked)
+- route (publish_blocked)
+- user (publish_blocked)
+- vehicle (publish_blocked)
+- vehicle_billing_company_product_mapping (publish_blocked)
+- vts_exception (publish_blocked)
+notes_for_llm:
+- Prefer approved joins from the context package over inferred joins.
+- Avoid exposing sensitive columns unless explicitly approved.
+- Ask for clarification if the question references ambiguous status codes or entities.
+- Do not rely on publish-blocked or acknowledgement-required items as final truth.

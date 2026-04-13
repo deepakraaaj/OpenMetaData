@@ -1,0 +1,18 @@
+{
+  "bundle_type": "tag_domain_overlay",
+  "source_name": "vts",
+  "domain_name": "platform_ops",
+  "copy_into_tag_domain_folder": true,
+  "copy_targets": [
+    "generated/capabilities.json",
+    "generated/domain_knowledge.json"
+  ],
+  "review_before_merge": [
+    "review/manifest.tables.review.json"
+  ],
+  "notes": [
+    "This bundle is designed to be produced independently by OpenMetaData and copied into a TAG domain folder.",
+    "The generated overlay improves semantic understanding and help text without automatically replacing manual CRUD rules.",
+    "Review the manifest tables file before merging it into TAG because TAG treats generated manifest tables as a full tables override."
+  ]
+}

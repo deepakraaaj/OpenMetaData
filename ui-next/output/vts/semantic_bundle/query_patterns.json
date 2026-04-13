@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "source_name": "vts",
+  "domain_name": "platform_ops",
+  "review_mode": "guided",
+  "generated_at": "2026-04-09T15:34:56+00:00",
+  "patterns": [
+    {
+      "intent": "alert cfg_summary",
+      "question_examples": [
+        "Show me a summary of alert cfg records",
+        "How many alert cfg records are there?"
+      ],
+      "preferred_tables": [
+        "alert_cfg"
+      ],
+      "required_joins": [
+        "alert_cfg.sms_template_master_id=sms_template_master.id",
+        "alert_cfg.sms_template_master_id=asset_type_master.id",
+        "alert_cfg.sms_template_master_id=call_log_problem_master.id"
+      ],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "date_updated",
+        "report_type"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM alert_cfg",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "api key_summary",
+      "question_examples": [
+        "Show me a summary of api key records",
+        "How many api key records are there?"
+      ],
+      "preferred_tables": [
+        "api_key"
+      ],
+      "required_joins": [
+        "api_key.user_id=user.id",
+        "api_key.user_id=user_location_mapping.id",
+        "api_key.user_id=user_role.id"
+      ],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "is_active",
+        "user_id"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM api_key",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "app setting_summary",
+      "question_examples": [
+        "Show me a summary of app setting records",
+        "How many app setting records are there?"
+      ],
+      "preferred_tables": [
+        "app_setting"
+      ],
+      "required_joins": [],
+      "safe_filters": [
+        "date_created",
+        "version_code",
+        "is_force_update",
+        "created_by"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM app_setting",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "asset category_summary",
+      "question_examples": [
+        "Show me a summary of asset category records",
+        "How many asset category records are there?"
+      ],
+      "preferred_tables": [
+        "asset_category"
+      ],
+      "required_joins": [],
+      "safe_filters": [
+        "type"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM asset_category",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "asset device mapping_summary",
+      "question_examples": [
+        "Show me a summary of asset device mapping records",
+        "How many asset device mapping records are there?"
+      ],
+      "preferred_tables": [
+        "asset_device_mapping"
+      ],
+      "required_joins": [
+        "asset_device_mapping.company_id=company.id",
+        "asset_device_mapping.company_id=location_company_mapping.id",
+        "asset_device_mapping.company_id=vehicle_billing_company_history.id"
+      ],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM asset_device_mapping",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "asset type master_summary",
+      "question_examples": [
+        "Show me a summary of asset type master records",
+        "How many asset type master records are there?"
+      ],
+      "preferred_tables": [
+        "asset_type_master"
+      ],
+      "required_joins": [],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM asset_type_master",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "asset use case cfg_summary",
+      "question_examples": [
+        "Show me a summary of asset use case cfg records",
+        "How many asset use case cfg records are there?"
+      ],
+      "preferred_tables": [
+        "asset_use_case_cfg"
+      ],
+      "required_joins": [],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM asset_use_case_cfg",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "asset use case device cfg_summary",
+      "question_examples": [
+        "Show me a summary of asset use case device cfg records",
+        "How many asset use case device cfg records are there?"
+      ],
+      "preferred_tables": [
+        "asset_use_case_device_cfg"
+      ],
+      "required_joins": [],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "date_updated",
+        "is_active"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM asset_use_case_device_cfg",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "asset use case mapping_summary",
+      "question_examples": [
+        "Show me a summary of asset use case mapping records",
+        "How many asset use case mapping records are there?"
+      ],
+      "preferred_tables": [
+        "asset_use_case_mapping"
+      ],
+      "required_joins": [
+        "asset_use_case_mapping.company_id=company.id",
+        "asset_use_case_mapping.company_id=location_company_mapping.id",
+        "asset_use_case_mapping.company_id=vehicle_billing_company_history.id"
+      ],
+      "safe_filters": [
+        "id",
+        "date_created",
+        "date_updated",
+        "company_id"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM asset_use_case_mapping",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "call log_summary",
+      "question_examples": [
+        "Show me a summary of call log records",
+        "How many call log records are there?"
+      ],
+      "preferred_tables": [
+        "call_log"
+      ],
+      "required_joins": [
+        "call_log.vts_transaction_id=vts_transaction.id",
+        "call_log.company_id=company.id",
+        "call_log.vts_transaction_id=dms_transaction.id"
+      ],
+      "safe_filters": [
+        "date_created",
+        "last_gprs_updated_time",
+        "recent_state",
+        "start_time"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM call_log",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "call log problem identified_summary",
+      "question_examples": [
+        "Show me a summary of call log problem identified records",
+        "How many call log problem identified records are there?"
+      ],
+      "preferred_tables": [
+        "call_log_problem_identified"
+      ],
+      "required_joins": [],
+      "safe_filters": [],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM call_log_problem_identified",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    },
+    {
+      "intent": "call log problem master_summary",
+      "question_examples": [
+        "Show me a summary of call log problem master records",
+        "How many call log problem master records are there?"
+      ],
+      "preferred_tables": [
+        "call_log_problem_master"
+      ],
+      "required_joins": [],
+      "safe_filters": [
+        "date_created",
+        "date_updated",
+        "created_by",
+        "updated_by"
+      ],
+      "optional_sql_template": "SELECT COUNT(*) AS total_records FROM call_log_problem_master",
+      "rendering_guidance": "Default to counts, recent records, and status breakdowns before raw detail dumps."
+    }
+  ],
+  "learned_queries": [],
+  "review_hints": []
+}

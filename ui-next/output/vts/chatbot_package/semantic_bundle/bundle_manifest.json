@@ -1,0 +1,15 @@
+{
+  "bundle_type": "tag_semantic_bundle",
+  "version": 1,
+  "files": [
+    "schema_context.json",
+    "business_semantics.json",
+    "relationship_map.json",
+    "enum_dictionary.json",
+    "query_patterns.json"
+  ],
+  "notes": [
+    "These files are the human-editable semantic retrieval source of truth for TAG.",
+    "Review and edit them before publishing into a TAG domain folder."
+  ]
+}

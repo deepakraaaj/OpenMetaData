@@ -1,0 +1,2458 @@
+{
+  "source_name": "vts",
+  "domain_name": "platform_ops",
+  "sections": [
+    {
+      "id": "domain-purpose",
+      "title": "Domain Purpose",
+      "description": "Confirm the business scope and main entities before SQL patterns are learned.",
+      "questions": [
+        {
+          "id": "scope",
+          "label": "What is this application mainly used for?",
+          "kind": "textarea",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "scope"
+          ],
+          "suggested_answer": "vts appears to support platform ops workflows.",
+          "evidence": [
+            "Source: vts",
+            "DB type: DatabaseType.mysql"
+          ]
+        },
+        {
+          "id": "key-entities",
+          "label": "What do users call the main records in this app?",
+          "kind": "tags",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "key_entities"
+          ],
+          "suggested_answer": [
+            "Alert Cfg",
+            "Api Key",
+            "App Setting",
+            "Asset Category",
+            "Asset Device Mapping",
+            "Asset Type Master",
+            "Asset Use Case Cfg",
+            "Asset Use Case Device Cfg"
+          ],
+          "evidence": [
+            "asset_category",
+            "asset_device_mapping",
+            "asset_use_case_mapping",
+            "call_log_problem_master",
+            "call_log_solution_master",
+            "company"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "table-roles",
+      "title": "Table Roles",
+      "description": "Pick the operational tables the assistant should prioritize.",
+      "questions": [
+        {
+          "id": "primary-table",
+          "label": "Which table is the main operational record table?",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "table_roles",
+            "primary_table"
+          ],
+          "choices": [
+            {
+              "label": "asset_category",
+              "hint": "Primary records for asset category."
+            },
+            {
+              "label": "asset_device_mapping",
+              "hint": "Relationship mapping records for asset device."
+            },
+            {
+              "label": "asset_use_case_mapping",
+              "hint": "Relationship mapping records for asset use case."
+            },
+            {
+              "label": "call_log_problem_master",
+              "hint": "Primary records for call log problem master."
+            },
+            {
+              "label": "call_log_solution_master",
+              "hint": "Primary records for call log solution master."
+            },
+            {
+              "label": "company",
+              "hint": "Support and contact details maintained for regional or state entities, offices, and companies."
+            },
+            {
+              "label": "contact_information",
+              "hint": "Support and contact details maintained for companies, regional or state entities, and offices."
+            },
+            {
+              "label": "country",
+              "hint": "Primary records for country."
+            },
+            {
+              "label": "country_state",
+              "hint": "Primary records for country state."
+            },
+            {
+              "label": "device_command_master",
+              "hint": "Configuration or reference records for device command master."
+            },
+            {
+              "label": "device_removal_location_detail",
+              "hint": "Detailed records associated with device removal location."
+            },
+            {
+              "label": "dms_exception",
+              "hint": "Primary records for dms exception."
+            },
+            {
+              "label": "dms_transaction",
+              "hint": "Primary records for dms transaction."
+            },
+            {
+              "label": "event_alert_master",
+              "hint": "Configuration or reference records for event alert master."
+            },
+            {
+              "label": "inspection_question_master",
+              "hint": "Primary records for inspection question master."
+            },
+            {
+              "label": "inspection_type_master",
+              "hint": "Primary records for inspection type master."
+            },
+            {
+              "label": "location",
+              "hint": "Directory of operational contact details and support channels."
+            },
+            {
+              "label": "location_additional_fence",
+              "hint": "Primary records for location additional fence."
+            },
+            {
+              "label": "location_boundary",
+              "hint": "Primary records for location boundary."
+            },
+            {
+              "label": "location_company_mapping",
+              "hint": "Relationship mapping records for location company."
+            },
+            {
+              "label": "product",
+              "hint": "Product records."
+            },
+            {
+              "label": "product_change_approval",
+              "hint": "Primary records for product change approval."
+            },
+            {
+              "label": "random_password_generator",
+              "hint": "Primary records for random password generator."
+            },
+            {
+              "label": "regional_office",
+              "hint": "Primary records for regional office."
+            },
+            {
+              "label": "removal_category_master",
+              "hint": "Primary records for removal category master."
+            },
+            {
+              "label": "removal_category_product_type_mapping",
+              "hint": "Relationship mapping records for removal category product type."
+            },
+            {
+              "label": "role_master",
+              "hint": "Primary records for role master."
+            },
+            {
+              "label": "route",
+              "hint": "Primary records for route."
+            },
+            {
+              "label": "sim_info",
+              "hint": "Primary records for sim info."
+            },
+            {
+              "label": "sms_provider_master",
+              "hint": "Primary records for sms provider master."
+            },
+            {
+              "label": "sms_template_master",
+              "hint": "Primary records for sms template master."
+            },
+            {
+              "label": "state_office",
+              "hint": "Primary records for state office."
+            },
+            {
+              "label": "tickets_support",
+              "hint": "Directory of operational contact details and support channels."
+            },
+            {
+              "label": "tickets_support_status",
+              "hint": "Primary records for tickets support status."
+            },
+            {
+              "label": "transporter_details",
+              "hint": "Detailed records associated with transporter."
+            },
+            {
+              "label": "trip",
+              "hint": "Support and contact details maintained for companies, regional or state entities, and offices."
+            },
+            {
+              "label": "trip_log",
+              "hint": "Historical event records for trip."
+            },
+            {
+              "label": "trip_status_master",
+              "hint": "Primary records for trip status master."
+            },
+            {
+              "label": "trip_vts_mapping",
+              "hint": "Relationship mapping records for trip vts."
+            },
+            {
+              "label": "user",
+              "hint": "Primary records for user."
+            },
+            {
+              "label": "user_location_mapping",
+              "hint": "Relationship mapping records for user location."
+            },
+            {
+              "label": "vehicle",
+              "hint": "Vehicle records."
+            },
+            {
+              "label": "vehicle_billing_company_history",
+              "hint": "Historical event records for vehicle billing company."
+            },
+            {
+              "label": "vehicle_billing_company_product_mapping",
+              "hint": "Relationship mapping records for vehicle billing company product."
+            },
+            {
+              "label": "vehicle_communication",
+              "hint": "Vehicle Communication records."
+            },
+            {
+              "label": "vehicle_communication_issue",
+              "hint": "Vehicle Communication Issue records."
+            },
+            {
+              "label": "vehicle_company_mapping",
+              "hint": "Relationship mapping records for vehicle company."
+            },
+            {
+              "label": "vehicle_inspection_image",
+              "hint": "Primary records for vehicle inspection image."
+            },
+            {
+              "label": "vehicle_inspection_question_response",
+              "hint": "Primary records for vehicle inspection question response."
+            },
+            {
+              "label": "vehicle_inspection_response",
+              "hint": "Vehicle Inspection Response records."
+            },
+            {
+              "label": "vehicle_inspection_response_image",
+              "hint": "Primary records for vehicle inspection response image."
+            },
+            {
+              "label": "vehicle_trip_communication",
+              "hint": "Vehicle Trip Communication records."
+            },
+            {
+              "label": "vts_exception",
+              "hint": "Primary records for vts exception."
+            },
+            {
+              "label": "vts_exception_mapping",
+              "hint": "Relationship mapping records for vts exception."
+            },
+            {
+              "label": "vts_transaction",
+              "hint": "Directory of operational contact details and support channels."
+            }
+          ],
+          "suggested_answer": "asset_category",
+          "evidence": [
+            "asset_category: rows=0",
+            "asset_device_mapping: rows=27",
+            "asset_use_case_mapping: rows=35",
+            "call_log_problem_master: rows=0",
+            "call_log_solution_master: rows=0",
+            "company: rows=14",
+            "contact_information: rows=0",
+            "country: rows=0"
+          ]
+        },
+        {
+          "id": "people-table",
+          "label": "Which table represents people or users in this domain?",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "table_roles",
+            "people_table"
+          ],
+          "choices": [
+            {
+              "label": "asset_category",
+              "hint": "Primary records for asset category."
+            },
+            {
+              "label": "asset_device_mapping",
+              "hint": "Relationship mapping records for asset device."
+            },
+            {
+              "label": "asset_use_case_mapping",
+              "hint": "Relationship mapping records for asset use case."
+            },
+            {
+              "label": "call_log_problem_master",
+              "hint": "Primary records for call log problem master."
+            },
+            {
+              "label": "call_log_solution_master",
+              "hint": "Primary records for call log solution master."
+            },
+            {
+              "label": "company",
+              "hint": "Support and contact details maintained for regional or state entities, offices, and companies."
+            },
+            {
+              "label": "contact_information",
+              "hint": "Support and contact details maintained for companies, regional or state entities, and offices."
+            },
+            {
+              "label": "country",
+              "hint": "Primary records for country."
+            },
+            {
+              "label": "country_state",
+              "hint": "Primary records for country state."
+            },
+            {
+              "label": "device_command_master",
+              "hint": "Configuration or reference records for device command master."
+            },
+            {
+              "label": "device_removal_location_detail",
+              "hint": "Detailed records associated with device removal location."
+            },
+            {
+              "label": "dms_exception",
+              "hint": "Primary records for dms exception."
+            },
+            {
+              "label": "dms_transaction",
+              "hint": "Primary records for dms transaction."
+            },
+            {
+              "label": "event_alert_master",
+              "hint": "Configuration or reference records for event alert master."
+            },
+            {
+              "label": "inspection_question_master",
+              "hint": "Primary records for inspection question master."
+            },
+            {
+              "label": "inspection_type_master",
+              "hint": "Primary records for inspection type master."
+            },
+            {
+              "label": "location",
+              "hint": "Directory of operational contact details and support channels."
+            },
+            {
+              "label": "location_additional_fence",
+              "hint": "Primary records for location additional fence."
+            },
+            {
+              "label": "location_boundary",
+              "hint": "Primary records for location boundary."
+            },
+            {
+              "label": "location_company_mapping",
+              "hint": "Relationship mapping records for location company."
+            },
+            {
+              "label": "product",
+              "hint": "Product records."
+            },
+            {
+              "label": "product_change_approval",
+              "hint": "Primary records for product change approval."
+            },
+            {
+              "label": "random_password_generator",
+              "hint": "Primary records for random password generator."
+            },
+            {
+              "label": "regional_office",
+              "hint": "Primary records for regional office."
+            },
+            {
+              "label": "removal_category_master",
+              "hint": "Primary records for removal category master."
+            },
+            {
+              "label": "removal_category_product_type_mapping",
+              "hint": "Relationship mapping records for removal category product type."
+            },
+            {
+              "label": "role_master",
+              "hint": "Primary records for role master."
+            },
+            {
+              "label": "route",
+              "hint": "Primary records for route."
+            },
+            {
+              "label": "sim_info",
+              "hint": "Primary records for sim info."
+            },
+            {
+              "label": "sms_provider_master",
+              "hint": "Primary records for sms provider master."
+            },
+            {
+              "label": "sms_template_master",
+              "hint": "Primary records for sms template master."
+            },
+            {
+              "label": "state_office",
+              "hint": "Primary records for state office."
+            },
+            {
+              "label": "tickets_support",
+              "hint": "Directory of operational contact details and support channels."
+            },
+            {
+              "label": "tickets_support_status",
+              "hint": "Primary records for tickets support status."
+            },
+            {
+              "label": "transporter_details",
+              "hint": "Detailed records associated with transporter."
+            },
+            {
+              "label": "trip",
+              "hint": "Support and contact details maintained for companies, regional or state entities, and offices."
+            },
+            {
+              "label": "trip_log",
+              "hint": "Historical event records for trip."
+            },
+            {
+              "label": "trip_status_master",
+              "hint": "Primary records for trip status master."
+            },
+            {
+              "label": "trip_vts_mapping",
+              "hint": "Relationship mapping records for trip vts."
+            },
+            {
+              "label": "user",
+              "hint": "Primary records for user."
+            },
+            {
+              "label": "user_location_mapping",
+              "hint": "Relationship mapping records for user location."
+            },
+            {
+              "label": "vehicle",
+              "hint": "Vehicle records."
+            },
+            {
+              "label": "vehicle_billing_company_history",
+              "hint": "Historical event records for vehicle billing company."
+            },
+            {
+              "label": "vehicle_billing_company_product_mapping",
+              "hint": "Relationship mapping records for vehicle billing company product."
+            },
+            {
+              "label": "vehicle_communication",
+              "hint": "Vehicle Communication records."
+            },
+            {
+              "label": "vehicle_communication_issue",
+              "hint": "Vehicle Communication Issue records."
+            },
+            {
+              "label": "vehicle_company_mapping",
+              "hint": "Relationship mapping records for vehicle company."
+            },
+            {
+              "label": "vehicle_inspection_image",
+              "hint": "Primary records for vehicle inspection image."
+            },
+            {
+              "label": "vehicle_inspection_question_response",
+              "hint": "Primary records for vehicle inspection question response."
+            },
+            {
+              "label": "vehicle_inspection_response",
+              "hint": "Vehicle Inspection Response records."
+            },
+            {
+              "label": "vehicle_inspection_response_image",
+              "hint": "Primary records for vehicle inspection response image."
+            },
+            {
+              "label": "vehicle_trip_communication",
+              "hint": "Vehicle Trip Communication records."
+            },
+            {
+              "label": "vts_exception",
+              "hint": "Primary records for vts exception."
+            },
+            {
+              "label": "vts_exception_mapping",
+              "hint": "Relationship mapping records for vts exception."
+            },
+            {
+              "label": "vts_transaction",
+              "hint": "Directory of operational contact details and support channels."
+            }
+          ],
+          "suggested_answer": "user",
+          "evidence": [
+            "user",
+            "user_location_mapping"
+          ]
+        },
+        {
+          "id": "location-table",
+          "label": "Which table represents facilities, locations, or service areas?",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "table_roles",
+            "location_table"
+          ],
+          "choices": [
+            {
+              "label": "asset_category",
+              "hint": "Primary records for asset category."
+            },
+            {
+              "label": "asset_device_mapping",
+              "hint": "Relationship mapping records for asset device."
+            },
+            {
+              "label": "asset_use_case_mapping",
+              "hint": "Relationship mapping records for asset use case."
+            },
+            {
+              "label": "call_log_problem_master",
+              "hint": "Primary records for call log problem master."
+            },
+            {
+              "label": "call_log_solution_master",
+              "hint": "Primary records for call log solution master."
+            },
+            {
+              "label": "company",
+              "hint": "Support and contact details maintained for regional or state entities, offices, and companies."
+            },
+            {
+              "label": "contact_information",
+              "hint": "Support and contact details maintained for companies, regional or state entities, and offices."
+            },
+            {
+              "label": "country",
+              "hint": "Primary records for country."
+            },
+            {
+              "label": "country_state",
+              "hint": "Primary records for country state."
+            },
+            {
+              "label": "device_command_master",
+              "hint": "Configuration or reference records for device command master."
+            },
+            {
+              "label": "device_removal_location_detail",
+              "hint": "Detailed records associated with device removal location."
+            },
+            {
+              "label": "dms_exception",
+              "hint": "Primary records for dms exception."
+            },
+            {
+              "label": "dms_transaction",
+              "hint": "Primary records for dms transaction."
+            },
+            {
+              "label": "event_alert_master",
+              "hint": "Configuration or reference records for event alert master."
+            },
+            {
+              "label": "inspection_question_master",
+              "hint": "Primary records for inspection question master."
+            },
+            {
+              "label": "inspection_type_master",
+              "hint": "Primary records for inspection type master."
+            },
+            {
+              "label": "location",
+              "hint": "Directory of operational contact details and support channels."
+            },
+            {
+              "label": "location_additional_fence",
+              "hint": "Primary records for location additional fence."
+            },
+            {
+              "label": "location_boundary",
+              "hint": "Primary records for location boundary."
+            },
+            {
+              "label": "location_company_mapping",
+              "hint": "Relationship mapping records for location company."
+            },
+            {
+              "label": "product",
+              "hint": "Product records."
+            },
+            {
+              "label": "product_change_approval",
+              "hint": "Primary records for product change approval."
+            },
+            {
+              "label": "random_password_generator",
+              "hint": "Primary records for random password generator."
+            },
+            {
+              "label": "regional_office",
+              "hint": "Primary records for regional office."
+            },
+            {
+              "label": "removal_category_master",
+              "hint": "Primary records for removal category master."
+            },
+            {
+              "label": "removal_category_product_type_mapping",
+              "hint": "Relationship mapping records for removal category product type."
+            },
+            {
+              "label": "role_master",
+              "hint": "Primary records for role master."
+            },
+            {
+              "label": "route",
+              "hint": "Primary records for route."
+            },
+            {
+              "label": "sim_info",
+              "hint": "Primary records for sim info."
+            },
+            {
+              "label": "sms_provider_master",
+              "hint": "Primary records for sms provider master."
+            },
+            {
+              "label": "sms_template_master",
+              "hint": "Primary records for sms template master."
+            },
+            {
+              "label": "state_office",
+              "hint": "Primary records for state office."
+            },
+            {
+              "label": "tickets_support",
+              "hint": "Directory of operational contact details and support channels."
+            },
+            {
+              "label": "tickets_support_status",
+              "hint": "Primary records for tickets support status."
+            },
+            {
+              "label": "transporter_details",
+              "hint": "Detailed records associated with transporter."
+            },
+            {
+              "label": "trip",
+              "hint": "Support and contact details maintained for companies, regional or state entities, and offices."
+            },
+            {
+              "label": "trip_log",
+              "hint": "Historical event records for trip."
+            },
+            {
+              "label": "trip_status_master",
+              "hint": "Primary records for trip status master."
+            },
+            {
+              "label": "trip_vts_mapping",
+              "hint": "Relationship mapping records for trip vts."
+            },
+            {
+              "label": "user",
+              "hint": "Primary records for user."
+            },
+            {
+              "label": "user_location_mapping",
+              "hint": "Relationship mapping records for user location."
+            },
+            {
+              "label": "vehicle",
+              "hint": "Vehicle records."
+            },
+            {
+              "label": "vehicle_billing_company_history",
+              "hint": "Historical event records for vehicle billing company."
+            },
+            {
+              "label": "vehicle_billing_company_product_mapping",
+              "hint": "Relationship mapping records for vehicle billing company product."
+            },
+            {
+              "label": "vehicle_communication",
+              "hint": "Vehicle Communication records."
+            },
+            {
+              "label": "vehicle_communication_issue",
+              "hint": "Vehicle Communication Issue records."
+            },
+            {
+              "label": "vehicle_company_mapping",
+              "hint": "Relationship mapping records for vehicle company."
+            },
+            {
+              "label": "vehicle_inspection_image",
+              "hint": "Primary records for vehicle inspection image."
+            },
+            {
+              "label": "vehicle_inspection_question_response",
+              "hint": "Primary records for vehicle inspection question response."
+            },
+            {
+              "label": "vehicle_inspection_response",
+              "hint": "Vehicle Inspection Response records."
+            },
+            {
+              "label": "vehicle_inspection_response_image",
+              "hint": "Primary records for vehicle inspection response image."
+            },
+            {
+              "label": "vehicle_trip_communication",
+              "hint": "Vehicle Trip Communication records."
+            },
+            {
+              "label": "vts_exception",
+              "hint": "Primary records for vts exception."
+            },
+            {
+              "label": "vts_exception_mapping",
+              "hint": "Relationship mapping records for vts exception."
+            },
+            {
+              "label": "vts_transaction",
+              "hint": "Directory of operational contact details and support channels."
+            }
+          ],
+          "suggested_answer": "device_removal_location_detail",
+          "evidence": [
+            "device_removal_location_detail",
+            "location",
+            "location_additional_fence",
+            "location_boundary",
+            "location_company_mapping",
+            "regional_office"
+          ]
+        },
+        {
+          "id": "tenant-scope",
+          "label": "Which tenant/company field should TAG always filter on?",
+          "kind": "table-column-select",
+          "bundle_file": "schema_context.json",
+          "field_path": [
+            "table_roles",
+            "tenant_scope"
+          ],
+          "choices": [
+            {
+              "table_name": "asset_device_mapping",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "asset_use_case_mapping",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "contact_information",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "dms_exception",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "dms_transaction",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "location_company_mapping",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "route",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "tickets_support",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "trip",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "trip_vts_mapping",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "user",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "user_location_mapping",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "vehicle",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "vehicle_billing_company_history",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "vehicle_communication_issue",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "vehicle_company_mapping",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "vehicle_inspection_response",
+              "columns": [
+                "company_id"
+              ]
+            },
+            {
+              "table_name": "vts_exception",
+              "columns": [
+                "company_id"
+              ]
+            }
+          ],
+          "suggested_answer": "",
+          "evidence": [
+            "asset_device_mapping: company_id",
+            "asset_use_case_mapping: company_id",
+            "contact_information: company_id",
+            "dms_exception: company_id",
+            "dms_transaction: company_id",
+            "location_company_mapping: company_id",
+            "route: company_id",
+            "tickets_support: company_id"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "business-language",
+      "title": "Business Language",
+      "description": "Refine glossary terms and resolve unknown business meanings.",
+      "questions": [
+        {
+          "id": "glossary-0",
+          "label": "What should 'platform ops' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            0,
+            "meaning"
+          ],
+          "suggested_answer": "Operational domain inferred from schema structure for platform ops.",
+          "evidence": []
+        },
+        {
+          "id": "glossary-1",
+          "label": "What should 'alert cfg' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            1,
+            "meaning"
+          ],
+          "suggested_answer": "Directory of operational contact details and support channels.",
+          "evidence": [
+            "alert_cfg",
+            "id",
+            "date_created",
+            "date_updated",
+            "report_type",
+            "email_subject"
+          ]
+        },
+        {
+          "id": "glossary-2",
+          "label": "What should 'api key' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            2,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for api key.",
+          "evidence": [
+            "api_key",
+            "id",
+            "date_created",
+            "is_active",
+            "user_id"
+          ]
+        },
+        {
+          "id": "glossary-3",
+          "label": "What should 'app setting' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            3,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for app setting.",
+          "evidence": [
+            "app_setting",
+            "id",
+            "date_created",
+            "is_active",
+            "application_name",
+            "version_name"
+          ]
+        },
+        {
+          "id": "glossary-4",
+          "label": "What should 'asset category' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            4,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for asset category.",
+          "evidence": [
+            "asset_category",
+            "id",
+            "type"
+          ]
+        },
+        {
+          "id": "glossary-5",
+          "label": "What should 'asset device mapping' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            5,
+            "meaning"
+          ],
+          "suggested_answer": "Relationship mapping records for asset device.",
+          "evidence": [
+            "asset_device_mapping",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active",
+            "created_by"
+          ]
+        },
+        {
+          "id": "glossary-6",
+          "label": "What should 'asset type master' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            6,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for asset type master.",
+          "evidence": [
+            "asset_type_master",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active",
+            "name"
+          ]
+        },
+        {
+          "id": "glossary-7",
+          "label": "What should 'asset use case cfg' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            7,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for asset use case cfg.",
+          "evidence": [
+            "asset_use_case_cfg",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active",
+            "name"
+          ]
+        },
+        {
+          "id": "glossary-8",
+          "label": "What should 'asset use case device cfg' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            8,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for asset use case device cfg.",
+          "evidence": [
+            "asset_use_case_device_cfg",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active",
+            "product_category_id"
+          ]
+        },
+        {
+          "id": "glossary-9",
+          "label": "What should 'asset use case mapping' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            9,
+            "meaning"
+          ],
+          "suggested_answer": "Relationship mapping records for asset use case.",
+          "evidence": [
+            "asset_use_case_mapping",
+            "id",
+            "date_created",
+            "date_updated",
+            "company_id",
+            "type"
+          ]
+        },
+        {
+          "id": "glossary-10",
+          "label": "What should 'call log' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            10,
+            "meaning"
+          ],
+          "suggested_answer": "Historical event records for call.",
+          "evidence": [
+            "call_log",
+            "id",
+            "date_created",
+            "vehicle_id",
+            "trip_id",
+            "location_id"
+          ]
+        },
+        {
+          "id": "glossary-11",
+          "label": "What should 'call log problem identified' mean in the assistant?",
+          "kind": "text",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "glossary",
+            11,
+            "meaning"
+          ],
+          "suggested_answer": "Primary records for call log problem identified.",
+          "evidence": [
+            "call_log_problem_identified",
+            "call_log_id",
+            "problem_identified_id"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "business-rules",
+      "title": "Business Rules",
+      "description": "Answer the operational questions the LLM cannot infer safely from schema alone.",
+      "questions": [
+        {
+          "id": "unresolved-0",
+          "label": "Use the AI suggestion for `product` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            0,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "product"
+          ]
+        },
+        {
+          "id": "unresolved-1",
+          "label": "Use the AI suggestion for `location` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            1,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "location"
+          ]
+        },
+        {
+          "id": "unresolved-2",
+          "label": "Use the AI suggestion for `trip` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            2,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "trip"
+          ]
+        },
+        {
+          "id": "unresolved-3",
+          "label": "Use the AI suggestion for `contact_information` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            3,
+            "answer"
+          ],
+          "suggested_answer": "excluded",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": true,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: excluded",
+            "Included by default because it appears business-relevant.",
+            "Included by default because it appears business-relevant.. Inferred role: core entity. Signals: default entity candidate; contains descriptive identity columns; high relationship centrality.. domain=Vehicle Management. anchors=dms_transaction, vts_transaction. related to company, country, country_state",
+            "The table looks important, but the role or scope still needs confirmation.",
+            "related tables: company, country, country_state, location_company_mapping",
+            "contact_information"
+          ]
+        },
+        {
+          "id": "unresolved-4",
+          "label": "Use the AI suggestion for `company` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            4,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "company"
+          ]
+        },
+        {
+          "id": "unresolved-5",
+          "label": "Use the AI suggestion for `vts_transaction` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            5,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "vts_transaction"
+          ]
+        },
+        {
+          "id": "unresolved-6",
+          "label": "Use the AI suggestion for `user` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            6,
+            "answer"
+          ],
+          "suggested_answer": "excluded",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": true,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: excluded",
+            "user"
+          ]
+        },
+        {
+          "id": "unresolved-7",
+          "label": "Use the AI suggestion for `vts_exception` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            7,
+            "answer"
+          ],
+          "suggested_answer": "excluded",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": true,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: excluded",
+            "vts_exception"
+          ]
+        },
+        {
+          "id": "unresolved-8",
+          "label": "Use the AI suggestion for `tickets_support` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            8,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "tickets_support"
+          ]
+        },
+        {
+          "id": "unresolved-9",
+          "label": "Use the AI suggestion for `product_change_approval` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            9,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "product_change_approval"
+          ]
+        },
+        {
+          "id": "unresolved-10",
+          "label": "Use the AI suggestion for `vehicle_communication` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            10,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "vehicle_communication"
+          ]
+        },
+        {
+          "id": "unresolved-11",
+          "label": "Use the AI suggestion for `vehicle_inspection_image` or override it.",
+          "kind": "select",
+          "bundle_file": "business_semantics.json",
+          "field_path": [
+            "unresolved_questions",
+            11,
+            "answer"
+          ],
+          "suggested_answer": "selected",
+          "choices": [
+            {
+              "label": "Keep in Scope",
+              "value": "selected",
+              "description": "Publish this table into the semantic bundle.",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "Exclude for Now",
+              "value": "excluded",
+              "description": "Keep it out of the bundle until a human confirms it.",
+              "is_best_guess": false,
+              "is_fallback": false
+            }
+          ],
+          "evidence": [
+            "System belief: selected",
+            "vehicle_inspection_image"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enum-meaning",
+      "title": "Statuses And Enums",
+      "description": "Map status, priority, type, and compact categorical values to business labels the LLM cannot infer reliably.",
+      "questions": [
+        {
+          "id": "enum-3",
+          "label": "What should `alert_cfg.report_type` values mean?",
+          "kind": "textarea",
+          "bundle_file": "enum_dictionary.json",
+          "field_path": [
+            "entries",
+            3,
+            "business_meaning"
+          ],
+          "suggested_answer": "Lifecycle or workflow status for the record.",
+          "evidence": [
+            "14",
+            "15",
+            "16",
+            "17",
+            "22"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "query-patterns",
+      "title": "Real Questions",
+      "description": "Add the real questions users ask so retrieval and SQL generation match production language.",
+      "questions": [
+        {
+          "id": "pattern-0",
+          "label": "Which real questions should map to intent 'alert cfg_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            0,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of alert cfg records",
+            "How many alert cfg records are there?"
+          ],
+          "evidence": [
+            "alert_cfg",
+            "id",
+            "date_created",
+            "date_updated",
+            "report_type"
+          ]
+        },
+        {
+          "id": "pattern-1",
+          "label": "Which real questions should map to intent 'api key_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            1,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of api key records",
+            "How many api key records are there?"
+          ],
+          "evidence": [
+            "api_key",
+            "id",
+            "date_created",
+            "is_active",
+            "user_id"
+          ]
+        },
+        {
+          "id": "pattern-2",
+          "label": "Which real questions should map to intent 'app setting_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            2,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of app setting records",
+            "How many app setting records are there?"
+          ],
+          "evidence": [
+            "app_setting",
+            "date_created",
+            "version_code",
+            "is_force_update",
+            "created_by"
+          ]
+        },
+        {
+          "id": "pattern-3",
+          "label": "Which real questions should map to intent 'asset category_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            3,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of asset category records",
+            "How many asset category records are there?"
+          ],
+          "evidence": [
+            "asset_category",
+            "type"
+          ]
+        },
+        {
+          "id": "pattern-4",
+          "label": "Which real questions should map to intent 'asset device mapping_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            4,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of asset device mapping records",
+            "How many asset device mapping records are there?"
+          ],
+          "evidence": [
+            "asset_device_mapping",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active"
+          ]
+        },
+        {
+          "id": "pattern-5",
+          "label": "Which real questions should map to intent 'asset type master_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            5,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of asset type master records",
+            "How many asset type master records are there?"
+          ],
+          "evidence": [
+            "asset_type_master",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active"
+          ]
+        },
+        {
+          "id": "pattern-6",
+          "label": "Which real questions should map to intent 'asset use case cfg_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            6,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of asset use case cfg records",
+            "How many asset use case cfg records are there?"
+          ],
+          "evidence": [
+            "asset_use_case_cfg",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active"
+          ]
+        },
+        {
+          "id": "pattern-7",
+          "label": "Which real questions should map to intent 'asset use case device cfg_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            7,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of asset use case device cfg records",
+            "How many asset use case device cfg records are there?"
+          ],
+          "evidence": [
+            "asset_use_case_device_cfg",
+            "id",
+            "date_created",
+            "date_updated",
+            "is_active"
+          ]
+        },
+        {
+          "id": "pattern-8",
+          "label": "Which real questions should map to intent 'asset use case mapping_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            8,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of asset use case mapping records",
+            "How many asset use case mapping records are there?"
+          ],
+          "evidence": [
+            "asset_use_case_mapping",
+            "id",
+            "date_created",
+            "date_updated",
+            "company_id"
+          ]
+        },
+        {
+          "id": "pattern-9",
+          "label": "Which real questions should map to intent 'call log_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            9,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of call log records",
+            "How many call log records are there?"
+          ],
+          "evidence": [
+            "call_log",
+            "date_created",
+            "last_gprs_updated_time",
+            "recent_state",
+            "start_time"
+          ]
+        },
+        {
+          "id": "pattern-10",
+          "label": "Which real questions should map to intent 'call log problem identified_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            10,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of call log problem identified records",
+            "How many call log problem identified records are there?"
+          ],
+          "evidence": [
+            "call_log_problem_identified"
+          ]
+        },
+        {
+          "id": "pattern-11",
+          "label": "Which real questions should map to intent 'call log problem master_summary'?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "patterns",
+            11,
+            "question_examples"
+          ],
+          "suggested_answer": [
+            "Show me a summary of call log problem master records",
+            "How many call log problem master records are there?"
+          ],
+          "evidence": [
+            "call_log_problem_master",
+            "date_created",
+            "date_updated",
+            "created_by",
+            "updated_by"
+          ]
+        },
+        {
+          "id": "additional-real-questions",
+          "label": "What other real user questions should the assistant understand?",
+          "kind": "tags",
+          "bundle_file": "query_patterns.json",
+          "field_path": [
+            "additional_examples"
+          ],
+          "suggested_answer": [],
+          "evidence": [
+            "alert cfg_summary",
+            "api key_summary",
+            "app setting_summary",
+            "asset category_summary",
+            "asset device mapping_summary",
+            "asset type master_summary",
+            "asset use case cfg_summary",
+            "asset use case device cfg_summary"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "relationships",
+      "title": "Join Validation",
+      "description": "Confirm business joins, especially non-FK joins the LLM cannot safely invent.",
+      "questions": [
+        {
+          "id": "relationship-0",
+          "label": "Which entity does `vts_transaction.terminal_trip_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            0,
+            "answer"
+          ],
+          "suggested_answer": "trip",
+          "choices": [
+            {
+              "label": "trip",
+              "value": "trip",
+              "description": "vts_transaction.terminal_trip_id=trip.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "trip log",
+              "value": "trip_log",
+              "description": "vts_transaction.terminal_trip_id=trip_log.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "trip status master",
+              "value": "trip_status_master",
+              "description": "vts_transaction.terminal_trip_id=trip_status_master.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "trip vts mapping",
+              "value": "trip_vts_mapping",
+              "description": "vts_transaction.terminal_trip_id=trip_vts_mapping.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "vehicle trip communication",
+              "value": "vehicle_trip_communication",
+              "description": "vts_transaction.terminal_trip_id=vehicle_trip_communication.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: trip",
+            "column name `terminal_trip_id` overlaps with `trip`",
+            "candidate joins: trip, trip_log, trip_status_master, trip_vts_mapping, vehicle_trip_communication",
+            "closest inferred join: vts_transaction.terminal_trip_id=trip.id",
+            "vts_transaction",
+            "terminal_trip_id"
+          ]
+        },
+        {
+          "id": "relationship-1",
+          "label": "Which entity does `trip.billing_company_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            1,
+            "answer"
+          ],
+          "suggested_answer": "vehicle_billing_company_history",
+          "choices": [
+            {
+              "label": "vehicle billing company history",
+              "value": "vehicle_billing_company_history",
+              "description": "trip.billing_company_id=vehicle_billing_company_history.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "vehicle billing company product mapping",
+              "value": "vehicle_billing_company_product_mapping",
+              "description": "trip.billing_company_id=vehicle_billing_company_product_mapping.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "company",
+              "value": "company",
+              "description": "trip.billing_company_id=company.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "location company mapping",
+              "value": "location_company_mapping",
+              "description": "trip.billing_company_id=location_company_mapping.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: vehicle_billing_company_history",
+            "column name `billing_company_id` overlaps with `vehicle_billing_company_history`",
+            "candidate joins: vehicle_billing_company_history, vehicle_billing_company_product_mapping, company, location_company_mapping",
+            "closest inferred join: trip.billing_company_id=vehicle_billing_company_history.id",
+            "trip",
+            "billing_company_id"
+          ]
+        },
+        {
+          "id": "relationship-2",
+          "label": "Which entity does `trip.recent_state_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            2,
+            "answer"
+          ],
+          "suggested_answer": "country_state",
+          "choices": [
+            {
+              "label": "country state",
+              "value": "country_state",
+              "description": "trip.recent_state_id=country_state.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "state office",
+              "value": "state_office",
+              "description": "trip.recent_state_id=state_office.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "vehicle communication issue state history",
+              "value": "vehicle_communication_issue_state_history",
+              "description": "trip.recent_state_id=vehicle_communication_issue_state_history.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: country_state",
+            "column name `recent_state_id` overlaps with `country_state`",
+            "candidate joins: country_state, state_office, vehicle_communication_issue_state_history",
+            "closest inferred join: trip.recent_state_id=country_state.id",
+            "trip",
+            "recent_state_id"
+          ]
+        },
+        {
+          "id": "relationship-3",
+          "label": "Which entity does `product.last_master_sms_config_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            3,
+            "answer"
+          ],
+          "suggested_answer": "asset_type_master",
+          "choices": [
+            {
+              "label": "asset type master",
+              "value": "asset_type_master",
+              "description": "product.last_master_sms_config_id=asset_type_master.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "call log problem master",
+              "value": "call_log_problem_master",
+              "description": "product.last_master_sms_config_id=call_log_problem_master.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "call log solution master",
+              "value": "call_log_solution_master",
+              "description": "product.last_master_sms_config_id=call_log_solution_master.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: asset_type_master",
+            "column name `last_master_sms_config_id` overlaps with `asset_type_master`",
+            "candidate joins: asset_type_master, call_log_problem_master, call_log_solution_master",
+            "closest inferred join: product.last_master_sms_config_id=asset_type_master.id",
+            "product",
+            "last_master_sms_config_id"
+          ]
+        },
+        {
+          "id": "relationship-4",
+          "label": "Which entity does `product.last_vts_config_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            4,
+            "answer"
+          ],
+          "suggested_answer": "trip_vts_mapping",
+          "choices": [
+            {
+              "label": "trip vts mapping",
+              "value": "trip_vts_mapping",
+              "description": "product.last_vts_config_id=trip_vts_mapping.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "vts exception",
+              "value": "vts_exception",
+              "description": "product.last_vts_config_id=vts_exception.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "vts exception mapping",
+              "value": "vts_exception_mapping",
+              "description": "product.last_vts_config_id=vts_exception_mapping.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "vts transaction",
+              "value": "vts_transaction",
+              "description": "product.last_vts_config_id=vts_transaction.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: trip_vts_mapping",
+            "column name `last_vts_config_id` overlaps with `trip_vts_mapping`",
+            "candidate joins: trip_vts_mapping, vts_exception, vts_exception_mapping, vts_transaction",
+            "closest inferred join: product.last_vts_config_id=trip_vts_mapping.id",
+            "product",
+            "last_vts_config_id"
+          ]
+        },
+        {
+          "id": "relationship-5",
+          "label": "Which entity does `product.last_vts_interval_config_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            5,
+            "answer"
+          ],
+          "suggested_answer": "trip_vts_mapping",
+          "choices": [
+            {
+              "label": "trip vts mapping",
+              "value": "trip_vts_mapping",
+              "description": "product.last_vts_interval_config_id=trip_vts_mapping.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "vts exception",
+              "value": "vts_exception",
+              "description": "product.last_vts_interval_config_id=vts_exception.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "vts exception mapping",
+              "value": "vts_exception_mapping",
+              "description": "product.last_vts_interval_config_id=vts_exception_mapping.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "vts transaction",
+              "value": "vts_transaction",
+              "description": "product.last_vts_interval_config_id=vts_transaction.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: trip_vts_mapping",
+            "column name `last_vts_interval_config_id` overlaps with `trip_vts_mapping`",
+            "candidate joins: trip_vts_mapping, vts_exception, vts_exception_mapping, vts_transaction",
+            "closest inferred join: product.last_vts_interval_config_id=trip_vts_mapping.id",
+            "product",
+            "last_vts_interval_config_id"
+          ]
+        },
+        {
+          "id": "relationship-6",
+          "label": "Which entity does `vehicle_communication.recent_trackable_event_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            6,
+            "answer"
+          ],
+          "suggested_answer": "event_alert_log",
+          "choices": [
+            {
+              "label": "event alert log",
+              "value": "event_alert_log",
+              "description": "vehicle_communication.recent_trackable_event_id=event_alert_log.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "event alert master",
+              "value": "event_alert_master",
+              "description": "vehicle_communication.recent_trackable_event_id=event_alert_master.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "event log position detail",
+              "value": "event_log_position_detail",
+              "description": "vehicle_communication.recent_trackable_event_id=event_log_position_detail.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: event_alert_log",
+            "column name `recent_trackable_event_id` overlaps with `event_alert_log`",
+            "candidate joins: event_alert_log, event_alert_master, event_log_position_detail",
+            "closest inferred join: vehicle_communication.recent_trackable_event_id=event_alert_log.id",
+            "vehicle_communication",
+            "recent_trackable_event_id"
+          ]
+        },
+        {
+          "id": "relationship-7",
+          "label": "Which entity does `asset_use_case_mapping.entity_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            7,
+            "answer"
+          ],
+          "suggested_answer": "entity_alert_flag_history",
+          "choices": [
+            {
+              "label": "entity alert flag history",
+              "value": "entity_alert_flag_history",
+              "description": "asset_use_case_mapping.entity_id=entity_alert_flag_history.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "entity update history",
+              "value": "entity_update_history",
+              "description": "asset_use_case_mapping.entity_id=entity_update_history.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: entity_alert_flag_history",
+            "column name `entity_id` overlaps with `entity_alert_flag_history`",
+            "candidate joins: entity_alert_flag_history, entity_update_history",
+            "closest inferred join: asset_use_case_mapping.entity_id=entity_alert_flag_history.id",
+            "asset_use_case_mapping",
+            "entity_id"
+          ]
+        },
+        {
+          "id": "relationship-8",
+          "label": "Which entity does `company.parent_company_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            8,
+            "answer"
+          ],
+          "suggested_answer": "location_company_mapping",
+          "choices": [
+            {
+              "label": "location company mapping",
+              "value": "location_company_mapping",
+              "description": "company.parent_company_id=location_company_mapping.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "vehicle billing company history",
+              "value": "vehicle_billing_company_history",
+              "description": "company.parent_company_id=vehicle_billing_company_history.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: location_company_mapping",
+            "column name `parent_company_id` overlaps with `location_company_mapping`",
+            "candidate joins: location_company_mapping, vehicle_billing_company_history",
+            "closest inferred join: company.parent_company_id=location_company_mapping.id",
+            "company",
+            "parent_company_id"
+          ]
+        },
+        {
+          "id": "relationship-9",
+          "label": "Which entity does `device_removal_location_detail.support_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            9,
+            "answer"
+          ],
+          "suggested_answer": "tickets_support",
+          "choices": [
+            {
+              "label": "tickets support",
+              "value": "tickets_support",
+              "description": "device_removal_location_detail.support_id=tickets_support.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "tickets support status",
+              "value": "tickets_support_status",
+              "description": "device_removal_location_detail.support_id=tickets_support_status.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: tickets_support",
+            "column name `support_id` overlaps with `tickets_support`",
+            "candidate joins: tickets_support, tickets_support_status",
+            "closest inferred join: device_removal_location_detail.support_id=tickets_support.id",
+            "device_removal_location_detail",
+            "support_id"
+          ]
+        },
+        {
+          "id": "relationship-10",
+          "label": "Which entity does `product_change_approval.support_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            10,
+            "answer"
+          ],
+          "suggested_answer": "tickets_support",
+          "choices": [
+            {
+              "label": "tickets support",
+              "value": "tickets_support",
+              "description": "product_change_approval.support_id=tickets_support.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "tickets support status",
+              "value": "tickets_support_status",
+              "description": "product_change_approval.support_id=tickets_support_status.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: tickets_support",
+            "column name `support_id` overlaps with `tickets_support`",
+            "candidate joins: tickets_support, tickets_support_status",
+            "closest inferred join: product_change_approval.support_id=tickets_support.id",
+            "product_change_approval",
+            "support_id"
+          ]
+        },
+        {
+          "id": "relationship-11",
+          "label": "Which entity does `tickets_support.recent_ro_support_status_id` most likely reference?",
+          "kind": "select",
+          "bundle_file": "relationship_map.json",
+          "field_path": [
+            "review_questions",
+            11,
+            "answer"
+          ],
+          "suggested_answer": "tickets_support_status",
+          "choices": [
+            {
+              "label": "tickets support status",
+              "value": "tickets_support_status",
+              "description": "tickets_support.recent_ro_support_status_id=tickets_support_status.id",
+              "is_best_guess": true,
+              "is_fallback": false
+            },
+            {
+              "label": "trip status master",
+              "value": "trip_status_master",
+              "description": "tickets_support.recent_ro_support_status_id=trip_status_master.id",
+              "is_best_guess": false,
+              "is_fallback": false
+            },
+            {
+              "label": "Something else",
+              "value": "__other__",
+              "description": "None of these tables is the real business target.",
+              "is_best_guess": false,
+              "is_fallback": true
+            }
+          ],
+          "evidence": [
+            "System belief: tickets_support_status",
+            "column name `recent_ro_support_status_id` overlaps with `tickets_support_status`",
+            "candidate joins: tickets_support_status, trip_status_master",
+            "closest inferred join: tickets_support.recent_ro_support_status_id=tickets_support_status.id",
+            "tickets_support",
+            "recent_ro_support_status_id"
+          ]
+        }
+      ]
+    }
+  ]
+}

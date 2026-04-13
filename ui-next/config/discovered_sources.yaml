@@ -1,0 +1,29 @@
+generated_at: '2026-04-09T15:34:26+00:00'
+roots_scanned: []
+discovered_sources:
+- name: vts
+  connection:
+    type: mysql
+    url: mysql+aiomysql://root:12345@127.0.0.1:3306/VTS
+    host: 127.0.0.1
+    port: 3306
+    database: VTS
+    username: root
+    password: '12345'
+    options: {}
+    resolved_database: VTS
+  description: Vehicle tracking and Driver Management system
+  evidence: []
+  tags:
+  - manual
+  - url_onboarding
+  allow_tables: []
+  protected_tables: []
+  approved_use_cases: []
+  notes:
+  - Created from direct DB URL onboarding request.
+  is_active: true
+  output_slug: vts
+missing_connection_templates: []
+summary:
+  count: 1

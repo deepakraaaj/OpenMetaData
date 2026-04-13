@@ -1,0 +1,1535 @@
+- entity_name: Alert Cfg
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - alert_cfg
+  mapped_columns:
+  - alert_cfg.id
+  - alert_cfg.date_created
+  - alert_cfg.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Api Key
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - api_key
+  mapped_columns:
+  - api_key.id
+  - api_key.date_created
+  - api_key.is_active
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: App Setting
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - app_setting
+  mapped_columns:
+  - app_setting.id
+  - app_setting.date_created
+  - app_setting.is_active
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Asset Category
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - asset_category
+  mapped_columns:
+  - asset_category.id
+  - asset_category.type
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Asset Device Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - asset_device_mapping
+  mapped_columns:
+  - asset_device_mapping.id
+  - asset_device_mapping.date_created
+  - asset_device_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Asset Type Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - asset_type_master
+  mapped_columns:
+  - asset_type_master.id
+  - asset_type_master.date_created
+  - asset_type_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Asset Use Case Cfg
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - asset_use_case_cfg
+  mapped_columns:
+  - asset_use_case_cfg.id
+  - asset_use_case_cfg.date_created
+  - asset_use_case_cfg.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Asset Use Case Device Cfg
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - asset_use_case_device_cfg
+  mapped_columns:
+  - asset_use_case_device_cfg.id
+  - asset_use_case_device_cfg.date_created
+  - asset_use_case_device_cfg.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Asset Use Case Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - asset_use_case_mapping
+  mapped_columns:
+  - asset_use_case_mapping.id
+  - asset_use_case_mapping.date_created
+  - asset_use_case_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Call Log
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - call_log
+  mapped_columns:
+  - call_log.id
+  - call_log.date_created
+  - call_log.vehicle_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Call Log Problem Identified
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - call_log_problem_identified
+  mapped_columns:
+  - call_log_problem_identified.call_log_id
+  - call_log_problem_identified.problem_identified_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Call Log Problem Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - call_log_problem_master
+  mapped_columns:
+  - call_log_problem_master.id
+  - call_log_problem_master.date_created
+  - call_log_problem_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Call Log Problem Reported
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - call_log_problem_reported
+  mapped_columns:
+  - call_log_problem_reported.call_log_id
+  - call_log_problem_reported.problem_reported_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Call Log Solution Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - call_log_solution_master
+  mapped_columns:
+  - call_log_solution_master.id
+  - call_log_solution_master.date_created
+  - call_log_solution_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Call Log Solution Provided
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - call_log_solution_provided
+  mapped_columns:
+  - call_log_solution_provided.call_log_id
+  - call_log_solution_provided.solution_provided_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Company
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - company
+  mapped_columns:
+  - company.id
+  - company.date_created
+  - company.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Contact Information
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - contact_information
+  mapped_columns:
+  - contact_information.id
+  - contact_information.date_created
+  - contact_information.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Country
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - country
+  mapped_columns:
+  - country.id
+  - country.name
+  - country.description
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Country State
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - country_state
+  mapped_columns:
+  - country_state.id
+  - country_state.name
+  - country_state.short_code
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Device Cfg History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - device_cfg_history
+  mapped_columns:
+  - device_cfg_history.id
+  - device_cfg_history.date_created
+  - device_cfg_history.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Device Command Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - device_command_master
+  mapped_columns:
+  - device_command_master.id
+  - device_command_master.date_created
+  - device_command_master.name
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Device History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - device_history
+  mapped_columns:
+  - device_history.id
+  - device_history.date_created
+  - device_history.vehicle_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Device Removal Location Detail
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - device_removal_location_detail
+  mapped_columns:
+  - device_removal_location_detail.id
+  - device_removal_location_detail.device_history_id
+  - device_removal_location_detail.support_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Dms Exception
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - dms_exception
+  mapped_columns:
+  - dms_exception.id
+  - dms_exception.date_created
+  - dms_exception.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Dms Exception Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - dms_exception_mapping
+  mapped_columns:
+  - dms_exception_mapping.id
+  - dms_exception_mapping.date_created
+  - dms_exception_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Dms Transaction
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - dms_transaction
+  mapped_columns:
+  - dms_transaction.id
+  - dms_transaction.date_created
+  - dms_transaction.company_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Email Log
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - email_log
+  mapped_columns:
+  - email_log.id
+  - email_log.date_created
+  - email_log.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Entity Alert Flag History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - entity_alert_flag_history
+  mapped_columns:
+  - entity_alert_flag_history.id
+  - entity_alert_flag_history.date_created
+  - entity_alert_flag_history.entity_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Entity Update History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - entity_update_history
+  mapped_columns:
+  - entity_update_history.id
+  - entity_update_history.date_created
+  - entity_update_history.entity_type
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Event Alert Log
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - event_alert_log
+  mapped_columns:
+  - event_alert_log.id
+  - event_alert_log.date_created
+  - event_alert_log.vehicle_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Event Alert Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - event_alert_master
+  mapped_columns:
+  - event_alert_master.id
+  - event_alert_master.date_created
+  - event_alert_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Event Log Position Detail
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - event_log_position_detail
+  mapped_columns:
+  - event_log_position_detail.id
+  - event_log_position_detail.event_alert_log_id
+  - event_log_position_detail.latitude
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Flyway Schema History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - flyway_schema_history
+  mapped_columns:
+  - flyway_schema_history.installed_rank
+  - flyway_schema_history.version
+  - flyway_schema_history.description
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Inspection Question Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - inspection_question_master
+  mapped_columns:
+  - inspection_question_master.id
+  - inspection_question_master.date_created
+  - inspection_question_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Inspection Type Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - inspection_type_master
+  mapped_columns:
+  - inspection_type_master.id
+  - inspection_type_master.date_created
+  - inspection_type_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Inspection Type Question Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - inspection_type_question_mapping
+  mapped_columns:
+  - inspection_type_question_mapping.id
+  - inspection_type_question_mapping.inspection_type_id
+  - inspection_type_question_mapping.inspection_question_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Location
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - location
+  mapped_columns:
+  - location.id
+  - location.date_created
+  - location.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Location Additional Fence
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - location_additional_fence
+  mapped_columns:
+  - location_additional_fence.id
+  - location_additional_fence.date_created
+  - location_additional_fence.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Location Boundary
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - location_boundary
+  mapped_columns:
+  - location_boundary.id
+  - location_boundary.date_created
+  - location_boundary.location_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Location Company Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - location_company_mapping
+  mapped_columns:
+  - location_company_mapping.id
+  - location_company_mapping.date_created
+  - location_company_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Product
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - product
+  mapped_columns:
+  - product.id
+  - product.date_created
+  - product.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Product Change Approval
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - product_change_approval
+  mapped_columns:
+  - product_change_approval.id
+  - product_change_approval.vehicle_id
+  - product_change_approval.product_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Random Password Generator
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - random_password_generator
+  mapped_columns:
+  - random_password_generator.id
+  - random_password_generator.date_created
+  - random_password_generator.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Regional Office
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - regional_office
+  mapped_columns:
+  - regional_office.id
+  - regional_office.name
+  - regional_office.short_code
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Removal Category Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - removal_category_master
+  mapped_columns:
+  - removal_category_master.id
+  - removal_category_master.reason
+  - removal_category_master.description
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Removal Category Product Type Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - removal_category_product_type_mapping
+  mapped_columns:
+  - removal_category_product_type_mapping.id
+  - removal_category_product_type_mapping.removal_category_master_id
+  - removal_category_product_type_mapping.product_type
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Role Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - role_master
+  mapped_columns:
+  - role_master.id
+  - role_master.date_created
+  - role_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Route
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - route
+  mapped_columns:
+  - route.id
+  - route.date_created
+  - route.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Sim Info
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - sim_info
+  mapped_columns:
+  - sim_info.mobile_number
+  - sim_info.date_created
+  - sim_info.network_operator
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Sms Log
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - sms_log
+  mapped_columns:
+  - sms_log.id
+  - sms_log.message_content
+  - sms_log.mobile_number
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Sms Provider Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - sms_provider_master
+  mapped_columns:
+  - sms_provider_master.id
+  - sms_provider_master.provider_type
+  - sms_provider_master.base_url
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Sms Template Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - sms_template_master
+  mapped_columns:
+  - sms_template_master.id
+  - sms_template_master.date_created
+  - sms_template_master.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: State Office
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - state_office
+  mapped_columns:
+  - state_office.id
+  - state_office.name
+  - state_office.short_code
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Supported Product Cfg
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - supported_product_cfg
+  mapped_columns:
+  - supported_product_cfg.id
+  - supported_product_cfg.name
+  - supported_product_cfg.quantity
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Tickets Support
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - tickets_support
+  mapped_columns:
+  - tickets_support.id
+  - tickets_support.date_created
+  - tickets_support.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Tickets Support Statu
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - tickets_support_status
+  mapped_columns:
+  - tickets_support_status.id
+  - tickets_support_status.date_created
+  - tickets_support_status.tickets_support_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Transporter Detail
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - transporter_details
+  mapped_columns:
+  - transporter_details.id
+  - transporter_details.date_created
+  - transporter_details.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Trip
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - trip
+  mapped_columns:
+  - trip.id
+  - trip.date_created
+  - trip.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Trip Log
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - trip_log
+  mapped_columns:
+  - trip_log.id
+  - trip_log.date_created
+  - trip_log.trip_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Trip Status Master
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - trip_status_master
+  mapped_columns:
+  - trip_status_master.id
+  - trip_status_master.type
+  - trip_status_master.display_type
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Trip Vts Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - trip_vts_mapping
+  mapped_columns:
+  - trip_vts_mapping.id
+  - trip_vts_mapping.date_created
+  - trip_vts_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Unhandled Log
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - unhandled_log
+  mapped_columns:
+  - unhandled_log.id
+  - unhandled_log.date_created
+  - unhandled_log.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: User
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - user
+  mapped_columns:
+  - user.id
+  - user.date_created
+  - user.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: User Location Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - user_location_mapping
+  mapped_columns:
+  - user_location_mapping.id
+  - user_location_mapping.user_id
+  - user_location_mapping.location_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: User Role
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - user_role
+  mapped_columns:
+  - user_role.id
+  - user_role.user_id
+  - user_role.role_master_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle
+  mapped_columns:
+  - vehicle.id
+  - vehicle.date_created
+  - vehicle.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Billing Company History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_billing_company_history
+  mapped_columns:
+  - vehicle_billing_company_history.id
+  - vehicle_billing_company_history.date_created
+  - vehicle_billing_company_history.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Billing Company Product Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_billing_company_product_mapping
+  mapped_columns:
+  - vehicle_billing_company_product_mapping.id
+  - vehicle_billing_company_product_mapping.date_created
+  - vehicle_billing_company_product_mapping.vehicle_billing_company_history_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Communication
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_communication
+  mapped_columns:
+  - vehicle_communication.id
+  - vehicle_communication.vehicle_id
+  - vehicle_communication.gsm_last_updated_time
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Communication Issue
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_communication_issue
+  mapped_columns:
+  - vehicle_communication_issue.id
+  - vehicle_communication_issue.date_created
+  - vehicle_communication_issue.vehicle_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Communication Issue State History
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_communication_issue_state_history
+  mapped_columns:
+  - vehicle_communication_issue_state_history.id
+  - vehicle_communication_issue_state_history.date_created
+  - vehicle_communication_issue_state_history.vehicle_communication_issue_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Company Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_company_mapping
+  mapped_columns:
+  - vehicle_company_mapping.id
+  - vehicle_company_mapping.date_created
+  - vehicle_company_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Inspection Image
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_inspection_image
+  mapped_columns:
+  - vehicle_inspection_image.id
+  - vehicle_inspection_image.date_created
+  - vehicle_inspection_image.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Inspection Question Response
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_inspection_question_response
+  mapped_columns:
+  - vehicle_inspection_question_response.id
+  - vehicle_inspection_question_response.vehicle_inspection_response_id
+  - vehicle_inspection_question_response.inspection_question_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Inspection Response
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_inspection_response
+  mapped_columns:
+  - vehicle_inspection_response.id
+  - vehicle_inspection_response.date_created
+  - vehicle_inspection_response.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Inspection Response Image
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_inspection_response_image
+  mapped_columns:
+  - vehicle_inspection_response_image.id
+  - vehicle_inspection_response_image.vehicle_inspection_response_id
+  - vehicle_inspection_response_image.url
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Locking System Image
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_locking_system_images
+  mapped_columns:
+  - vehicle_locking_system_images.id
+  - vehicle_locking_system_images.date_created
+  - vehicle_locking_system_images.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vehicle Trip Communication
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vehicle_trip_communication
+  mapped_columns:
+  - vehicle_trip_communication.id
+  - vehicle_trip_communication.date_created
+  - vehicle_trip_communication.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vts Exception
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vts_exception
+  mapped_columns:
+  - vts_exception.id
+  - vts_exception.date_created
+  - vts_exception.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vts Exception Mapping
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vts_exception_mapping
+  mapped_columns:
+  - vts_exception_mapping.id
+  - vts_exception_mapping.date_created
+  - vts_exception_mapping.date_updated
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null
+- entity_name: Vts Transaction
+  description: Canonical entity spanning 1 related table(s).
+  mapped_source_tables:
+  - vts_transaction
+  mapped_columns:
+  - vts_transaction.id
+  - vts_transaction.vehicle_id
+  - vts_transaction.dynamic_trip_id
+  confidence:
+    label: medium
+    score: 0.65
+    rationale:
+    - derived from table naming overlap
+  attribution:
+    source: pulled_from_db_schema
+    user: null
+    timestamp: null
+    rationale: null
+    tooling_notes: null

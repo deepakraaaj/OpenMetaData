@@ -1,0 +1,3228 @@
+[
+  {
+    "schema": "VTS",
+    "table": "alert_cfg",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 26,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_alert_configuration_company_id_report_type",
+        "columns": [
+          "company_id",
+          "report_type"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "report_type",
+      "email_subject",
+      "email_to",
+      "email_cc",
+      "company_id",
+      "mobile_number",
+      "is_active",
+      "created_by",
+      "updated_by",
+      "sms_template_master_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "api_key",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 2,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "is_active",
+      "user_id",
+      "api_key",
+      "name",
+      "privilege_name"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "app_setting",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "is_force_update",
+      "created_by"
+    ],
+    "status_columns": [
+      "version_code"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "asset_category",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "asset_device_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 27,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_asset_device_mapping_asset_use_case_mapping_id",
+        "columns": [
+          "asset_use_case_mapping_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_asset_device_mapping_product_id_idx",
+        "columns": [
+          "product_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "created_by",
+      "updated_by",
+      "product_id",
+      "asset_use_case_mapping_id",
+      "company_id",
+      "product_category_id",
+      "action"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "asset_type_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 3,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "name",
+      "url",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "asset_use_case_cfg",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 7,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_asset_use_case_cfg_asset_type",
+        "columns": [
+          "asset_type"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "name",
+      "asset_type",
+      "asset_name",
+      "sub_asset_type",
+      "sub_asset_name",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "asset_use_case_device_cfg",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 8,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_asset_use_case_device_cfg_asset_use_case",
+        "columns": [
+          "asset_use_case_cfg_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_asset_use_case_device_cfg_supported_product",
+        "columns": [
+          "product_category_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "product_category_id",
+      "is_edge_device",
+      "asset_use_case_cfg_id",
+      "count",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "asset_use_case_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 35,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_asset_use_case_mapping_asset_use_case",
+        "columns": [
+          "asset_use_case_cfg_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "company_id",
+      "type",
+      "entity_id",
+      "asset_use_case_cfg_id",
+      "is_active",
+      "description",
+      "message_to_display",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "call_log",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_call_log_company_date_created",
+        "columns": [
+          "company_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_event_log_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_call_log_location",
+        "columns": [
+          "location_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_call_log_rule",
+        "columns": [
+          "trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_call_log_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "last_gprs_updated_time",
+      "start_time",
+      "created_by"
+    ],
+    "status_columns": [
+      "recent_state",
+      "company_id",
+      "call_type",
+      "controller_mobile_number"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "call_log_problem_identified",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "FK_call_log_problem_identified",
+        "columns": [
+          "call_log_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_problem_identified_id",
+        "columns": [
+          "problem_identified_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "call_log_problem_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "call_log_problem_reported",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "FK_call_log_problem_reported",
+        "columns": [
+          "call_log_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_problem_reported_id",
+        "columns": [
+          "problem_reported_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "call_log_solution_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "call_log_solution_provided",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "FK_call_log_solution_provided",
+        "columns": [
+          "call_log_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_solution_provided_id",
+        "columns": [
+          "solution_provided_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "company",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 14,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "IDX_company_client_type",
+        "columns": [
+          "parent_company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "UK_company_name",
+        "columns": [
+          "name"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by",
+      "location_master_data_requested",
+      "vehicle_master_data_requested",
+      "client_integration_requested",
+      "terminal_geo_requested",
+      "location_master_data_received",
+      "vehicle_master_data_received",
+      "client_integration_completed",
+      "terminal_geo_confirmed",
+      "last_vts_time_updated",
+      "last_invoice_time_updated"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "address",
+      "name",
+      "type",
+      "updated_by",
+      "code",
+      "customer_support_number",
+      "country_state_id",
+      "state_office_id",
+      "regional_office_id",
+      "implementation_status",
+      "total_operational_vehicle",
+      "location_master_data_requested",
+      "vehicle_master_data_requested",
+      "client_integration_requested",
+      "terminal_geo_requested",
+      "location_master_data_received",
+      "vehicle_master_data_received",
+      "client_integration_completed",
+      "terminal_geo_confirmed",
+      "is_include_exception_report",
+      "is_send_ro_open_alert",
+      "is_alert_enabled",
+      "invoice_type",
+      "is_tas_code_enabled",
+      "gst_number",
+      "is_including_report",
+      "is_use_location_master_mobile_number",
+      "parent_company_id",
+      "exception_approval",
+      "is_send_terminal_open_alert",
+      "last_vts_time_updated",
+      "last_invoice_time_updated"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "contact_information",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_contact_information_company_country_state_state_office",
+        "columns": [
+          "company_id",
+          "country_state_id",
+          "state_office_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "application_code",
+      "company_id",
+      "country_state_id",
+      "state_office_id",
+      "customer_support_mobile_number",
+      "electronics_tech_support_mobile_number",
+      "it_tech_support_mobile_number",
+      "operations_support_mobile_number"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "country",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "name",
+      "description",
+      "country_short_code",
+      "currency_name",
+      "currency_code",
+      "dial_code",
+      "is_active"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "country_state",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 28,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "name",
+      "short_code",
+      "country_id",
+      "state_code"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "device_cfg_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_device_configuration_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_device_configuration_command",
+        "columns": [
+          "device_command_master_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_device_configuration_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_device_configuration_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by"
+    ],
+    "status_columns": [
+      "type",
+      "company_id",
+      "status"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "device_command_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 12,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "name",
+      "format",
+      "default_value",
+      "minimum_version",
+      "maximum_version",
+      "is_allow_otp",
+      "product_category_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "device_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 48,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_device_history_created_by",
+        "columns": [
+          "created_by"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_device_history_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_device_history_action",
+        "columns": [
+          "action"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_device_history_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_device_history_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "created_by",
+      "date_updated",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "vehicle_id",
+      "device_id",
+      "action",
+      "device_type",
+      "comments",
+      "created_by",
+      "updated_by",
+      "company_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "device_removal_location_detail",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 15,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_device_removal_location_detail_device_history_id",
+        "columns": [
+          "device_history_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "device_history_id",
+      "support_id",
+      "reason_id",
+      "location_type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "dms_exception",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 22,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "FK_dms_exception_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_dms_exception_trip",
+        "columns": [
+          "trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_dms_exception_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "id_UNIQUE",
+        "columns": [
+          "id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "company_id",
+      "vehicle_id",
+      "trip_id",
+      "distracted_count",
+      "drowsy_count",
+      "no_driver_count",
+      "yawning_count",
+      "is_distracted",
+      "is_drowsy",
+      "is_no_driver",
+      "is_yawning",
+      "is_active",
+      "distracted_duration",
+      "drowsy_duration",
+      "no_driver_duration",
+      "yawning_duration",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "dms_exception_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 15043,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_dms_exception_mapping_dms_exception",
+        "columns": [
+          "dms_exception_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_dms_exception_mapping_end_dms",
+        "columns": [
+          "end_dms_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_dms_exception_mapping_start_dms",
+        "columns": [
+          "start_dms_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by",
+      "start_time",
+      "end_time"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "dms_exception_id",
+      "start_dms_id",
+      "end_dms_id",
+      "exception_type",
+      "is_active",
+      "no_of_occurrence",
+      "created_by",
+      "updated_by",
+      "start_time",
+      "end_time",
+      "duration"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "dms_transaction",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 28144,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_dm_transaction_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "transaction_time"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "company_id",
+      "vehicle_id",
+      "product_id",
+      "device_type",
+      "sequence_id",
+      "file_path",
+      "meta_data",
+      "driver_behaviour"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "email_log",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 1003,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_email_log_type_source",
+        "columns": [
+          "type",
+          "source"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_email_log_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "type",
+      "source",
+      "message_content",
+      "email_subject",
+      "to_email_id",
+      "email_cc",
+      "is_sent",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "entity_alert_flag_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": [
+      "entity_type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "entity_update_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 43,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_entity_type_entity_id",
+        "columns": [
+          "entity_type",
+          "entity_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "entity_type",
+      "entity_id",
+      "current_data",
+      "old_data",
+      "created_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "event_alert_log",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 1232,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_event_log_company_orderby_date",
+        "columns": [
+          "company_id",
+          "orderby_date"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_event_log_event_orderby_date",
+        "columns": [
+          "event_alert_master_id",
+          "orderby_date"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_event_log_orderby_date_event",
+        "columns": [
+          "orderby_date",
+          "event_alert_master_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_event_log_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_event_log_rule",
+        "columns": [
+          "trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_event_log_transaction",
+        "columns": [
+          "vts_transaction_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "created_by",
+      "orderby_date",
+      "approved_date"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "vehicle_id",
+      "trip_id",
+      "vts_transaction_id",
+      "sms_otp_requested_mobile_number",
+      "created_by",
+      "event_alert_master_id",
+      "orderby_date",
+      "company_id",
+      "email_log_id",
+      "trip_log_id",
+      "emergency_mobile_number",
+      "is_approved",
+      "vts_exception_mapping_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "event_alert_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 8,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_event_id_category_event_source",
+        "columns": [
+          "id",
+          "category",
+          "alert_type"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "category",
+      "alert_type",
+      "name",
+      "description",
+      "sms_template_master_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "event_log_position_detail",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 1119,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "IDX_event_log_location_detail_event_alert_log_id",
+        "columns": [
+          "event_alert_log_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "gps_time",
+      "mobile_time",
+      "date_created"
+    ],
+    "status_columns": [
+      "id",
+      "event_alert_log_id",
+      "latitude",
+      "longitude",
+      "gps_time",
+      "mobile_time",
+      "request_status",
+      "date_created"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "flyway_schema_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 12,
+    "primary_key": [
+      "installed_rank"
+    ],
+    "indexes": [
+      {
+        "name": "flyway_schema_history_s_idx",
+        "columns": [
+          "success"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "installed_on"
+    ],
+    "status_columns": [
+      "installed_rank",
+      "version",
+      "description",
+      "type",
+      "script",
+      "checksum",
+      "installed_by",
+      "installed_on",
+      "execution_time",
+      "success"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "inspection_question_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "inspection_type_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_inspection_type_name",
+        "columns": [
+          "name"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "inspection_type_question_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_inspection_type_question_mapping_inspection_type_id",
+        "columns": [
+          "inspection_type_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_inspection_type_question_mapping_question_id",
+        "columns": [
+          "inspection_question_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": [
+      "inspection_type_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "location",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 27,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_location_code_type_tas_code",
+        "columns": [
+          "location_code",
+          "type",
+          "tas_code"
+        ],
+        "unique": true
+      },
+      {
+        "name": "UK_location_name",
+        "columns": [
+          "name"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "name",
+      "type",
+      "location_code",
+      "latitude",
+      "longitude",
+      "address",
+      "perimeter",
+      "notify_email_id",
+      "notify_mobile_number",
+      "created_by",
+      "updated_by",
+      "is_freeze_location",
+      "is_multiple_unloading",
+      "is_alert_via_email",
+      "is_prevent_trip_complete",
+      "is_ignore_communication_check",
+      "is_alert_enabled",
+      "tas_code",
+      "is_storage_tank_enabled",
+      "is_vts_enabled"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "location_additional_fence",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_location_additional_fence_location",
+        "columns": [
+          "location_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "location_boundary",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_location_boundary_location",
+        "columns": [
+          "location_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "location_company_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 27,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_location_company_mapping_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_route_location_company_mapping",
+        "columns": [
+          "route_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "UK_location_company_mapping_location_company",
+        "columns": [
+          "location_id",
+          "company_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "company_id",
+      "location_id",
+      "created_by",
+      "updated_by",
+      "route_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "product",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 20,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_mac_address",
+        "columns": [
+          "mac_address"
+        ],
+        "unique": true
+      },
+      {
+        "name": "UK_product_reference_id_supported_product_id",
+        "columns": [
+          "reference_id",
+          "product_category_id"
+        ],
+        "unique": true
+      },
+      {
+        "name": "UK_serial_number",
+        "columns": [
+          "serial_number"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "manufacture_date",
+      "created_by",
+      "updated_by",
+      "last_updated_time",
+      "last_gps_updated_time"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "reference_id",
+      "serial_number",
+      "product_category_id",
+      "batch_number",
+      "manufacture_date",
+      "version",
+      "created_by",
+      "updated_by",
+      "is_edge_device",
+      "mobile_number",
+      "mac_address",
+      "response_count",
+      "is_vts_enabled"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "product_change_approval",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_product_change_approval_created_by",
+        "columns": [
+          "created_by"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_product_change_approval_vehicle_id",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "random_password_generator",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_random_password_generator_serial_number",
+        "columns": [
+          "serial_number"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "mobile_number"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "regional_office",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 4,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "name",
+      "short_code",
+      "address"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "removal_category_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 11,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_reason_and_category",
+        "columns": [
+          "reason",
+          "category"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "reason",
+      "description",
+      "category",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "removal_category_product_type_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 25,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_removal_category_device_type_mapping_removal_category_id",
+        "columns": [
+          "removal_category_master_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "removal_category_master_id",
+      "product_type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "role_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 37,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "name",
+      "pre_condition",
+      "is_default",
+      "is_access_mandatory",
+      "created_by",
+      "updated_by",
+      "company_type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "route",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 7,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_route_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_route_destination_location",
+        "columns": [
+          "destination_location_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_route_source_location",
+        "columns": [
+          "source_location_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "is_active",
+      "company_id",
+      "source_location_id",
+      "destination_location_id",
+      "encoded_polyline",
+      "decoded_polyline",
+      "distance_in_meters",
+      "duration_in_seconds",
+      "route_code",
+      "selected_route"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "sim_info",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "mobile_number"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": [
+      "mobile_number"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "sms_log",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 528,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "IDX_sms_log_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by"
+    ],
+    "status_columns": [
+      "id",
+      "message_content",
+      "mobile_number",
+      "detail",
+      "date_created",
+      "provider_type",
+      "date_updated",
+      "is_sent",
+      "delivery_status",
+      "error_message",
+      "is_group_message",
+      "total_sms",
+      "sms_template_master_id",
+      "type",
+      "created_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "sms_provider_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "provider_type",
+      "base_url",
+      "send_api_endpoint",
+      "username",
+      "access_code",
+      "sender_id",
+      "status_api_endpoint",
+      "status_report_endpoint",
+      "priority",
+      "thirteen_digit_send_api_endpoint",
+      "is_active"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "sms_template_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 3,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "name",
+      "template_content",
+      "template_identifier",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "state_office",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 16,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "name",
+      "short_code",
+      "address"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "supported_product_cfg",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 7,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_supported_product_name",
+        "columns": [
+          "name"
+        ],
+        "unique": true
+      },
+      {
+        "name": "product_category_id_UNIQUE",
+        "columns": [
+          "product_category_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "name",
+      "quantity",
+      "is_active",
+      "product_category_id",
+      "is_mandatory",
+      "date_created",
+      "created_by",
+      "serial_number_prefix"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "tickets_support",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_ro_support_company_id",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_ro_support_location_id",
+        "columns": [
+          "location_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_ro_support_rule_id",
+        "columns": [
+          "rule_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_ro_support_vehicle_id",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "input_invoice_time",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "company_id",
+      "customer_mobile_number",
+      "recent_ro_support_status_id",
+      "recent_rule_state",
+      "issue_type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "tickets_support_status",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_ro_support_status_ro_support_id",
+        "columns": [
+          "tickets_support_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": [
+      "status"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "transporter_details",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_transporter_code",
+        "columns": [
+          "code"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "code"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "trip",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 94,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_rule_billing_company_date_created",
+        "columns": [
+          "billing_company_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_rule_company_date_created",
+        "columns": [
+          "company_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_rule_date_created_type",
+        "columns": [
+          "date_created",
+          "type"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_rule_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_shipment_identifier",
+        "columns": [
+          "shipment_identifier"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_route_trip",
+        "columns": [
+          "route_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_rule_location",
+        "columns": [
+          "location_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_rule_recent_state",
+        "columns": [
+          "recent_state_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "UK_rule_fan_invoice_number",
+        "columns": [
+          "fan_invoice_number"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by",
+      "scheduled_date",
+      "vehicle_entry_date_time",
+      "vehicle_dispatch_date_time"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "name",
+      "notify_mobile_number",
+      "vehicle_id",
+      "location_id",
+      "created_by",
+      "updated_by",
+      "fan_invoice_number",
+      "type",
+      "recent_state_id",
+      "plant_code",
+      "company_id",
+      "is_split_load",
+      "billing_company_id",
+      "notify_email_id",
+      "sequence_number",
+      "invoice_category",
+      "vehicle_dispatch_date_time",
+      "emergency_action",
+      "route_id",
+      "encoded_polyline",
+      "decoded_polyline",
+      "distance_in_meters",
+      "duration_in_seconds"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "trip_log",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 983,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_rule_state_date_created_state_id",
+        "columns": [
+          "date_created",
+          "trip_status_master_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "CMP_KY_state_state_source_company",
+        "columns": [
+          "trip_status_master_id",
+          "state_source",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_rule_state_rule_date_created",
+        "columns": [
+          "trip_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_rule_state_state_id",
+        "columns": [
+          "trip_status_master_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "Fk_rule_state_product_id_idx",
+        "columns": [
+          "product_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_rule",
+        "columns": [
+          "id",
+          "device_open_status",
+          "device_lock_status",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_rule_state_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_rule_state_orderby_date",
+        "columns": [
+          "orderby_date"
+        ],
+        "unique": false
+      },
+      {
+        "name": "trip_log_vts_transaction_id",
+        "columns": [
+          "vts_transaction_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "orderby_date"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "trip_id",
+      "trip_status_master_id",
+      "state_source",
+      "orderby_date",
+      "email_log_id",
+      "driver_status",
+      "cleaner_status",
+      "device_open_status",
+      "device_lock_status",
+      "vts_transaction_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "trip_status_master",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 21,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "type",
+      "display_type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "trip_vts_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 52,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "CMP_KY_vts_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_transaction_mapping_vts_destination",
+        "columns": [
+          "destination_exits_vts_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_transaction_mapping_vts_enroute",
+        "columns": [
+          "enroute_vts_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_transaction_mapping_vts_reached_ro",
+        "columns": [
+          "reached_ro_vts_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_transaction_mapping_vts_reached_terminal",
+        "columns": [
+          "reached_terminal_vts_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_transaction_rule",
+        "columns": [
+          "dynamic_trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "id_UNIQUE",
+        "columns": [
+          "id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "company_id",
+      "vehicle_id",
+      "dynamic_trip_id",
+      "terminal_trip_id",
+      "enroute_vts_id",
+      "reached_ro_vts_id",
+      "destination_exits_vts_id",
+      "reached_terminal_vts_id",
+      "current_vts_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "unhandled_log",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 60931,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "IDX_unhandled_log_date_created_type",
+        "columns": [
+          "date_created",
+          "type"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_unhandled_log_field_one",
+        "columns": [
+          "field_one"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_unhandled_log_field_three",
+        "columns": [
+          "field_three"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_unhandled_log_field_two",
+        "columns": [
+          "field_two"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "type",
+      "log_message",
+      "meta_data",
+      "stack_trace",
+      "field_one",
+      "field_two",
+      "field_three",
+      "created_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "user",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 13,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_user_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "UK_user_email_id",
+        "columns": [
+          "email_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "email_id",
+      "first_name",
+      "last_name",
+      "mobile_number",
+      "password",
+      "company_id",
+      "profile_pic",
+      "created_by",
+      "updated_by",
+      "primary_service_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "user_location_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 13,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_user_location_mapping_location_id",
+        "columns": [
+          "location_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "UK_user_location_mapping_user_location",
+        "columns": [
+          "user_id",
+          "location_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "created_by",
+      "updated_by",
+      "date_created",
+      "date_updated"
+    ],
+    "status_columns": [
+      "id",
+      "user_id",
+      "location_id",
+      "is_active",
+      "created_by",
+      "updated_by",
+      "date_created",
+      "date_updated",
+      "company_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "user_role",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 13,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_user_role_user_id_role_id",
+        "columns": [
+          "user_id",
+          "role_master_id"
+        ],
+        "unique": true
+      },
+      {
+        "name": "user_role_role",
+        "columns": [
+          "role_master_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": [
+      "id",
+      "user_id",
+      "role_master_id",
+      "pre_condition"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 37,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_transporter_id",
+        "columns": [
+          "transporter_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vehicle_installed_company",
+        "columns": [
+          "installed_company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vehicle_recent_reported_company",
+        "columns": [
+          "recent_reported_company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "UK_vehicle_vehicle_number",
+        "columns": [
+          "vehicle_number",
+          "company_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by",
+      "manufacture_date",
+      "commissioned_date",
+      "removed_date"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "vehicle_number",
+      "company_id",
+      "created_by",
+      "updated_by",
+      "capacity",
+      "number_of_compartments",
+      "compartment_capacity",
+      "contractor_code",
+      "contractor_name",
+      "category",
+      "is_pilot",
+      "response_count",
+      "battery_make",
+      "voltage",
+      "is_under_elock_contract",
+      "model",
+      "manufacture_month",
+      "manufacture_year",
+      "commissioned_date",
+      "notify_trip_creation",
+      "alert_flag",
+      "lock_tag_status",
+      "installed_company_id",
+      "recent_reported_company_id",
+      "is_alert_enabled",
+      "is_service",
+      "is_vts_enabled"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_billing_company_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 59,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_vehicle_billing_company_history_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_billing_company_history_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vehicle_billing_company_history_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "commissioned_date",
+      "removed_date",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "is_active",
+      "vehicle_id",
+      "company_id",
+      "commissioned_date",
+      "removed_date",
+      "created_by",
+      "updated_by",
+      "contractor_code",
+      "contractor_name",
+      "category"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_billing_company_product_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 23,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "vehicle_billing_company_history_id",
+      "product_id",
+      "commission_device_history_id",
+      "action",
+      "created_by",
+      "decommission_device_history_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_communication",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 37,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "UK_vehicle_communication_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "gsm_last_updated_time",
+      "gprs_last_updated_time",
+      "gps_last_updated_time",
+      "gps_last_update_id",
+      "recent_device_changed",
+      "interval_between_previous_update"
+    ],
+    "status_columns": [
+      "id",
+      "vehicle_id",
+      "gps_last_updated_time",
+      "gps_last_update_id",
+      "recent_terminal_rule",
+      "recent_dynamic_rule",
+      "vts_transaction_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_communication_issue",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_communication_issue_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vehicle_communication_issue_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "vehicle_communication_issue_recent_state_id",
+        "columns": [
+          "recent_state_history_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "gprs_last_updated_time",
+      "last_invoice_time",
+      "last_gps_invoice_otp_device_change_time",
+      "date_updated",
+      "gps_last_updated_time",
+      "first_occurrence",
+      "last_occurrence",
+      "number_of_occurrence_since_issue_created",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "provider_type",
+      "mobile_number",
+      "company_id",
+      "issue_type",
+      "issue_status",
+      "recent_state_history_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_communication_issue_state_history",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [],
+    "timestamp_columns": [
+      "date_created",
+      "created_by"
+    ],
+    "status_columns": [
+      "issue_status",
+      "state_history_parent_id"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_company_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 37,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_company_mapping_company_id",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_company_mapping_vehicle_id",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "vehicle_id",
+      "company_id",
+      "is_active",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_inspection_image",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_inspection_image_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_inspection_image_vehicle_inspection_response",
+        "columns": [
+          "vehicle_inspection_response_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "status"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_inspection_question_response",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_insp_question_resp_inspection_question_id",
+        "columns": [
+          "inspection_question_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_insp_question_resp_vehicle_insp_resp_id",
+        "columns": [
+          "vehicle_inspection_response_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": [
+      "status"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_inspection_response",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "CMP_KY_vehicle_inspection_response_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_inspection_inspection_type_id",
+        "columns": [
+          "inspection_type_master_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vehicle_inspection_response_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vehicle_inspection_response_date_created",
+        "columns": [
+          "date_created"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by",
+      "gprs_last_updated_time",
+      "gps_last_update_id"
+    ],
+    "status_columns": [
+      "inspection_type_master_id",
+      "status",
+      "company_id",
+      "lock_tag_status"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_inspection_response_image",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_insp_resp_image_vehicle_insp_resp_id",
+        "columns": [
+          "vehicle_inspection_response_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [],
+    "status_columns": []
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_locking_system_images",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 0,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_locking_system_images_vehicle_inspection_image",
+        "columns": [
+          "vehicle_inspection_image_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "status",
+      "type"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vehicle_trip_communication",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 65,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vehicle_trip_communication_rule_id",
+        "columns": [
+          "trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vehicle_trip_communication_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "gprs_last_updated_time",
+      "gps_last_update_id",
+      "gsm_last_updated_time",
+      "geo_response_last_updated_time"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "trip_id",
+      "vehicle_id",
+      "mobile_number",
+      "geo_response_count",
+      "is_vts_enabled",
+      "is_smart_fuel_app_enabled"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vts_exception",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 257,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "FK_vts_exception_company",
+        "columns": [
+          "company_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_exception_trip",
+        "columns": [
+          "trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_exception_vehicle",
+        "columns": [
+          "vehicle_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "id_UNIQUE",
+        "columns": [
+          "id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "company_id",
+      "is_active",
+      "vehicle_id",
+      "trip_id",
+      "over_speed_count",
+      "halt_count",
+      "night_driving_count",
+      "continues_driving_count",
+      "route_deviation_count",
+      "lunch_halt_count",
+      "night_halt_count",
+      "gps_not_available_count",
+      "harsh_acceleration_count",
+      "harsh_braking_count",
+      "harsh_manoeuvring_count",
+      "is_over_speed",
+      "is_halt",
+      "is_night_driving",
+      "is_continues_driving",
+      "is_route_deviation",
+      "is_lunch_halt",
+      "is_night_halt",
+      "is_gps_not_available",
+      "is_harsh_acceleration",
+      "is_harsh_braking",
+      "is_harsh_manoeuvring",
+      "over_speed_duration",
+      "halt_duration",
+      "lunch_halt_duration",
+      "night_halt_duration",
+      "gps_not_available_duration",
+      "route_deviation_duration",
+      "continues_driving_duration",
+      "night_driving_duration",
+      "harsh_acceleration_duration",
+      "harsh_braking_duration",
+      "harsh_manoeuvring_duration",
+      "created_by",
+      "updated_by"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vts_exception_mapping",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 9245,
+    "primary_key": [
+      "id"
+    ],
+    "indexes": [
+      {
+        "name": "FK_vts_exception_mapping_end_vts",
+        "columns": [
+          "end_vts_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_exception_mapping_start_vts",
+        "columns": [
+          "start_vts_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_exception_mapping_vts_exception",
+        "columns": [
+          "vts_exception_id"
+        ],
+        "unique": false
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "date_updated",
+      "created_by",
+      "updated_by",
+      "start_time",
+      "end_time"
+    ],
+    "status_columns": [
+      "id",
+      "date_created",
+      "date_updated",
+      "vts_exception_id",
+      "start_vts_id",
+      "end_vts_id",
+      "exception_type",
+      "is_active",
+      "no_of_occurrence",
+      "created_by",
+      "updated_by",
+      "start_time",
+      "end_time",
+      "duration",
+      "event_count"
+    ]
+  },
+  {
+    "schema": "VTS",
+    "table": "vts_transaction",
+    "table_type": "BASE TABLE",
+    "estimated_row_count": 87625,
+    "primary_key": [],
+    "indexes": [
+      {
+        "name": "CMP_KY_vts_transaction_vehicle_date_created",
+        "columns": [
+          "vehicle_id",
+          "date_created"
+        ],
+        "unique": false
+      },
+      {
+        "name": "FK_vts_transaction_trip",
+        "columns": [
+          "dynamic_trip_id"
+        ],
+        "unique": false
+      },
+      {
+        "name": "IDX_vts_transaction_gps_ts",
+        "columns": [
+          "gps_ts"
+        ],
+        "unique": false
+      },
+      {
+        "name": "id_UNIQUE",
+        "columns": [
+          "id"
+        ],
+        "unique": true
+      }
+    ],
+    "timestamp_columns": [
+      "date_created",
+      "gps_ts",
+      "gps_date"
+    ],
+    "status_columns": [
+      "id",
+      "vehicle_id",
+      "dynamic_trip_id",
+      "terminal_trip_id",
+      "date_created",
+      "gps_ts",
+      "ground_speed",
+      "vendor_id",
+      "version",
+      "packet_type",
+      "packet_status",
+      "imei_no",
+      "vehicle_number",
+      "gps_fix",
+      "gps_date",
+      "gps_time",
+      "latitude",
+      "latitude_dir",
+      "longitude",
+      "longitude_dir",
+      "speed",
+      "heading_angle",
+      "number_of_satellite",
+      "altitude",
+      "positional_dilution",
+      "horizontal_dilution",
+      "network_type",
+      "ignition_status",
+      "main_power_status",
+      "main_input_voltage",
+      "internal_voltage_battery",
+      "emergency_status",
+      "tamper_alert",
+      "gsm_signal_strength",
+      "mobile_country_code",
+      "mobile_network_code",
+      "location_area_code",
+      "cell_id",
+      "network_measurement",
+      "digital_input_status",
+      "digital_output_status",
+      "frame_status",
+      "check_sum",
+      "metadata"
+    ]
+  }
+]
